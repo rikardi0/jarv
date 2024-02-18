@@ -372,10 +372,10 @@ packages:
     dependency: "direct main"
     description:
       name: mediaquery_sizer
-      sha256: c0688be64b469f249f839ca69558d93d6ab584f9bce333e166fa47d51c7888cc
+      sha256: e7750068b501de33f3221fee1eaa72034239939e56aacdafc57038ed40a54341
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   meta:
     dependency: transitive
     description:
@@ -392,6 +392,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  multiple_stream_builder:
+    dependency: "direct main"
+    description:
+      name: multiple_stream_builder
+      sha256: fec7a8909d0942d1a8d726b7e3057bd73e2ab64a5ae2da6b7b44a959f17f09fb
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.2"
+  nested:
+    dependency: transitive
+    description:
+      name: nested
+      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   package_config:
     dependency: transitive
     description:
@@ -416,6 +432,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.1"
+  provider:
+    dependency: "direct main"
+    description:
+      name: provider
+      sha256: "9a96a0a19b594dbc5bf0f1f27d2bc67d5f95957359b461cd9feb44ed6ae75096"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.1"
   pub_semver:
     dependency: transitive
     description:
@@ -605,6 +629,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
+  virtual_keyboard_multi_language:
+    dependency: "direct main"
+    description:
+      name: virtual_keyboard_multi_language
+      sha256: b2190ec3dd94022c64ace96847ab2a40a2565acc9052a0324f6332d5500aee7a
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   watcher:
     dependency: transitive
     description:

@@ -19,7 +19,6 @@ class SubFamilia {
 
   final String nombreSub;
 
-  @primaryKey
   final String idFamilia;
 
   SubFamilia(this.idSubfamilia, this.nombreSub, this.idFamilia);

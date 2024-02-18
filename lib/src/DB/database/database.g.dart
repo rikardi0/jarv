@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: library_private_types_in_public_api
+
 part of 'database.dart';
 
 // **************************************************************************
@@ -397,6 +399,17 @@ class _$SubFamiliaDao extends SubFamiliaDao {
   }
 
   @override
+  Future<List<SubFamilia?>> findSubFamiliaByFamilia(String id) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM SubFamilia WHERE idFamilia = ?1',
+        mapper: (Map<String, Object?> row) => SubFamilia(
+            row['idSubfamilia'] as String,
+            row['nombreSub'] as String,
+            row['idFamilia'] as String),
+        arguments: [id]);
+  }
+
+  @override
   Future<void> insertSubFamilia(SubFamilia subfamilia) async {
     await _subFamiliaInsertionAdapter.insert(
         subfamilia, OnConflictStrategy.abort);
@@ -466,6 +479,21 @@ class _$ProductoDao extends ProductoDao {
         arguments: [id],
         queryableName: 'Producto',
         isView: false);
+  }
+
+  @override
+  Future<List<Producto?>> findProductoBySubFamiliaId(String id) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM Producto WHERE idSubfamilia = ?1',
+        mapper: (Map<String, Object?> row) => Producto(
+            row['productoId'] as String,
+            row['producto'] as String,
+            row['precio'] as double,
+            row['coste'] as double,
+            row['iva'] as double,
+            row['idSubfamilia'] as String,
+            row['medida'] as int),
+        arguments: [id]);
   }
 
   @override
@@ -1487,6 +1515,20 @@ class _$UsuarioDao extends UsuarioDao {
             contrasena: row['contrasena'] as String,
             nombreTienda: row['nombreTienda'] as String),
         arguments: [id],
+        queryableName: 'Usuario',
+        isView: false);
+  }
+
+  @override
+  Stream<Usuario?> findPasswordByUser(String nombre) {
+    return _queryAdapter.queryStream(
+        'SELECT contrasena FROM Usuario WHERE nombre = ?1',
+        mapper: (Map<String, Object?> row) => Usuario(
+            nombre: row['nombre'] as String,
+            idUsuario: row['idUsuario'] as int,
+            contrasena: row['contrasena'] as String,
+            nombreTienda: row['nombreTienda'] as String),
+        arguments: [nombre],
         queryableName: 'Usuario',
         isView: false);
   }

@@ -27,6 +27,9 @@ abstract class SubFamiliaDao {
   @Query('SELECT * FROM SubFamilia WHERE idSubfamilia = :id')
   Stream<SubFamilia?> findSubFamiliaById(String id);
 
+  @Query('SELECT * FROM SubFamilia WHERE idFamilia = :id')
+  Future<List<SubFamilia?>> findSubFamiliaByFamilia(String id);
+
   @insert
   Future<void> insertSubFamilia(SubFamilia subfamilia);
 }
@@ -41,6 +44,9 @@ abstract class ProductoDao {
 
   @Query('SELECT * FROM Producto WHERE productoId = :id')
   Stream<Producto?> findProductoById(String id);
+
+  @Query('SELECT * FROM Producto WHERE idSubfamilia = :id')
+  Future<List<Producto?>>findProductoBySubFamiliaId(String id);
 
   @insert
   Future<void> insertProducto(Producto producto);
@@ -281,6 +287,9 @@ abstract class UsuarioDao {
 
   @Query('SELECT * FROM Usuario WHERE idUsuario = :id')
   Stream<Usuario?> findUsuarioById(int id);
+
+  @Query('SELECT contrasena FROM Usuario WHERE nombre = :nombre')
+  Stream<Usuario?> findPasswordByUser(String nombre);
 
   @insert
   Future<void> insertUsuario(Usuario usuario);

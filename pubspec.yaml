@@ -18,7 +18,10 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   mediaquery_sizer: ^1.1.0
+  multiple_stream_builder: ^3.0.2
+  provider: ^6.1.1
   sqflite: ^2.3.2
+  virtual_keyboard_multi_language: ^1.0.3
 
 dev_dependencies:
   flutter_lints: ^2.0.0
