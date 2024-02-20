@@ -46,7 +46,7 @@ abstract class ProductoDao {
   Stream<Producto?> findProductoById(String id);
 
   @Query('SELECT * FROM Producto WHERE idSubfamilia = :id')
-  Future<List<Producto?>>findProductoBySubFamiliaId(String id);
+  Future<List<Producto?>> findProductoBySubFamiliaId(String id);
 
   @insert
   Future<void> insertProducto(Producto producto);

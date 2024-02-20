@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jarv/src/DB/db.dart';
+import 'package:jarv/src/data_source/db.dart';
 import 'package:jarv/src/widgets/card_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -81,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   content: userUser.nombre,
                                   valueNotifier: selectedUserIndex,
                                   colorSelected:
-                                      Color.fromARGB(255, 10, 0, 141),
+                                      const Color.fromARGB(255, 10, 0, 141),
                                   posicion: index));
                         },
                       );

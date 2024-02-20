@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:virtual_keyboard_multi_language/virtual_keyboard_multi_language.dart';
 
-import '../DB/db.dart';
+import '../data_source/db.dart';
 import '../widgets/card_button.dart';
 
 class MenuScreen extends StatefulWidget {

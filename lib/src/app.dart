@@ -3,19 +3,21 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'screen/screens.dart';
-import 'theme/custom_theme.dart';
+import 'package:jarv/config/theme/custom_theme.dart';
 
-import 'settings/settings.dart';
-import 'DB/db.dart';
+import '../config/settings/settings_controller.dart';
+import '../config/settings/settings_view.dart';
+import 'data_source/db.dart';
+import 'pages/pages.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
   const MyApp({
     super.key,
     required this.settingsController,
+    required this.database,
   });
-
+  final AppDatabase database;
   final SettingsController settingsController;
 
   @override
@@ -24,10 +26,7 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    // Glue the SettingsController to the MaterialApp.
-    //
-    // The AnimatedBuilder Widget listens to the SettingsController for changes.
-    // Whenever the user updates their settings, the MaterialApp is rebuilt.
+
     return AnimatedBuilder(
       animation: settingsController,
       builder: (BuildContext context, Widget? child) {
@@ -62,9 +61,21 @@ class MyApp extends StatelessWidget {
               builder: (BuildContext context) {
                 switch (routeSettings.name) {
                   case LoginScreen.routeName:
-                    return LoginScreen();
+                    return LoginScreen(
+                      usuarios: database.usuarioDao,
+                    );
+                  case MenuScreen.routeName:
+                    return MenuScreen(
+                      familia: database.familiaDao,
+                      producto: database.productoDao,
+                      subFamilia: database.subFamiliaDao,
+                    );
+                  case SettingsView.routeName:
+                    return SettingsView(controller: settingsController);
                   default:
-                    return LoginScreen();
+                    return LoginScreen(
+                      usuarios: database.usuarioDao,
+                    );
                 }
               },
             );
