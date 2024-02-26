@@ -2,12 +2,12 @@ name: jarv
 description: A new Flutter project.
 
 # Prevent accidental publishing to pub.dev.
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   build_runner: ^2.4.8
@@ -17,9 +17,8 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  mediaquery_sizer: ^1.1.0
+  flutter_speed_dial: ^7.0.0
   multiple_stream_builder: ^3.0.2
-  provider: ^6.1.1
   sqflite: ^2.3.2
   virtual_keyboard_multi_language: ^1.0.3
 
