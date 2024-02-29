@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/src/utils/models/arguments_check_out.dart';
 import 'package:jarv/src/utils/models/producto_preordenado.dart';
+import 'package:flutter/services.dart';
 
 class Pago extends StatefulWidget {
   const Pago({super.key});
@@ -13,6 +14,7 @@ class Pago extends StatefulWidget {
 
 class _PagoState extends State<Pago> {
   String metodoPago = 'tarjeta';
+  int entregado = 0;
   @override
   Widget build(BuildContext context) {
     const borderColor = Color.fromARGB(59, 7, 7, 7);
@@ -27,7 +29,13 @@ class _PagoState extends State<Pago> {
         body: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _columnVenta(context),
+            SizedBox(
+              width: size.width * 0.35,
+              child: Padding(
+                padding: const EdgeInsets.all(3.0),
+                child: _columnMetodoPago(context, argument),
+              ),
+            ),
             FacturaFiscal(
               size: size,
               borderColor: borderColor,
@@ -40,41 +48,105 @@ class _PagoState extends State<Pago> {
         ));
   }
 
-  Padding _columnVenta(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Venta',
-            style: Theme.of(context).textTheme.titleLarge,
-            textAlign: TextAlign.center,
+  Widget _columnMetodoPago(BuildContext context, CheckOutArgument argument) {
+    final cambio = entregado - argument.totalVenta;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Venta',
+          style: Theme.of(context).textTheme.titleLarge,
+          textAlign: TextAlign.center,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5.0),
+          child: Text(
+            'Metodo de Pago',
+            style: Theme.of(context).textTheme.titleMedium,
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
-            child: Text(
-              'Metodo de Pago',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+        ),
+        _dropDownMetodoPago(),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 3.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Total :'),
+              Text(argument.totalVenta.toString()),
+            ],
           ),
-          DropdownButton(
-              isExpanded: true,
-              icon: Icon(metodoPago == 'tarjeta'
-                  ? Icons.payment
-                  : Icons.payments_outlined),
-              value: metodoPago,
-              items: const <DropdownMenuItem>[
-                DropdownMenuItem(value: 'efectivo', child: Text('Efectivo')),
-                DropdownMenuItem(value: 'tarjeta', child: Text('Tarjeta')),
-              ],
-              onChanged: (value) {
-                metodoPago = value;
-                setState(() {});
-              })
-        ],
+        ),
+        rowColumn(
+            'Entregado',
+            SizedBox(
+              width: 50,
+              child: TextField(
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  if (value.isNotEmpty) {
+                    entregado = int.parse(value);
+                  } else {
+                    entregado = 0;
+                  }
+                  setState(() {});
+                },
+              ),
+            )),
+        const Divider(),
+        rowColumn(
+            'Cambio',
+            Text(entregado == 0
+                ? 'SIN CAMBIO'
+                : cambio.isNegative
+                    ? 'Faltan ${cambio.abs().toString()}'
+                    : cambio.toString())),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ElevatedButton(
+                onPressed: () {}, child: const Text('Imprimir Ticket')),
+            ElevatedButton(onPressed: () {}, child: const Text('Sin Ticket')),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget rowColumn(String title, Widget content) {
+    return Visibility(
+      visible: metodoPago == 'tarjeta' ? false : true,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('$title :'),
+            content,
+          ],
+        ),
       ),
     );
+  }
+
+  DropdownButton<dynamic> _dropDownMetodoPago() {
+    return DropdownButton(
+        isExpanded: true,
+        icon: Icon(
+            metodoPago == 'tarjeta' ? Icons.payment : Icons.payments_outlined),
+        value: metodoPago,
+        items: const <DropdownMenuItem>[
+          DropdownMenuItem(value: 'efectivo', child: Text('Efectivo')),
+          DropdownMenuItem(value: 'tarjeta', child: Text('Tarjeta')),
+        ],
+        onChanged: (value) {
+          metodoPago = value;
+          setState(() {});
+        });
   }
 }
 
@@ -164,11 +236,14 @@ class FacturaFiscal extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [Text('Total'), Text('8.5 €')],
                 ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [Text('Entregado 10 €'), Text('Cambio 1.50 €')],
+                Visibility(
+                  visible: tipoPago == 'tarjeta' ? false : true,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [Text('Entregado 10 €'), Text('Cambio 1.50 €')],
+                    ),
                   ),
                 )
               ],
