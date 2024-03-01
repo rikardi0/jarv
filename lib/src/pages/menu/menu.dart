@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:jarv/src/utils/models/arguments_check_out.dart';
-import 'package:jarv/src/utils/models/arguments_venta_espera.dart';
 import 'package:jarv/src/utils/models/producto_preordenado.dart';
 import 'package:jarv/src/widgets/menu/grid_producto.dart';
 import 'package:jarv/src/widgets/menu/list_familia.dart';
 import 'package:jarv/src/widgets/menu/row_sub_familia.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
+import 'package:provider/provider.dart';
 
 import '../../data_source/db.dart';
+import '../../utils/provider/venta_espera_provider.dart';
 import '../../widgets/menu/check_out_card.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -47,7 +48,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
   List<ProductoPreOrdenado?> productosAgregados = [];
   List<ProductoPreOrdenado?> productosEspera = [];
-  List<String?> identificadoresVenta = [];
+  String? identificadorVenta;
 
   @override
   Widget build(BuildContext context) {
@@ -86,8 +87,14 @@ class _MenuScreenState extends State<MenuScreen> {
             final itemFamilia = snapshot.snapshot1.data;
             final itemSubFamilia = snapshot.snapshot2.data;
             final itemProducto = snapshot.snapshot3.data;
-            return _buildMenuBody(size, itemFamilia, itemSubFamilia,
-                itemProducto, joinedCantidad, borderColor);
+            return _buildMenuBody(
+              size,
+              itemFamilia,
+              itemSubFamilia,
+              itemProducto,
+              joinedCantidad,
+              borderColor,
+            );
           }
         },
       ),
@@ -212,8 +219,13 @@ class _MenuScreenState extends State<MenuScreen> {
               const Color.fromARGB(147, 163, 162, 162), 'Ticket Diario'),
         ),
         Expanded(
-          child: footerButton(borderColor,
-              const Color.fromARGB(147, 163, 162, 162), 'Ventas en Espera'),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, '/espera');
+            },
+            child: footerButton(borderColor,
+                const Color.fromARGB(147, 163, 162, 162), 'Ventas en Espera'),
+          ),
         ),
         Expanded(
           child: footerButton(
@@ -353,15 +365,25 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   void onAceptarIdentificador() {
-    productosEspera.addAll(productosAgregados);
-    productosAgregados.clear();
+    context
+        .read<VentaEsperaProvider>()
+        .addProducto(producto: productosAgregados);
+
+    context
+        .read<VentaEsperaProvider>()
+        .addIdentificadores(nuevoIdentificador: identificadorVenta);
+    context.read<VentaEsperaProvider>().updateTotal(nuevoTotal: totalVenta);
+
     totalVenta = 0;
+    mostrarIdentificador = false;
     selectedSubFamiliaIndex.value = null;
     selectedFamiliaIndex.value = null;
     selectedProductoIndex.value = null;
-    checkOutAction(
-        '/espera', VentaEsperaArgument(productosEspera, identificadoresVenta));
-    mostrarIdentificador = false;
+    productosAgregados.clear();
+    Navigator.pushNamed(context, '/espera');
+    // checkOutAction(
+    //     '/espera', VentaEsperaArgument(productosEspera, identificadoresVenta));
+    //mostrarIdentificador = false;
     setState(() {});
   }
 
@@ -371,7 +393,7 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   void onTextIdentificadorTap(String value) {
-    identificadoresVenta.add(value);
+    identificadorVenta = value;
     setState(() {});
   }
 
