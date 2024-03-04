@@ -92,11 +92,24 @@ class _EsperaState extends State<Espera> {
             onTap: () {
               if (selectedVenta.value != null) {
                 listaProducto.removeAt(selectedVenta.value!);
+                selectedVenta.value = null;
               }
               setState(() {});
             },
             child:
                 const AppBarItemButton(icon: Icons.delete, label: 'Eliminar')),
+        GestureDetector(
+            onTap: () {
+              context
+                  .read<VentaEsperaProvider>()
+                  .changeBool(productoEspera: true);
+              context
+                  .read<VentaEsperaProvider>()
+                  .changePosicionEspera(nuevaPosicion: selectedVenta.value);
+              Navigator.pushNamed(context, '/menu');
+            },
+            child: const AppBarItemButton(
+                icon: Icons.edit_note_rounded, label: 'Editar')),
         GestureDetector(
             onTap: () {
               Navigator.pushNamed(context, '/venta',

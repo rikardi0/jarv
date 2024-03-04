@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:jarv/src/utils/models/arguments_check_out.dart';
 import 'package:jarv/src/utils/models/producto_preordenado.dart';
@@ -36,6 +37,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
   bool mostrarUsuario = true;
   bool mostrarIdentificador = false;
+  bool showTeclado = true;
 
   List<String> cantidad = [];
 
@@ -46,10 +48,33 @@ class _MenuScreenState extends State<MenuScreen> {
   ProductoPreOrdenado _productoPreOrdenado = ProductoPreOrdenado(
       productoId: '', nombreProducto: '', precio: 0, cantidad: '');
   double totalVenta = 0;
+  double totalVentaEspera = 0;
 
   List<ProductoPreOrdenado?> productosAgregados = [];
-
   String? identificadorVenta;
+
+  @override
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _changeState();
+    });
+  }
+
+  _changeState() async {
+    final VentaEsperaProvider provider =
+        Provider.of<VentaEsperaProvider>(context, listen: false);
+    bool? showElementoEspera = provider.mostrarElementoEspera;
+    int? posicionElementoEspera = provider.posicionListaEspera;
+    if (showElementoEspera!) {
+      productosAgregados =
+          provider.listaEspera[posicionElementoEspera!].listaProducto;
+
+      totalVenta += provider.listaEspera[posicionElementoEspera].totalVenta!;
+      provider.deleteProductoEspera(index: posicionElementoEspera);
+      context.read<VentaEsperaProvider>().changeBool(productoEspera: false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,6 +127,7 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
+//AppBar buttons
   Widget appBarCheckOut() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -134,7 +160,6 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-//AppBar buttons
   SpeedDial speedDial() {
     return SpeedDial(
       onOpen: () {
@@ -169,7 +194,7 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-//Butones del footer
+//Botones del footer
   Widget _footerActions(Size size, Color borderColor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -256,6 +281,8 @@ class _MenuScreenState extends State<MenuScreen> {
               SizedBox(
                 width: size.width * 0.4,
                 child: CheckOut(
+                  dropDownIcon: dropDownIcon,
+                  showTeclado: showTeclado,
                   cantidad: cantidad,
                   mostrarIdentificador: mostrarIdentificador,
                   productosAgregados: productosAgregados,
@@ -282,6 +309,11 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
+  dropDownIcon() {
+    showTeclado = !showTeclado;
+    setState(() {});
+  }
+
   void changeIndex(int index, ValueNotifier<int?> notifier) {
     notifier.value = index;
   }
@@ -289,6 +321,7 @@ class _MenuScreenState extends State<MenuScreen> {
   void onFamiliaTap(Familia familia, int index) {
     return setState(() {
       selectedSubFamiliaIndex.value = null;
+      selectedProductoIndex.value = null;
       subFamiliaSeleccionada = "";
       familiaSeleccionada = familia.idFamilia;
       changeIndex(index, selectedFamiliaIndex);
@@ -344,7 +377,11 @@ class _MenuScreenState extends State<MenuScreen> {
       mostrarIdentificador = false;
       selectedProductoIndex.value = null;
       productosAgregados.clear();
-      Navigator.pushNamed(context, '/espera');
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Color.fromARGB(206, 21, 10, 26),
+        content: Text('Venta agregada a lista de espera'),
+        duration: Durations.extralong4,
+      ));
       setState(() {});
     }
   }
