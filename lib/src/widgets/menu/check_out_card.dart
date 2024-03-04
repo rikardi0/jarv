@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:jarv/src/utils/models/producto_preordenado.dart';
 
 class CheckOut extends StatelessWidget {
@@ -41,6 +43,7 @@ class CheckOut extends StatelessWidget {
       elevation: 7,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _listaProductoOrdenado(),
           _totalVenta(),
@@ -61,7 +64,9 @@ class CheckOut extends StatelessWidget {
                       horizontal: 20.0, vertical: 2.0),
                   child: TextFormField(
                     onFieldSubmitted: (value) {
-                      onTextIdentificadorTap(value);
+                      if (value.isNotEmpty) {
+                        onTextIdentificadorTap(value);
+                      }
                     },
                     decoration: const InputDecoration(
                         labelText: 'Identificador de Venta'),
@@ -165,46 +170,76 @@ class CheckOut extends StatelessWidget {
         });
   }
 
-  Column _teclado(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+  Widget _teclado(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.3,
-            width: MediaQuery.of(context).size.width * 0.4,
-            child: Center(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.2,
+              width: MediaQuery.of(context).size.width * 0.3,
               child: GridView(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
+                    crossAxisCount: 3,
                     mainAxisSpacing: 0,
                     crossAxisSpacing: 0,
-                    mainAxisExtent: MediaQuery.of(context).size.height * 0.075),
+                    mainAxisExtent: MediaQuery.of(context).size.height * 0.07),
                 clipBehavior: Clip.antiAlias,
                 children: [
                   _itemNumeroTeclado('1'),
                   _itemNumeroTeclado('2'),
                   _itemNumeroTeclado('3'),
-                  GestureDetector(
-                      onTap: () => addAction(cantidad),
-                      child: _itemActionTeclado(Icons.add_box_outlined)),
                   _itemNumeroTeclado('4'),
                   _itemNumeroTeclado('5'),
                   _itemNumeroTeclado('6'),
-                  containerTeclado(const Text('')),
                   _itemNumeroTeclado('7'),
                   _itemNumeroTeclado('8'),
                   _itemNumeroTeclado('9'),
-                  GestureDetector(
-                      onTap: () => backspace(cantidad),
-                      child: _itemActionTeclado(Icons.backspace_outlined)),
-                  containerTeclado(const Text('')),
-                  _itemNumeroTeclado('0'),
-                  containerTeclado(const Text('')),
-                  containerTeclado(const Text('')),
                 ],
               ),
+            ),
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+              ),
+              child: Container(
+                  color: const Color.fromARGB(115, 235, 235, 235),
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  height: MediaQuery.of(context).size.height * 0.08,
+                  child: _itemNumeroTeclado('0')),
+            ),
+          ],
+        ),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              bottomRight: Radius.circular(20),
+            ),
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: () => backspace(cantidad),
+                  child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.14,
+                      child: _itemActionTeclado(
+                          Icons.backspace_outlined,
+                          Colors.deepPurple[200]!,
+                          Colors.black,
+                          Colors.transparent)),
+                ),
+                GestureDetector(
+                  onTap: () => addAction(cantidad),
+                  child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.14,
+                      child: _itemActionTeclado(
+                          Icons.add,
+                          Colors.deepPurple[500]!,
+                          Colors.white,
+                          Colors.transparent)),
+                ),
+              ],
             ),
           ),
         )
@@ -215,20 +250,28 @@ class CheckOut extends StatelessWidget {
   Widget _itemNumeroTeclado(String label) {
     return GestureDetector(
       onTap: () => onTapNum(label),
-      child: containerTeclado(Text(label)),
+      child: containerTeclado(
+          Text(label),
+          const Color.fromARGB(115, 235, 235, 235),
+          const Color.fromARGB(59, 7, 7, 7)),
     );
   }
 
-  Widget _itemActionTeclado(IconData icon) {
-    return containerTeclado(Icon(icon));
+  Widget _itemActionTeclado(
+      IconData icon, Color color, Color colorIcon, Color colorBorder) {
+    return containerTeclado(
+        Icon(
+          icon,
+          color: colorIcon,
+        ),
+        color,
+        colorBorder);
   }
 
-  Container containerTeclado(Widget element) {
+  Container containerTeclado(Widget element, Color color, Color colorBorder) {
     return Container(
         decoration: BoxDecoration(
-            color: const Color.fromARGB(115, 235, 235, 235),
-            border: Border.all(
-                color: const Color.fromARGB(59, 7, 7, 7), width: 0.5)),
+            color: color, border: Border.all(color: colorBorder, width: 0.5)),
         child: Center(child: element));
   }
 }

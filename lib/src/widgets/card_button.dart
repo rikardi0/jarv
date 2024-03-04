@@ -24,7 +24,7 @@ class CardButton extends StatelessWidget {
           ? Theme.of(context).cardTheme.elevation
           : 0,
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.5),
+          borderRadius: BorderRadius.circular(20),
           side: BorderSide(
               color: valueNotifier.value == posicion
                   ? colorSelected
