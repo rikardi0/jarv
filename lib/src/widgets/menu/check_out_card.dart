@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:jarv/src/utils/models/producto_preordenado.dart';
 
 class CheckOut extends StatelessWidget {
@@ -18,9 +16,12 @@ class CheckOut extends StatelessWidget {
       this.onTapNum,
       this.addAction,
       required this.cantidad,
-      this.backspace});
+      this.backspace,
+      required this.showTeclado,
+      this.dropDownIcon});
 
   final bool mostrarIdentificador;
+  final bool showTeclado;
   final List<ProductoPreOrdenado?> productosAgregados;
   final double totalVenta;
   final ProductoPreOrdenado productoPreOrdenado;
@@ -33,6 +34,7 @@ class CheckOut extends StatelessWidget {
   final dynamic onTapNum;
   final dynamic addAction;
   final dynamic backspace;
+  final dynamic dropDownIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -153,97 +155,118 @@ class CheckOut extends StatelessWidget {
     return FutureBuilder(
         future: actualizarCantidad,
         builder: (context, snapshot) {
-          return Container(
-              color: const Color.fromARGB(50, 54, 54, 54),
-              height: MediaQuery.of(context).size.height * 0.08,
-              width: MediaQuery.of(context).size.width * 0.4,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(productoPreOrdenado.nombreProducto),
-                  Text(productoPreOrdenado.cantidad),
-                  Text(productoPreOrdenado.precio != 0
-                      ? '€ ${productoPreOrdenado.precio.toString()}'
-                      : ''),
-                ],
-              ));
+          return ClipRRect(
+            borderRadius: BorderRadius.vertical(
+              bottom: showTeclado
+                  ? const Radius.circular(0)
+                  : const Radius.circular(20),
+            ),
+            child: Container(
+                color: const Color.fromARGB(50, 54, 54, 54),
+                height: MediaQuery.of(context).size.height * 0.08,
+                width: MediaQuery.of(context).size.width * 0.4,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(productoPreOrdenado.nombreProducto),
+                      Text(productoPreOrdenado.cantidad),
+                      Text(productoPreOrdenado.precio != 0
+                          ? '€ ${productoPreOrdenado.precio.toString()}'
+                          : ''),
+                      GestureDetector(
+                          onTap: () {
+                            dropDownIcon();
+                          },
+                          child: Icon(showTeclado
+                              ? Icons.arrow_drop_down
+                              : Icons.arrow_drop_up)),
+                    ],
+                  ),
+                )),
+          );
         });
   }
 
   Widget _teclado(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.2,
-              width: MediaQuery.of(context).size.width * 0.3,
-              child: GridView(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 0,
-                    crossAxisSpacing: 0,
-                    mainAxisExtent: MediaQuery.of(context).size.height * 0.07),
-                clipBehavior: Clip.antiAlias,
+    return Visibility(
+      visible: showTeclado,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.2,
+                width: MediaQuery.of(context).size.width * 0.3,
+                child: GridView(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 0,
+                      crossAxisSpacing: 0,
+                      mainAxisExtent:
+                          MediaQuery.of(context).size.height * 0.07),
+                  clipBehavior: Clip.antiAlias,
+                  children: [
+                    _itemNumeroTeclado('1'),
+                    _itemNumeroTeclado('2'),
+                    _itemNumeroTeclado('3'),
+                    _itemNumeroTeclado('4'),
+                    _itemNumeroTeclado('5'),
+                    _itemNumeroTeclado('6'),
+                    _itemNumeroTeclado('7'),
+                    _itemNumeroTeclado('8'),
+                    _itemNumeroTeclado('9'),
+                  ],
+                ),
+              ),
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                ),
+                child: Container(
+                    color: const Color.fromARGB(115, 235, 235, 235),
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    height: MediaQuery.of(context).size.height * 0.08,
+                    child: _itemNumeroTeclado('0')),
+              ),
+            ],
+          ),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                bottomRight: Radius.circular(20),
+              ),
+              child: Column(
                 children: [
-                  _itemNumeroTeclado('1'),
-                  _itemNumeroTeclado('2'),
-                  _itemNumeroTeclado('3'),
-                  _itemNumeroTeclado('4'),
-                  _itemNumeroTeclado('5'),
-                  _itemNumeroTeclado('6'),
-                  _itemNumeroTeclado('7'),
-                  _itemNumeroTeclado('8'),
-                  _itemNumeroTeclado('9'),
+                  GestureDetector(
+                    onTap: () => backspace(cantidad),
+                    child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.14,
+                        child: _itemActionTeclado(
+                            Icons.backspace_outlined,
+                            Colors.deepPurple[200]!,
+                            Colors.black,
+                            Colors.transparent)),
+                  ),
+                  GestureDetector(
+                    onTap: () => addAction(cantidad),
+                    child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.14,
+                        child: _itemActionTeclado(
+                            Icons.add,
+                            Colors.deepPurple[500]!,
+                            Colors.white,
+                            Colors.transparent)),
+                  ),
                 ],
               ),
             ),
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-              ),
-              child: Container(
-                  color: const Color.fromARGB(115, 235, 235, 235),
-                  width: MediaQuery.of(context).size.width * 0.3,
-                  height: MediaQuery.of(context).size.height * 0.08,
-                  child: _itemNumeroTeclado('0')),
-            ),
-          ],
-        ),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-              bottomRight: Radius.circular(20),
-            ),
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: () => backspace(cantidad),
-                  child: SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.14,
-                      child: _itemActionTeclado(
-                          Icons.backspace_outlined,
-                          Colors.deepPurple[200]!,
-                          Colors.black,
-                          Colors.transparent)),
-                ),
-                GestureDetector(
-                  onTap: () => addAction(cantidad),
-                  child: SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.14,
-                      child: _itemActionTeclado(
-                          Icons.add,
-                          Colors.deepPurple[500]!,
-                          Colors.white,
-                          Colors.transparent)),
-                ),
-              ],
-            ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 
