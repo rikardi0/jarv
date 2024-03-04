@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:jarv/src/utils/models/arguments_check_out.dart';
 import 'package:jarv/src/utils/models/producto_preordenado.dart';
+import 'package:jarv/src/widgets/app_bar_item.dart';
 import 'package:jarv/src/widgets/menu/grid_producto.dart';
 import 'package:jarv/src/widgets/menu/list_familia.dart';
 import 'package:jarv/src/widgets/menu/row_sub_familia.dart';
@@ -47,7 +48,7 @@ class _MenuScreenState extends State<MenuScreen> {
   double totalVenta = 0;
 
   List<ProductoPreOrdenado?> productosAgregados = [];
-  List<ProductoPreOrdenado?> productosEspera = [];
+
   String? identificadorVenta;
 
   @override
@@ -110,64 +111,30 @@ class _MenuScreenState extends State<MenuScreen> {
             mostrarIdentificador = true;
             setState(() {});
           },
-          child: appItemButton(
-            Icons.add_shopping_cart,
-            'En Espera',
-            '/espera',
-          ),
+          child: const AppBarItemButton(
+              icon: Icons.add_shopping_cart,
+              label: 'En Espera',
+              routeName: '/espera'),
         ),
-        appItemButton(
-          Icons.print_rounded,
-          'Sub-Total',
-          '/settings',
-        ),
+        const AppBarItemButton(
+            icon: Icons.print_rounded,
+            label: 'Sub-Total',
+            routeName: '/settings'),
         GestureDetector(
           onTap: () {
-            checkOutAction(
-                '/venta',
-                CheckOutArgument(
+            Navigator.pushNamed(context, '/venta',
+                arguments: CheckOutArgument(
                     productoAgregado: productosAgregados,
                     totalVenta: totalVenta));
           },
-          child: appItemButton(
-            Icons.euro_rounded,
-            'Pago',
-            '/venta',
-          ),
+          child: const AppBarItemButton(
+              icon: Icons.euro_rounded, label: 'Pago', routeName: '/venta'),
         ),
       ],
     );
   }
 
 //AppBar buttons
-  Widget appItemButton(IconData icon, String label, String routeName) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Icon(icon),
-          const SizedBox(
-            width: 5.0,
-          ),
-          Text(
-            label,
-          )
-        ],
-      ),
-    );
-  }
-
-  checkOutAction(String routeName, argument) {
-    Navigator.pushNamed(context, routeName, arguments: argument);
-    setState(() {});
-  }
-
-  appBarAction(String routeName) {
-    Navigator.pushNamed(context, routeName);
-    setState(() {});
-  }
-
   SpeedDial speedDial() {
     return SpeedDial(
       onOpen: () {
@@ -196,7 +163,8 @@ class _MenuScreenState extends State<MenuScreen> {
 
   SpeedDialChild speedDialItems(String label, IconData icono, routeName) {
     return SpeedDialChild(
-      labelWidget: appItemButton(icono, label, routeName),
+      labelWidget:
+          AppBarItemButton(icon: icono, label: label, routeName: routeName),
       elevation: 0,
     );
   }
@@ -212,11 +180,15 @@ class _MenuScreenState extends State<MenuScreen> {
               const Color.fromARGB(148, 248, 113, 113), 'Cierre Diario'),
         ),
         SizedBox(
-          width: size.width * 0.05,
+          width: size.width * 0.2,
         ),
         Expanded(
           child: footerButton(borderColor,
               const Color.fromARGB(147, 163, 162, 162), 'Ticket Diario'),
+        ),
+        Expanded(
+          child: footerButton(
+              borderColor, const Color.fromARGB(147, 163, 162, 162), 'Cliente'),
         ),
         Expanded(
           child: GestureDetector(
@@ -226,10 +198,6 @@ class _MenuScreenState extends State<MenuScreen> {
             child: footerButton(borderColor,
                 const Color.fromARGB(147, 163, 162, 162), 'Ventas en Espera'),
           ),
-        ),
-        Expanded(
-          child: footerButton(
-              borderColor, const Color.fromARGB(147, 163, 162, 162), 'Cliente'),
         ),
       ],
     );
@@ -365,26 +333,20 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   void onAceptarIdentificador() {
-    context
-        .read<VentaEsperaProvider>()
-        .addProducto(producto: productosAgregados);
-
-    context
-        .read<VentaEsperaProvider>()
-        .addIdentificadores(nuevoIdentificador: identificadorVenta);
-    context.read<VentaEsperaProvider>().updateTotal(nuevoTotal: totalVenta);
-
-    totalVenta = 0;
-    mostrarIdentificador = false;
-    selectedSubFamiliaIndex.value = null;
-    selectedFamiliaIndex.value = null;
-    selectedProductoIndex.value = null;
-    productosAgregados.clear();
-    Navigator.pushNamed(context, '/espera');
-    // checkOutAction(
-    //     '/espera', VentaEsperaArgument(productosEspera, identificadoresVenta));
-    //mostrarIdentificador = false;
-    setState(() {});
+    if (identificadorVenta != '') {
+      final List<ProductoPreOrdenado?> productosEspera = [];
+      productosEspera.addAll(productosAgregados);
+      context.read<VentaEsperaProvider>().addProductoEspera(
+          producto: productosEspera,
+          idVenta: identificadorVenta,
+          totalVenta: totalVenta);
+      totalVenta = 0;
+      mostrarIdentificador = false;
+      selectedProductoIndex.value = null;
+      productosAgregados.clear();
+      Navigator.pushNamed(context, '/espera');
+      setState(() {});
+    }
   }
 
   void onBackIdentificador() {

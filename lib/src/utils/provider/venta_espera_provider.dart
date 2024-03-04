@@ -1,40 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/src/utils/models/producto_espera.dart';
 import 'package:jarv/src/utils/models/producto_preordenado.dart';
 
 class VentaEsperaProvider extends ChangeNotifier {
-  List<double> totalVenta;
-  List<String?> identficadoresVenta;
-  List<ProductoPreOrdenado?> listaProducto;
+  List<ProductoEspera> listaEspera;
 
   VentaEsperaProvider({
-    required this.listaProducto,
-    required this.totalVenta,
-    required this.identficadoresVenta,
+    required this.listaEspera,
   });
 
-  void addProducto({
+  void addProductoEspera({
     required List<ProductoPreOrdenado?> producto,
+    required String? idVenta,
+    required double? totalVenta,
   }) async {
-    listaProducto.addAll(producto);
-    notifyListeners();
-  }
-
-  void clearProducto() async {
-    listaProducto.clear();
-    notifyListeners();
-  }
-
-  void updateTotal({
-    required double nuevoTotal,
-  }) async {
-    totalVenta.add(nuevoTotal);
-    notifyListeners();
-  }
-
-  void addIdentificadores({
-    required String? nuevoIdentificador,
-  }) async {
-    identficadoresVenta.add(nuevoIdentificador);
+    listaEspera.add(ProductoEspera(
+        identificadorVenta: idVenta,
+        listaProducto: producto,
+        totalVenta: totalVenta));
     notifyListeners();
   }
 }

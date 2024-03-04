@@ -33,11 +33,8 @@ class MyApp extends StatelessWidget {
         return MultiProvider(
           providers: [
             ChangeNotifierProvider(
-                create: (_) => VentaEsperaProvider(
-                      totalVenta: [],
-                      identficadoresVenta: [],
-                      listaProducto: [],
-                    ))
+                create: (BuildContext context) =>
+                    VentaEsperaProvider(listaEspera: []))
           ],
           child: MaterialApp(
             restorationScopeId: 'app',
