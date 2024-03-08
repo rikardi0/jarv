@@ -6,6 +6,8 @@ import 'package:jarv/src/widgets/app_bar_item.dart';
 import 'package:jarv/src/widgets/factura_fiscal.dart';
 import 'package:provider/provider.dart';
 
+import '../../widgets/card_venta.dart';
+
 class Espera extends StatefulWidget {
   const Espera({super.key});
 
@@ -33,21 +35,7 @@ class _EsperaState extends State<Espera> {
         backgroundColor: ThemeData().primaryColor.withOpacity(0.75),
       ),
       body: listaProductoEspera.isEmpty
-          ? const Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.info_outline),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Sin ventas en espera',
-                      style: TextStyle(fontSize: 20, color: Colors.black54),
-                    ),
-                  ),
-                ],
-              ),
-            )
+          ? listaEsperaVacia()
           : Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -56,8 +44,13 @@ class _EsperaState extends State<Espera> {
                   child: ListView.builder(
                       itemCount: listaProductoEspera.length,
                       itemBuilder: (context, index) {
-                        return _itemEspera(index, context, listaProductoEspera,
-                            Theme.of(context).primaryColor);
+                        return CardVenta(
+                          index: index,
+                          selected: selectedVenta,
+                          listaProductoEspera: listaProductoEspera,
+                          color: Theme.of(context).primaryColor,
+                          action: actionItem,
+                        );
                       }),
                 ),
                 selectedVenta.value != null
@@ -71,6 +64,33 @@ class _EsperaState extends State<Espera> {
                     : const SizedBox.shrink()
               ],
             ),
+    );
+  }
+
+  actionItem(index) {
+    if (selectedVenta.value != index) {
+      selectedVenta.value = index;
+    } else {
+      selectedVenta.value = null;
+    }
+    setState(() {});
+  }
+
+  Center listaEsperaVacia() {
+    return const Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.info_outline),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              'Sin ventas en espera',
+              style: TextStyle(fontSize: 20, color: Colors.black54),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -112,42 +132,6 @@ class _EsperaState extends State<Espera> {
             child: const AppBarItemButton(
                 icon: Icons.euro_rounded, label: 'Pagar'))
       ],
-    );
-  }
-
-  Card _itemEspera(int index, BuildContext context,
-      List<ProductoEspera> listaProductoEspera, Color color) {
-    return Card(
-      color: selectedVenta.value != index
-          ? Theme.of(context).cardTheme.color
-          : Colors.transparent,
-      elevation: selectedVenta.value != index
-          ? Theme.of(context).cardTheme.elevation
-          : 0,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(
-              color:
-                  selectedVenta.value == index ? color : Colors.transparent)),
-      child: ListTile(
-          onTap: () {
-            if (selectedVenta.value != index) {
-              selectedVenta.value = index;
-            } else {
-              selectedVenta.value = null;
-            }
-            setState(() {});
-          },
-          leading: Text(listaProductoEspera[index].identificadorVenta!),
-          subtitle:
-              Text('${listaProductoEspera[index].totalVenta.toString()} €'),
-          title: Text(
-            'Productos: ${listaProductoEspera[index].listaProducto.length.toString()}',
-            style: TextStyle(
-                color: selectedVenta.value == index
-                    ? color
-                    : Theme.of(context).listTileTheme.textColor),
-          )),
     );
   }
 }
