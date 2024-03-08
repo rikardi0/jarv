@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:jarv/src/pages/bottom_actions/cierre_diario.dart';
+import 'package:jarv/src/pages/bottom_actions/cliente.dart';
+import 'package:jarv/src/pages/bottom_actions/consumicion_propia.dart';
+import 'package:jarv/src/pages/bottom_actions/ticket_diario.dart';
 import 'package:provider/provider.dart';
 
 import '../config/settings/settings_controller.dart';
@@ -64,37 +68,49 @@ class MyApp extends StatelessWidget {
             darkTheme: ThemeData.dark(),
             themeMode: settingsController.themeMode,
 
-            onGenerateRoute: (RouteSettings routeSettings) {
-              return MaterialPageRoute<void>(
-                settings: routeSettings,
-                builder: (BuildContext context) {
-                  switch (routeSettings.name) {
-                    case LoginScreen.routeName:
-                      return LoginScreen(
-                        usuarios: database.usuarioDao,
-                      );
-                    case MenuScreen.routeName:
-                      return MenuScreen(
-                        familia: database.familiaDao,
-                        producto: database.productoDao,
-                        subFamilia: database.subFamiliaDao,
-                      );
-                    case Pago.routeName:
-                      return const Pago();
-                    case Espera.routeName:
-                      return const Espera();
-                    case SettingsView.routeName:
-                      return SettingsView(controller: settingsController);
-                    default:
-                      return LoginScreen(
-                        usuarios: database.usuarioDao,
-                      );
-                  }
-                },
-              );
-            },
+            onGenerateRoute: route,
           ),
         );
+      },
+    );
+  }
+
+  Route<dynamic>? route(RouteSettings routeSettings) {
+    return MaterialPageRoute<void>(
+      settings: routeSettings,
+      builder: (BuildContext context) {
+        switch (routeSettings.name) {
+          case LoginScreen.routeName:
+            return LoginScreen(
+              usuarios: database.usuarioDao,
+            );
+          case MenuScreen.routeName:
+            return MenuScreen(
+              familia: database.familiaDao,
+              producto: database.productoDao,
+              subFamilia: database.subFamiliaDao,
+            );
+          case Pago.routeName:
+            return Pago(
+              cliente: database.clienteDao,
+            );
+          case Espera.routeName:
+            return const Espera();
+          case ClienteMenu.routeName:
+            return const ClienteMenu();
+          case ConsumicionPropia.routeName:
+            return const ConsumicionPropia();
+          case TicketDiario.routeName:
+            return const TicketDiario();
+          case CierreDiario.routeName:
+            return const CierreDiario();
+          case SettingsView.routeName:
+            return SettingsView(controller: settingsController);
+          default:
+            return LoginScreen(
+              usuarios: database.usuarioDao,
+            );
+        }
       },
     );
   }

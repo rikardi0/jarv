@@ -113,7 +113,7 @@ class CheckOut extends StatelessWidget {
                 return Slidable(
                   key: UniqueKey(),
                   startActionPane: ActionPane(
-                      extentRatio: 0.75,
+                      extentRatio: 0.85,
                       motion: const ScrollMotion(),
                       openThreshold: 0.25,
                       children: [
@@ -399,32 +399,46 @@ class ActionButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.popAndPushNamed(context, '/cliente');
+              },
               icon: const Icon(Icons.groups_rounded),
               label: const Text('Cliente')),
           ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                popNamed(context, '/consumicion');
+              },
               icon: const Icon(Icons.dinner_dining_outlined),
               label: const Text('Consumicion Propia')),
           ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                popNamed(context, '/ticket_diario');
+              },
               icon: const Icon(Icons.calendar_today_rounded),
               label: const Text('Ticket Diario')),
           ElevatedButton.icon(
               onPressed: () {
-                Navigator.pushNamed(context, '/espera');
+                popNamed(context, '/espera');
               },
               icon: const Icon(Icons.list_alt_rounded),
               label: const Text('Venta en Espera')),
           ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                popNamed(context, '/cierre_diario');
+              },
               icon: const Icon(Icons.account_balance_outlined),
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Theme.of(context).canvasColor),
+                  backgroundColor:
+                      Theme.of(context).colorScheme.tertiaryContainer,
+                  foregroundColor:
+                      Theme.of(context).colorScheme.onTertiaryContainer),
               label: const Text('Cierre Diario')),
         ],
       ),
     );
+  }
+
+  void popNamed(BuildContext context, String routeName) {
+    Navigator.popAndPushNamed(context, routeName);
   }
 }
