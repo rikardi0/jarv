@@ -30,13 +30,10 @@ class CardButton extends StatelessWidget {
                   ? colorSelected
                   : Colors.transparent)),
       child: ListTile(
+          selected: valueNotifier.value == posicion ? true : false,
           title: Text(
-        content,
-        style: TextStyle(
-            color: valueNotifier.value == posicion
-                ? colorSelected
-                : Theme.of(context).listTileTheme.textColor),
-      )),
+            content,
+          )),
     );
   }
 }

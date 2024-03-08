@@ -36,17 +36,17 @@ class _MenuScreenState extends State<MenuScreen> {
   String subFamiliaSeleccionada = "";
 
   bool mostrarUsuario = true;
-  bool mostrarIdentificador = false;
   bool showTeclado = true;
-
+  bool mostrarIdentificador = false;
   List<String> cantidad = [];
 
   final selectedFamiliaIndex = ValueNotifier<int?>(null);
   final selectedSubFamiliaIndex = ValueNotifier<int?>(null);
   final selectedProductoIndex = ValueNotifier<int?>(null);
+  final selectedItemLista = ValueNotifier<int?>(null);
 
   ProductoPreOrdenado _productoPreOrdenado = ProductoPreOrdenado(
-      productoId: '', nombreProducto: '', precio: 0, cantidad: '');
+      productoId: '', nombreProducto: '', precio: 0, cantidad: '', iva: 0);
   double totalVenta = 0;
   double totalVentaEspera = 0;
 
@@ -98,7 +98,7 @@ class _MenuScreenState extends State<MenuScreen> {
             ? Text(mostrarUsuario ? 'Usuario' : '')
             : appBarCheckOut(),
         toolbarHeight: 45,
-        backgroundColor: const Color.fromARGB(255, 170, 117, 255),
+        backgroundColor: ThemeData().primaryColor.withOpacity(0.75),
         leading:
             productosAgregados.isEmpty ? speedDial() : const SizedBox.shrink(),
       ),
@@ -138,14 +138,14 @@ class _MenuScreenState extends State<MenuScreen> {
             setState(() {});
           },
           child: const AppBarItemButton(
-              icon: Icons.add_shopping_cart,
-              label: 'En Espera',
-              routeName: '/espera'),
+            icon: Icons.add_shopping_cart,
+            label: 'En Espera',
+          ),
         ),
         const AppBarItemButton(
-            icon: Icons.print_rounded,
-            label: 'Sub-Total',
-            routeName: '/settings'),
+          icon: Icons.print_rounded,
+          label: 'Sub-Total',
+        ),
         GestureDetector(
           onTap: () {
             Navigator.pushNamed(context, '/venta',
@@ -153,8 +153,8 @@ class _MenuScreenState extends State<MenuScreen> {
                     productoAgregado: productosAgregados,
                     totalVenta: totalVenta));
           },
-          child: const AppBarItemButton(
-              icon: Icons.euro_rounded, label: 'Pago', routeName: '/venta'),
+          child:
+              const AppBarItemButton(icon: Icons.euro_rounded, label: 'Pago'),
         ),
       ],
     );
@@ -177,67 +177,31 @@ class _MenuScreenState extends State<MenuScreen> {
       overlayOpacity: 0.0,
       animatedIcon: AnimatedIcons.view_list,
       children: [
-        speedDialItems('Proveedores', Icons.forklift, '/settings'),
-        speedDialItems('Estadistica', Icons.stacked_bar_chart, '/settings'),
-        speedDialItems('Inventario', Icons.inventory_rounded, '/settings'),
-        speedDialItems('Horario', Icons.schedule, '/settings'),
-        speedDialItems('Configuracion', Icons.settings, '/settings'),
+        speedDialItems('Proveedores', Icons.forklift),
+        speedDialItems(
+          'Estadistica',
+          Icons.stacked_bar_chart,
+        ),
+        speedDialItems(
+          'Inventario',
+          Icons.inventory_rounded,
+        ),
+        speedDialItems(
+          'Horario',
+          Icons.schedule,
+        ),
+        speedDialItems(
+          'Configuracion',
+          Icons.settings,
+        ),
       ],
     );
   }
 
-  SpeedDialChild speedDialItems(String label, IconData icono, routeName) {
+  SpeedDialChild speedDialItems(String label, IconData icono) {
     return SpeedDialChild(
-      labelWidget:
-          AppBarItemButton(icon: icono, label: label, routeName: routeName),
+      labelWidget: AppBarItemButton(icon: icono, label: label),
       elevation: 0,
-    );
-  }
-
-//Botones del footer
-  Widget _footerActions(Size size, Color borderColor) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        SizedBox(
-          width: size.width * 0.15,
-          child: footerButton(borderColor,
-              const Color.fromARGB(148, 248, 113, 113), 'Cierre Diario'),
-        ),
-        SizedBox(
-          width: size.width * 0.2,
-        ),
-        Expanded(
-          child: footerButton(borderColor,
-              const Color.fromARGB(147, 163, 162, 162), 'Ticket Diario'),
-        ),
-        Expanded(
-          child: footerButton(
-              borderColor, const Color.fromARGB(147, 163, 162, 162), 'Cliente'),
-        ),
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, '/espera');
-            },
-            child: footerButton(borderColor,
-                const Color.fromARGB(147, 163, 162, 162), 'Ventas en Espera'),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Container footerButton(Color color, Color bodyColor, String label) {
-    return Container(
-      decoration: BoxDecoration(
-        color: bodyColor,
-        border: Border.all(color: color),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(child: Text(label)),
-      ),
     );
   }
 
@@ -256,24 +220,34 @@ class _MenuScreenState extends State<MenuScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              ListFamilia(
-                  selectedFamiliaIndex: selectedFamiliaIndex,
-                  itemFamilia: itemFamilia,
-                  onFamiliaTap: onFamiliaTap),
+              SizedBox(
+                width: size.width * 0.15,
+                child: ListFamilia(
+                    selectedFamiliaIndex: selectedFamiliaIndex,
+                    itemFamilia: itemFamilia,
+                    onFamiliaTap: onFamiliaTap),
+              ),
               Column(
                 children: [
-                  RowSubFamilia(
-                    selectedSubFamiliaIndex: selectedSubFamiliaIndex,
-                    itemSubFamilia: itemSubFamilia,
-                    onSubFamiliaTap: onSubFamiliaTap,
+                  SizedBox(
+                    height: size.height * 0.17,
+                    width: size.width * 0.45,
+                    child: RowSubFamilia(
+                      selectedSubFamiliaIndex: selectedSubFamiliaIndex,
+                      itemSubFamilia: itemSubFamilia,
+                      onSubFamiliaTap: onSubFamiliaTap,
+                    ),
                   ),
                   Expanded(
-                    child: GridProducto(
-                      selectedProductoIndex: selectedProductoIndex,
-                      itemProducto: itemProducto,
-                      joinedCantidad: joinedCantidad,
-                      borderColor: borderColor,
-                      onProductTap: onProductTap,
+                    child: SizedBox(
+                      width: size.width * 0.45,
+                      child: GridProducto(
+                        selectedProductoIndex: selectedProductoIndex,
+                        itemProducto: itemProducto,
+                        joinedCantidad: joinedCantidad,
+                        borderColor: borderColor,
+                        onProductTap: onProductTap,
+                      ),
                     ),
                   ),
                 ],
@@ -288,6 +262,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   productosAgregados: productosAgregados,
                   totalVenta: totalVenta,
                   productoPreOrdenado: _productoPreOrdenado,
+                  selectedItemLista: selectedItemLista,
                   actualizarCantidad: actualizarCantidad(joinedCantidad),
                   onTextIdentificadorTap: onTextIdentificadorTap,
                   onBackIdentificador: onBackIdentificador,
@@ -296,17 +271,23 @@ class _MenuScreenState extends State<MenuScreen> {
                   addAction: addAction,
                   onTapNum: onTapNum,
                   backspace: backspace,
+                  onTapItem: onTapItem,
                 ),
               )
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: _footerActions(size, borderColor),
-        )
       ],
     );
+  }
+
+  onTapItem(index) {
+    if (selectedItemLista.value != index) {
+      selectedItemLista.value = index;
+    } else {
+      selectedItemLista.value = null;
+    }
+    setState(() {});
   }
 
   dropDownIcon() {
@@ -345,7 +326,11 @@ class _MenuScreenState extends State<MenuScreen> {
     setState(() {
       if (selectedProductoIndex.value == index) {
         _productoPreOrdenado = ProductoPreOrdenado(
-            productoId: '', nombreProducto: '', precio: 0, cantidad: '');
+            productoId: '',
+            nombreProducto: '',
+            precio: 0,
+            cantidad: '',
+            iva: 0);
         selectedProductoIndex.value = null;
       } else {
         changeIndex(index, selectedProductoIndex);
@@ -353,7 +338,8 @@ class _MenuScreenState extends State<MenuScreen> {
             productoId: producto.productoId,
             nombreProducto: producto.producto,
             precio: producto.precio,
-            cantidad: joinedCantidad);
+            cantidad: joinedCantidad,
+            iva: producto.iva);
       }
     });
   }
@@ -397,7 +383,9 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   void backspace(List<String> cantidad) {
-    cantidad.removeLast();
+    if (cantidad.isNotEmpty) {
+      cantidad.removeLast();
+    }
     setState(() {});
   }
 
@@ -412,13 +400,14 @@ class _MenuScreenState extends State<MenuScreen> {
           productoId: _productoPreOrdenado.productoId,
           nombreProducto: _productoPreOrdenado.nombreProducto,
           precio: _productoPreOrdenado.precio,
-          cantidad: _productoPreOrdenado.cantidad));
+          cantidad: _productoPreOrdenado.cantidad,
+          iva: _productoPreOrdenado.iva));
 
       totalVenta += _productoPreOrdenado.precio *
           double.parse(_productoPreOrdenado.cantidad);
       cantidad.clear();
       _productoPreOrdenado = ProductoPreOrdenado(
-          productoId: '', nombreProducto: '', precio: 0, cantidad: '');
+          productoId: '', nombreProducto: '', precio: 0, cantidad: '', iva: 0);
       selectedProductoIndex.value = null;
       setState(() {});
     }

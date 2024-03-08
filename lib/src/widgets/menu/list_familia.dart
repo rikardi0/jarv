@@ -16,24 +16,20 @@ class ListFamilia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return SizedBox(
-      width: size.width * 0.15,
-      child: ListView.builder(
-        itemCount: itemFamilia?.length,
-        itemBuilder: (context, index) {
-          Familia? familia = itemFamilia![index];
-          return GestureDetector(
-            onTap: () => onFamiliaTap(familia, index),
-            child: CardButton(
-              valueNotifier: selectedFamiliaIndex,
-              colorSelected: Colors.black,
-              content: familia.nombreFamilia,
-              posicion: index,
-            ),
-          );
-        },
-      ),
+    return ListView.builder(
+      itemCount: itemFamilia?.length,
+      itemBuilder: (context, index) {
+        Familia? familia = itemFamilia![index];
+        return GestureDetector(
+          onTap: () => onFamiliaTap(familia, index),
+          child: CardButton(
+            valueNotifier: selectedFamiliaIndex,
+            colorSelected: ThemeData().colorScheme.primary,
+            content: familia.nombreFamilia,
+            posicion: index,
+          ),
+        );
+      },
     );
   }
 }

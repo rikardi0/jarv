@@ -17,9 +17,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _loginFormKey = GlobalKey<FormState>();
   final selectedUserIndex = ValueNotifier<int?>(null);
-  bool showInputPassword = false;
 
   @override
   Widget build(BuildContext context) {
@@ -69,10 +67,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               onTap: () {
                                 setState(() {
                                   if (selectedUserIndex.value == index) {
-                                    showInputPassword = false;
                                     selectedUserIndex.value = null;
                                   } else {
-                                    showInputPassword = true;
                                     selectedUserIndex.value = index;
                                   }
                                 });
@@ -80,8 +76,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: CardButton(
                                   content: userUser.nombre,
                                   valueNotifier: selectedUserIndex,
-                                  colorSelected:
-                                      const Color.fromARGB(255, 10, 0, 141),
+                                  colorSelected: Theme.of(context)
+                                      .listTileTheme
+                                      .selectedTileColor!,
                                   posicion: index));
                         },
                       );
@@ -90,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Visibility(
-              visible: showInputPassword,
+              visible: true,
               child: Column(
                 children: [
                   SizedBox(
@@ -108,6 +105,26 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.pushNamed(context, "/menu");
                       },
                       child: const Text("Ingresar")),
+                  ElevatedButton(
+                      onPressed: () {
+                        for (var i = 0; i < 12; i++) {
+                          widget.producto.insertProducto(Producto(
+                              'productoId $i',
+                              'producto $i',
+                              10.0,
+                              10.0,
+                              10.0,
+                              'idSubfamilia $i',
+                              5));
+                          widget.familia.insertFamilia(Familia('idFamilia $i',
+                              'nombreFamilia $i', 'idUsuario $i'));
+                          widget.subFamilia.insertSubFamilia(SubFamilia(
+                              'idSubfamilia $i',
+                              'nombreSub $i',
+                              'idFamilia $i'));
+                        }
+                      },
+                      child: const Text("Agregar Datos")),
                 ],
               ),
             ),

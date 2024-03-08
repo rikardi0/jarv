@@ -5,12 +5,10 @@ class AppBarItemButton extends StatelessWidget {
     super.key,
     required this.icon,
     required this.label,
-    this.routeName,
   });
 
   final IconData icon;
   final String label;
-  final String? routeName;
 
   @override
   Widget build(BuildContext context) {

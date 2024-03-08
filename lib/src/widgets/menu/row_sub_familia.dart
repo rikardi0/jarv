@@ -16,27 +16,22 @@ class RowSubFamilia extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return SizedBox(
-      height: size.height * 0.17,
-      width: size.width * 0.45,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: itemSubFamilia?.length ?? 0,
-        itemBuilder: (context, index) {
-          SubFamilia? subFamilia = itemSubFamilia![index];
-          return GestureDetector(
-              onTap: () => onSubFamiliaTap(subFamilia, index),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.15,
-                child: CardButton(
-                    content: subFamilia!.nombreSub,
-                    valueNotifier: selectedSubFamiliaIndex,
-                    colorSelected: Colors.deepPurpleAccent,
-                    posicion: index),
-              ));
-        },
-      ),
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: itemSubFamilia?.length ?? 0,
+      itemBuilder: (context, index) {
+        SubFamilia? subFamilia = itemSubFamilia![index];
+        return GestureDetector(
+            onTap: () => onSubFamiliaTap(subFamilia, index),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.15,
+              child: CardButton(
+                  content: subFamilia!.nombreSub,
+                  valueNotifier: selectedSubFamiliaIndex,
+                  colorSelected: Theme.of(context).colorScheme.primary,
+                  posicion: index),
+            ));
+      },
     );
   }
 }

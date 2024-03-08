@@ -30,7 +30,7 @@ class _EsperaState extends State<Espera> {
             ? appBarActions(listaProductoEspera)
             : const Text('Ventas en Espera'),
         toolbarHeight: 65,
-        backgroundColor: const Color.fromARGB(255, 170, 117, 255),
+        backgroundColor: ThemeData().primaryColor.withOpacity(0.75),
       ),
       body: listaProductoEspera.isEmpty
           ? const Center(
@@ -56,18 +56,8 @@ class _EsperaState extends State<Espera> {
                   child: ListView.builder(
                       itemCount: listaProductoEspera.length,
                       itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            if (selectedVenta.value != index) {
-                              selectedVenta.value = index;
-                            } else {
-                              selectedVenta.value = null;
-                            }
-                            setState(() {});
-                          },
-                          child: _itemEspera(index, context,
-                              listaProductoEspera, Colors.deepPurpleAccent),
-                        );
+                        return _itemEspera(index, context, listaProductoEspera,
+                            Theme.of(context).primaryColor);
                       }),
                 ),
                 selectedVenta.value != null
@@ -140,6 +130,14 @@ class _EsperaState extends State<Espera> {
               color:
                   selectedVenta.value == index ? color : Colors.transparent)),
       child: ListTile(
+          onTap: () {
+            if (selectedVenta.value != index) {
+              selectedVenta.value = index;
+            } else {
+              selectedVenta.value = null;
+            }
+            setState(() {});
+          },
           leading: Text(listaProductoEspera[index].identificadorVenta!),
           subtitle:
               Text('${listaProductoEspera[index].totalVenta.toString()} €'),
