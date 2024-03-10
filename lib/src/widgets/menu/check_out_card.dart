@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:jarv/src/utils/models/producto_preordenado.dart';
 
@@ -23,10 +24,12 @@ class CheckOut extends StatelessWidget {
       this.dropDownIcon,
       this.deslizarItem,
       required this.selectedItemLista,
-      this.onTapItem});
+      this.onTapItem,
+      required this.menuPrincipal});
 
   final bool mostrarIdentificador;
   final bool showTeclado;
+  final bool menuPrincipal;
   final List<ProductoPreOrdenado?> productosAgregados;
   final double totalVenta;
   final ProductoPreOrdenado productoPreOrdenado;
@@ -228,8 +231,9 @@ class CheckOut extends StatelessWidget {
   }
 
   Widget _teclado(BuildContext context) {
+    final ratio = menuPrincipal ? 0.3 : 0.39;
     final height = MediaQuery.of(context).size.height * 0.2;
-    final width = MediaQuery.of(context).size.width * 0.3;
+    final width = MediaQuery.of(context).size.width * ratio;
     return Visibility(
       visible: showTeclado,
       child: Row(
@@ -302,25 +306,28 @@ class CheckOut extends StatelessWidget {
               ),
             ],
           ),
-          Expanded(
-            child: ClipRRect(
-              borderRadius:
-                  const BorderRadius.only(bottomRight: Radius.circular(20)),
-              child: SizedBox(
-                height: height + height / 3,
-                child: GestureDetector(
-                  onTap: () {
-                    showCupertinoModalPopup(
-                        barrierColor: const Color.fromARGB(29, 0, 0, 0),
-                        context: context,
-                        builder: (context) {
-                          return const ActionButton();
-                        });
-                  },
-                  child: _itemActionTeclado(
-                    Icons.view_agenda_outlined,
-                    ThemeData().primaryColor,
-                    Colors.white,
+          Visibility(
+            visible: menuPrincipal ? true : false,
+            child: Expanded(
+              child: ClipRRect(
+                borderRadius:
+                    const BorderRadius.only(bottomRight: Radius.circular(20)),
+                child: SizedBox(
+                  height: height + height / 3,
+                  child: GestureDetector(
+                    onTap: () {
+                      showCupertinoModalPopup(
+                          barrierColor: const Color.fromARGB(29, 0, 0, 0),
+                          context: context,
+                          builder: (context) {
+                            return const ActionButton();
+                          });
+                    },
+                    child: _itemActionTeclado(
+                      Icons.view_agenda_outlined,
+                      ThemeData().primaryColor,
+                      Colors.white,
+                    ),
                   ),
                 ),
               ),
