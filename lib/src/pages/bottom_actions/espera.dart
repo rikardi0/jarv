@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/src/utils/models/arguments_check_out.dart';
-import 'package:jarv/src/utils/models/producto_espera.dart';
+import 'package:jarv/src/utils/models/producto_ordenado.dart';
 import 'package:jarv/src/utils/provider/venta_espera_provider.dart';
 import 'package:jarv/src/widgets/app_bar_item.dart';
 import 'package:jarv/src/widgets/factura_fiscal.dart';
@@ -21,7 +21,7 @@ class _EsperaState extends State<Espera> {
   final selectedVenta = ValueNotifier<int?>(null);
   @override
   Widget build(BuildContext context) {
-    final List<ProductoEspera> listaProductoEspera =
+    final List<ProductoOrdenado> listaProductoEspera =
         context.watch<VentaEsperaProvider>().listaEspera;
 
     final size = MediaQuery.of(context).size;
@@ -47,7 +47,7 @@ class _EsperaState extends State<Espera> {
                         return CardVenta(
                           index: index,
                           selected: selectedVenta,
-                          listaProductoEspera: listaProductoEspera,
+                          listaProductos: listaProductoEspera,
                           color: Theme.of(context).primaryColor,
                           action: actionItem,
                         );
@@ -94,7 +94,7 @@ class _EsperaState extends State<Espera> {
     );
   }
 
-  Row appBarActions(List<ProductoEspera> listaProducto) {
+  Row appBarActions(List<ProductoOrdenado> listaProducto) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [

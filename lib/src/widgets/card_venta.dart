@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../utils/models/producto_espera.dart';
+import '../utils/models/producto_ordenado.dart';
 
 class CardVenta extends StatelessWidget {
   final int index;
   final ValueNotifier<int?> selected;
-  final List<ProductoEspera> listaProductoEspera;
+  final List<ProductoOrdenado> listaProductos;
   final Color color;
   final dynamic action;
 
@@ -13,7 +13,7 @@ class CardVenta extends StatelessWidget {
     Key? key,
     required this.index,
     required this.selected,
-    required this.listaProductoEspera,
+    required this.listaProductos,
     required this.color,
     this.action,
   }) : super(key: key);
@@ -35,10 +35,10 @@ class CardVenta extends StatelessWidget {
         onTap: () {
           action(index);
         },
-        leading: Text(listaProductoEspera[index].identificadorVenta!),
-        subtitle: Text('${listaProductoEspera[index].totalVenta.toString()} €'),
+        leading: Text(listaProductos[index].identificadorVenta!),
+        subtitle: Text('${listaProductos[index].totalVenta.toString()} €'),
         title: Text(
-          'Productos: ${listaProductoEspera[index].listaProducto.length.toString()}',
+          'Productos: ${listaProductos[index].listaProducto.length.toString()}',
           style: TextStyle(
             color: selected.value == index
                 ? color

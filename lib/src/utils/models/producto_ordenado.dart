@@ -1,7 +1,7 @@
 import 'package:jarv/src/utils/models/producto_preordenado.dart';
 
-class ProductoEspera {
-  ProductoEspera(
+class ProductoOrdenado {
+  ProductoOrdenado(
       {required this.identificadorVenta,
       required this.listaProducto,
       required this.totalVenta});
