@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:jarv/src/utils/models/producto_preordenado.dart';
 
@@ -209,7 +208,10 @@ class CheckOut extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment:
+                        productoPreOrdenado.nombreProducto.isEmpty
+                            ? MainAxisAlignment.spaceAround
+                            : MainAxisAlignment.spaceBetween,
                     children: [
                       Text(productoPreOrdenado.nombreProducto),
                       Text(productoPreOrdenado.cantidad),
@@ -402,45 +404,54 @@ class ActionButton extends StatelessWidget {
       ),
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.175,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          ElevatedButton.icon(
-              onPressed: () {
-                Navigator.popAndPushNamed(context, '/cliente');
-              },
-              icon: const Icon(Icons.groups_rounded),
-              label: const Text('Cliente')),
-          ElevatedButton.icon(
-              onPressed: () {
-                popNamed(context, '/consumicion');
-              },
-              icon: const Icon(Icons.dinner_dining_outlined),
-              label: const Text('Consumicion Propia')),
-          ElevatedButton.icon(
-              onPressed: () {
-                popNamed(context, '/ticket_diario');
-              },
-              icon: const Icon(Icons.calendar_today_rounded),
-              label: const Text('Ticket Diario')),
-          ElevatedButton.icon(
-              onPressed: () {
-                popNamed(context, '/espera');
-              },
-              icon: const Icon(Icons.list_alt_rounded),
-              label: const Text('Venta en Espera')),
-          ElevatedButton.icon(
-              onPressed: () {
-                popNamed(context, '/cierre_diario');
-              },
-              icon: const Icon(Icons.account_balance_outlined),
-              style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Theme.of(context).colorScheme.tertiaryContainer,
-                  foregroundColor:
-                      Theme.of(context).colorScheme.onTertiaryContainer),
-              label: const Text('Cierre Diario')),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.popAndPushNamed(context, '/cliente');
+                },
+                icon: const Icon(Icons.groups_rounded),
+                label: const Text('Cliente')),
+            ElevatedButton.icon(
+                onPressed: () {
+                  popNamed(context, '/consumicion');
+                },
+                icon: const Icon(Icons.dinner_dining_outlined),
+                label: const Text('Consumicion Propia')),
+            ElevatedButton.icon(
+                onPressed: () {
+                  popNamed(context, '/ticket_diario');
+                },
+                icon: const Icon(Icons.calendar_today_rounded),
+                label: const Text('Ticket Diario')),
+            ElevatedButton.icon(
+                onPressed: () {
+                  popNamed(context, '/espera');
+                },
+                icon: const Icon(Icons.list_alt_rounded),
+                label: const Text('Venta en Espera')),
+            ElevatedButton.icon(
+                onPressed: () {
+                  popNamed(context, '/devolucion');
+                },
+                icon: const Icon(Icons.replay_circle_filled_outlined),
+                label: const Text('Devolucion')),
+            ElevatedButton.icon(
+                onPressed: () {
+                  popNamed(context, '/cierre_diario');
+                },
+                icon: const Icon(Icons.account_balance_outlined),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.tertiaryContainer,
+                    foregroundColor:
+                        Theme.of(context).colorScheme.onTertiaryContainer),
+                label: const Text('Cierre Diario')),
+          ],
+        ),
       ),
     );
   }
