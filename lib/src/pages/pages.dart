@@ -2,9 +2,9 @@ export '../pages/login.dart';
 export 'menu/menu.dart';
 export 'menu/pago.dart';
 
-export 'bottom_actions/espera.dart';
-export 'bottom_actions/cierre_diario.dart';
-export 'bottom_actions/devolucion.dart';
-export 'bottom_actions/cliente.dart';
-export 'bottom_actions/consumicion_propia.dart';
-export 'bottom_actions/ticket_diario.dart';
+export 'teclado_actions/espera.dart';
+export 'teclado_actions/cierre_diario.dart';
+export 'teclado_actions/devolucion.dart';
+export 'teclado_actions/cliente.dart';
+export 'teclado_actions/consumicion_propia.dart';
+export 'teclado_actions/ticket_diario.dart';
