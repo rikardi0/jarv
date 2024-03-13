@@ -27,12 +27,9 @@ class _EsperaState extends State<Espera> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
         title: selectedVenta.value != null || listaProductoEspera.isEmpty
             ? appBarActions(listaProductoEspera)
             : const Text('Ventas en Espera'),
-        toolbarHeight: 65,
-        backgroundColor: ThemeData().primaryColor.withOpacity(0.75),
       ),
       body: listaProductoEspera.isEmpty
           ? listaEsperaVacia()
@@ -40,7 +37,7 @@ class _EsperaState extends State<Espera> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(
-                  width: size.width * 0.25,
+                  width: size.width * 0.4,
                   child: ListView.builder(
                       itemCount: listaProductoEspera.length,
                       itemBuilder: (context, index) {

@@ -17,6 +17,7 @@ class ListFamilia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      physics: const BouncingScrollPhysics(),
       itemCount: itemFamilia?.length,
       itemBuilder: (context, index) {
         Familia? familia = itemFamilia![index];
@@ -24,7 +25,7 @@ class ListFamilia extends StatelessWidget {
           onTap: () => onFamiliaTap(familia, index),
           child: CardButton(
             valueNotifier: selectedFamiliaIndex,
-            colorSelected: ThemeData().colorScheme.primary,
+            colorSelected: ThemeData().colorScheme.onPrimary,
             content: familia.nombreFamilia,
             posicion: index,
           ),

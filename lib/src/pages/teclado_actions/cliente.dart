@@ -12,12 +12,15 @@ class ClienteMenu extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Clientes'),
-          backgroundColor:
-              Theme.of(context).colorScheme.primary.withOpacity(0.75),
         ),
         body: Row(
           children: [
             filterCliente(context, size),
+            VerticalDivider(
+              endIndent: 20.0,
+              width: 10,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -40,44 +43,19 @@ class ClienteMenu extends StatelessWidget {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                  color: Theme.of(context).highlightColor.withOpacity(0.35),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceVariant
+                      .withOpacity(0.25),
                   borderRadius: BorderRadius.circular(10)),
               width: size.width * 0.35,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.5),
                 child: ListView(
                   children: [
-                    TextFormField(
-                      onFieldSubmitted: (value) {},
-                      decoration: const InputDecoration(
-                        labelText: 'NIF',
-                      ),
-                    ),
-                    TextFormField(
-                      onFieldSubmitted: (value) {},
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre',
-                      ),
-                    ),
-                    TextFormField(
-                      keyboardType: TextInputType.phone,
-                      onFieldSubmitted: (value) {},
-                      decoration: const InputDecoration(
-                        labelText: 'Telefono',
-                      ),
-                    ),
-                    TextFormField(
-                      keyboardType: TextInputType.emailAddress,
-                      onFieldSubmitted: (value) {},
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                      ),
-                    ),
-                    TextFormField(
-                      keyboardType: TextInputType.streetAddress,
-                      onFieldSubmitted: (value) {},
-                      decoration: const InputDecoration(labelText: 'Direccion'),
-                    ),
+                    textField('Nombre', TextInputType.name),
+                    textField('Telefono', TextInputType.phone),
+                    textField('NIF', TextInputType.none),
                   ],
                 ),
               ),
@@ -91,6 +69,17 @@ class ClienteMenu extends StatelessWidget {
                 label: const Text('Nuevo Cliente')),
           )
         ],
+      ),
+    );
+  }
+
+  TextFormField textField(String label, TextInputType type) {
+    return TextFormField(
+      onFieldSubmitted: (value) {},
+      keyboardType: type,
+      decoration: InputDecoration(
+        labelText: label,
+        suffixIcon: const Icon(Icons.search),
       ),
     );
   }

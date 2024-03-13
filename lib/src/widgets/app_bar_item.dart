@@ -17,12 +17,18 @@ class AppBarItemButton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(icon),
+          Icon(
+            icon,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
           const SizedBox(
             width: 5.0,
           ),
           Text(
             label,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+            ),
           )
         ],
       ),

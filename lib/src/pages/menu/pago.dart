@@ -23,9 +23,7 @@ class _PagoState extends State<Pago> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 170, 117, 255),
-        ),
+        appBar: AppBar(),
         body: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -106,9 +104,9 @@ class _PagoState extends State<Pago> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            ElevatedButton(
+            ElevatedButton(onPressed: () {}, child: const Text('No Imprimir')),
+            FilledButton(
                 onPressed: () {}, child: const Text('Imprimir Ticket')),
-            ElevatedButton(onPressed: () {}, child: const Text('Sin Ticket')),
           ],
         ),
       ],

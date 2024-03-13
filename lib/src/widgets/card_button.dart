@@ -18,11 +18,8 @@ class CardButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: valueNotifier.value != posicion
-          ? Theme.of(context).cardTheme.color
-          : Colors.transparent,
-      elevation: valueNotifier.value != posicion
-          ? Theme.of(context).cardTheme.elevation
-          : 0,
+          ? Theme.of(context).colorScheme.background
+          : Theme.of(context).colorScheme.primary,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
