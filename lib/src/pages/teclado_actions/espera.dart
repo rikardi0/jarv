@@ -34,7 +34,7 @@ class _EsperaState extends State<Espera> {
       body: listaProductoEspera.isEmpty
           ? listaEsperaVacia()
           : Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 SizedBox(
                   width: size.width * 0.4,

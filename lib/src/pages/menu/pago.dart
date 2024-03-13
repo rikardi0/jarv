@@ -26,6 +26,7 @@ class _PagoState extends State<Pago> {
         appBar: AppBar(),
         body: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
               width: size.width * 0.35,
@@ -93,7 +94,6 @@ class _PagoState extends State<Pago> {
                 },
               ),
             )),
-        const Divider(),
         rowColumn(
             'Cambio',
             Text(entregado == 0
@@ -103,6 +103,7 @@ class _PagoState extends State<Pago> {
                     : cambio.toString())),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ElevatedButton(onPressed: () {}, child: const Text('No Imprimir')),
             FilledButton(

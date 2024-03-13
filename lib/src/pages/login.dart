@@ -6,9 +6,15 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({
     super.key,
     required this.usuarios,
+    required this.familia,
+    required this.subFamilia,
+    required this.producto,
   });
 
   final UsuarioDao usuarios;
+  final FamiliaDao familia;
+  final SubFamiliaDao subFamilia;
+  final ProductoDao producto;
 
   static const routeName = "/login";
 
@@ -56,9 +62,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         itemCount: user?.length ?? 0,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount:
-                                    3, // number of items in each row
-                                mainAxisSpacing: 0, // spacing between rows
+                                crossAxisCount: 3,
+                                mainAxisSpacing: 0,
                                 crossAxisSpacing: 10,
                                 mainAxisExtent: 180),
                         itemBuilder: (context, index) {

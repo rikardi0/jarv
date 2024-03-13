@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:jarv/src/pages/bottom_actions/cierre_diario.dart';
-import 'package:jarv/src/pages/bottom_actions/cliente.dart';
-import 'package:jarv/src/pages/bottom_actions/consumicion_propia.dart';
-import 'package:jarv/src/pages/bottom_actions/ticket_diario.dart';
+import 'package:jarv/config/theme/custom_theme.dart';
 import 'package:provider/provider.dart';
 
 import '../config/settings/settings_controller.dart';
 import '../config/settings/settings_view.dart';
 import 'data_source/db.dart';
+
 import 'pages/pages.dart';
 import 'utils/provider/venta_espera_provider.dart';
 
@@ -64,8 +62,8 @@ class MyApp extends StatelessWidget {
             onGenerateTitle: (BuildContext context) =>
                 AppLocalizations.of(context)!.appTitle,
 
-            theme: ThemeData.light(),
-            darkTheme: ThemeData.dark(),
+            theme: CustomThemeData.lightTheme(context),
+            darkTheme: CustomThemeData.darkTheme(context),
             themeMode: settingsController.themeMode,
 
             onGenerateRoute: route,
@@ -83,6 +81,9 @@ class MyApp extends StatelessWidget {
           case LoginScreen.routeName:
             return LoginScreen(
               usuarios: database.usuarioDao,
+              familia: database.familiaDao,
+              subFamilia: database.subFamiliaDao,
+              producto: database.productoDao,
             );
           case MenuScreen.routeName:
             return MenuScreen(
@@ -91,17 +92,23 @@ class MyApp extends StatelessWidget {
               subFamilia: database.subFamiliaDao,
             );
           case Pago.routeName:
-            return Pago(
-              cliente: database.clienteDao,
-            );
+            return const Pago();
           case Espera.routeName:
             return const Espera();
           case ClienteMenu.routeName:
             return const ClienteMenu();
           case ConsumicionPropia.routeName:
-            return const ConsumicionPropia();
+            return ConsumicionPropia(
+              familia: database.familiaDao,
+              subFamilia: database.subFamiliaDao,
+              producto: database.productoDao,
+            );
           case TicketDiario.routeName:
-            return const TicketDiario();
+            return TicketDiario(
+              ventas: database.ventaDao,
+            );
+          case Devolucion.routeName:
+            return const Devolucion();
           case CierreDiario.routeName:
             return const CierreDiario();
           case SettingsView.routeName:
@@ -109,6 +116,9 @@ class MyApp extends StatelessWidget {
           default:
             return LoginScreen(
               usuarios: database.usuarioDao,
+              familia: database.familiaDao,
+              subFamilia: database.subFamiliaDao,
+              producto: database.productoDao,
             );
         }
       },
