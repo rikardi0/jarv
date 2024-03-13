@@ -29,9 +29,9 @@ class CheckOut extends StatelessWidget {
   final bool mostrarIdentificador;
   final bool showTeclado;
   final bool menuPrincipal;
-  final List<ProductoPreOrdenado?> productosAgregados;
+  final List<ProductoOrdenado?> productosAgregados;
   final double totalVenta;
-  final ProductoPreOrdenado productoPreOrdenado;
+  final ProductoOrdenado productoPreOrdenado;
   final List<String> cantidad;
   final Future<void> actualizarCantidad;
   final ValueNotifier<int?> selectedItemLista;
@@ -49,17 +49,20 @@ class CheckOut extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: const RoundedRectangleBorder(
-          side: BorderSide(color: Color.fromARGB(59, 7, 7, 7)),
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
-      elevation: 7,
+      shape: RoundedRectangleBorder(
+          side: BorderSide(
+              color:
+                  Theme.of(context).colorScheme.onBackground.withOpacity(0.15)),
+          borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(20))),
+      elevation: 0.5,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _listaProductoOrdenado(context),
           _totalVenta(),
-          _elementoPreOrdenado(),
+          _displayCantidad(),
           _teclado(context),
         ],
       ),
@@ -108,7 +111,7 @@ class CheckOut extends StatelessWidget {
           : ListView.builder(
               itemCount: productosAgregados.length,
               itemBuilder: (BuildContext context, int index) {
-                final ProductoPreOrdenado? producto = productosAgregados[index];
+                final ProductoOrdenado? producto = productosAgregados[index];
                 final double total =
                     double.parse(producto!.cantidad) * producto.precio;
 
@@ -191,7 +194,7 @@ class CheckOut extends StatelessWidget {
     );
   }
 
-  FutureBuilder<void> _elementoPreOrdenado() {
+  FutureBuilder<void> _displayCantidad() {
     return FutureBuilder(
         future: actualizarCantidad,
         builder: (context, snapshot) {
@@ -208,16 +211,9 @@ class CheckOut extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
                   child: Row(
-                    mainAxisAlignment:
-                        productoPreOrdenado.nombreProducto.isEmpty
-                            ? MainAxisAlignment.spaceAround
-                            : MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(productoPreOrdenado.nombreProducto),
                       Text(productoPreOrdenado.cantidad),
-                      Text(productoPreOrdenado.precio != 0
-                          ? '€ ${productoPreOrdenado.precio.toString()}'
-                          : ''),
                       GestureDetector(
                           onTap: () {
                             dropDownIcon();
@@ -233,152 +229,180 @@ class CheckOut extends StatelessWidget {
   }
 
   Widget _teclado(BuildContext context) {
-    final ratio = menuPrincipal ? 0.3 : 0.39;
-    final height = MediaQuery.of(context).size.height * 0.2;
+    final ratio = menuPrincipal ? 0.15 : 0.3;
+    final height = MediaQuery.of(context).size.height * 0.275;
     final width = MediaQuery.of(context).size.width * ratio;
+    final colorScheme = Theme.of(context).colorScheme;
+    var totalHeight = height + height / 3;
     return Visibility(
       visible: showTeclado,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              SizedBox(
-                height: height,
-                width: width,
-                child: GridView(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 0,
-                    crossAxisSpacing: 0,
-                    mainAxisExtent: height / 3,
+      child: Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                SizedBox(
+                  height: height,
+                  width: width,
+                  child: GridView(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 1,
+                      crossAxisSpacing: 0,
+                      mainAxisExtent: height / 3.1,
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    children: [
+                      _itemNumeroTeclado('1', context),
+                      _itemNumeroTeclado('2', context),
+                      _itemNumeroTeclado('3', context),
+                      _itemNumeroTeclado('4', context),
+                      _itemNumeroTeclado('5', context),
+                      _itemNumeroTeclado('6', context),
+                      _itemNumeroTeclado('7', context),
+                      _itemNumeroTeclado('8', context),
+                      _itemNumeroTeclado('9', context),
+                    ],
                   ),
-                  clipBehavior: Clip.antiAlias,
+                ),
+                Row(
                   children: [
-                    _itemNumeroTeclado('1'),
-                    _itemNumeroTeclado('2'),
-                    _itemNumeroTeclado('3'),
-                    _itemNumeroTeclado('4'),
-                    _itemNumeroTeclado('5'),
-                    _itemNumeroTeclado('6'),
-                    _itemNumeroTeclado('7'),
-                    _itemNumeroTeclado('8'),
-                    _itemNumeroTeclado('9'),
+                    GestureDetector(
+                      onTap: () => onTapNum('0'),
+                      child: ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                        child: Container(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .outline
+                                .withOpacity(0.75),
+                            height: height / 3,
+                            width: width / 1.5,
+                            child: const Center(
+                                child: Text(
+                              '0',
+                              style: TextStyle(
+                                fontSize: 20,
+                              ),
+                            ))),
+                      ),
+                    ),
+                    SizedBox(
+                      height: height / 3,
+                      width: width / 3,
+                      child: _itemNumeroTeclado(',', context),
+                    ),
                   ],
                 ),
-              ),
-              Row(
+              ],
+            ),
+            SizedBox(
+              height: totalHeight,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(20)),
-                    child: SizedBox(
-                      height: height / 3,
-                      width: width / 3,
-                      child: GestureDetector(
-                        onTap: () => addAction(cantidad),
-                        child: _itemActionTeclado(
-                          Icons.add,
-                          ThemeData().primaryColor.withOpacity(0.5),
-                          Colors.black,
-                        ),
-                      ),
-                    ),
+                  _itemActionTeclado(
+                    context,
+                    height,
+                    width,
+                    'Devolucion',
+                    Icons.change_circle_outlined,
+                    colorScheme.onPrimaryContainer,
                   ),
-                  SizedBox(
-                      height: height / 3,
-                      width: width / 3,
-                      child: _itemNumeroTeclado('0')),
-                  GestureDetector(
-                    onTap: () => backspace(cantidad),
-                    child: SizedBox(
-                      height: height / 3,
-                      width: width / 3,
-                      child: _itemActionTeclado(
-                        Icons.backspace_outlined,
-                        ThemeData().highlightColor,
-                        Colors.black,
-                      ),
-                    ),
+                  _itemActionTeclado(
+                    context,
+                    height,
+                    width,
+                    'Cliente',
+                    Icons.group,
+                    colorScheme.primary,
+                  ),
+                  _itemActionTeclado(
+                    context,
+                    height,
+                    width,
+                    'Consumicion',
+                    Icons.dinner_dining,
+                    colorScheme.secondary,
+                  ),
+                  _itemActionTeclado(
+                    context,
+                    height,
+                    width,
+                    'Ticket Diario',
+                    Icons.change_circle_outlined,
+                    colorScheme.tertiary,
                   ),
                 ],
               ),
-            ],
-          ),
-          Visibility(
-            visible: menuPrincipal ? true : false,
-            child: Expanded(
-              child: ClipRRect(
-                borderRadius:
-                    const BorderRadius.only(bottomRight: Radius.circular(20)),
-                child: SizedBox(
-                  height: height + height / 3,
-                  child: GestureDetector(
-                    onTap: () {
-                      showCupertinoModalPopup(
-                          barrierColor: const Color.fromARGB(29, 0, 0, 0),
-                          context: context,
-                          builder: (context) {
-                            return const ActionButton();
-                          });
-                    },
-                    child: _itemActionTeclado(
-                      Icons.view_agenda_outlined,
-                      ThemeData().primaryColor,
-                      Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
 
-  Widget _itemNumeroTeclado(String label) {
+  Container _itemActionTeclado(BuildContext context, double height,
+      double width, String label, IconData icon, Color colorIcon) {
+    return Container(
+      decoration: ShapeDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          shape: StadiumBorder(
+              side: BorderSide(
+            color: Theme.of(context).colorScheme.surfaceVariant,
+          ))),
+      height: height / 3.5,
+      width: width / 1.25,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: AlignmentDirectional.centerStart,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2.5),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: colorIcon,
+              ),
+              Text(
+                label,
+                style: TextStyle(color: colorIcon),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _itemNumeroTeclado(String label, context) {
     return GestureDetector(
         onTap: () => onTapNum(label),
         child: containerTeclado(
-            Text(
-              label,
-              style: const TextStyle(
-                  fontSize: 16.5,
-                  color: Color.fromARGB(255, 65, 65, 65),
-                  shadows: [
-                    Shadow(
-                      color: Color.fromARGB(
-                          38, 20, 6, 41), // Choose the color of the shadow
-                      blurRadius:
-                          5.0, // Adjust the blur radius for the shadow effect
-                      offset: Offset(1.0,
-                          1.0), // Set the horizontal and vertical offset for the shadow
-                    ),
-                  ]),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 20,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
-            const Color.fromARGB(115, 235, 235, 235)));
+          ),
+          Theme.of(context).colorScheme.outline.withOpacity(0.25),
+        ));
   }
 
-  Widget _itemActionTeclado(IconData icon, Color color, Color colorIcon) {
-    return containerTeclado(
-      Icon(
-        icon,
-        color: colorIcon,
-      ),
-      color,
-    );
-  }
-
-  Container containerTeclado(Widget element, Color color) {
+  Widget containerTeclado(Widget element, Color color) {
     return Container(
         decoration: BoxDecoration(
-            color: color,
-            border: Border.all(
-                color: const Color.fromARGB(59, 7, 7, 7), width: 0.15)),
+          color: color,
+          shape: BoxShape.circle,
+        ),
         child: Center(child: element));
   }
 }

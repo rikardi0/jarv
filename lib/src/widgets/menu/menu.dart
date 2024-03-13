@@ -45,12 +45,12 @@ class _MenuState extends State<Menu> {
   final selectedProductoIndex = ValueNotifier<int?>(null);
   final selectedItemLista = ValueNotifier<int?>(null);
 
-  ProductoPreOrdenado _productoPreOrdenado = ProductoPreOrdenado(
+  ProductoOrdenado _productoOrdenado = ProductoOrdenado(
       productoId: '', nombreProducto: '', precio: 0, cantidad: '', iva: 0);
   double totalVenta = 0;
   double totalVentaEspera = 0;
 
-  List<ProductoPreOrdenado?> productosAgregados = [];
+  List<ProductoOrdenado?> productosAgregados = [];
   String? identificadorVenta;
 
   @override
@@ -95,14 +95,28 @@ class _MenuState extends State<Menu> {
 
     return Scaffold(
       appBar: AppBar(
+        actions: widget.menuPrincipal
+            ? mostrarUsuario
+                ? const [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 15.0),
+                      child: AppBarItemButton(
+                          icon: Icons.supervised_user_circle_outlined,
+                          label: 'Usuario'),
+                    )
+                  ]
+                : null
+            : null,
+        backgroundColor: mostrarUsuario
+            ? null
+            : Theme.of(context).colorScheme.primaryContainer,
         centerTitle: widget.menuPrincipal ? true : false,
         title: widget.menuPrincipal
             ? productosAgregados.isEmpty
-                ? Text(mostrarUsuario ? 'Usuario' : '')
+                ? null
                 : appBarCheckOut()
             : const Text('Consumicion Propia'),
-        toolbarHeight: 45,
-        backgroundColor: ThemeData().primaryColor.withOpacity(0.75),
+        toolbarHeight: 35,
         leading: widget.menuPrincipal
             ? productosAgregados.isEmpty
                 ? speedDial()
@@ -225,61 +239,74 @@ class _MenuState extends State<Menu> {
         Expanded(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SizedBox(
-                width: size.width * 0.15,
+                width: size.width * 0.205,
                 child: ListFamilia(
                     selectedFamiliaIndex: selectedFamiliaIndex,
                     itemFamilia: itemFamilia,
                     onFamiliaTap: onFamiliaTap),
               ),
-              Column(
-                children: [
-                  SizedBox(
-                    height: size.height * 0.17,
-                    width: size.width * 0.45,
-                    child: RowSubFamilia(
-                      selectedSubFamiliaIndex: selectedSubFamiliaIndex,
-                      itemSubFamilia: itemSubFamilia,
-                      onSubFamiliaTap: onSubFamiliaTap,
-                    ),
-                  ),
-                  Expanded(
-                    child: SizedBox(
-                      width: size.width * 0.45,
-                      child: GridProducto(
-                        selectedProductoIndex: selectedProductoIndex,
-                        itemProducto: itemProducto,
-                        joinedCantidad: joinedCantidad,
-                        borderColor: borderColor,
-                        onProductTap: onProductTap,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: size.height * 0.15,
+                        child: RowSubFamilia(
+                          selectedSubFamiliaIndex: selectedSubFamiliaIndex,
+                          itemSubFamilia: itemSubFamilia,
+                          onSubFamiliaTap: onSubFamiliaTap,
+                        ),
                       ),
-                    ),
+                      Expanded(
+                        child: GridProducto(
+                          selectedProductoIndex: selectedProductoIndex,
+                          itemProducto: itemProducto,
+                          joinedCantidad: joinedCantidad,
+                          borderColor: borderColor,
+                          onProductTap: onProductTap,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-              SizedBox(
-                width: size.width * 0.4,
-                child: CheckOut(
-                  dropDownIcon: dropDownIcon,
-                  showTeclado: showTeclado,
-                  cantidad: cantidad,
-                  mostrarIdentificador: mostrarIdentificador,
-                  productosAgregados: productosAgregados,
-                  totalVenta: totalVenta,
-                  productoPreOrdenado: _productoPreOrdenado,
-                  selectedItemLista: selectedItemLista,
-                  actualizarCantidad: actualizarCantidad(joinedCantidad),
-                  onTextIdentificadorTap: onTextIdentificadorTap,
-                  onBackIdentificador: onBackIdentificador,
-                  onAceptarIdentificador: onAceptarIdentificador,
-                  clearButton: clearButton,
-                  addAction: addAction,
-                  onTapNum: onTapNum,
-                  backspace: backspace,
-                  onTapItem: onTapItem,
-                  menuPrincipal: widget.menuPrincipal,
+              Container(
+                decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.background,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onBackground
+                          .withOpacity(0.15),
+                    )),
+                width: size.width * 0.3,
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: CheckOut(
+                    dropDownIcon: dropDownIcon,
+                    showTeclado: showTeclado,
+                    cantidad: cantidad,
+                    mostrarIdentificador: mostrarIdentificador,
+                    productosAgregados: productosAgregados,
+                    totalVenta: totalVenta,
+                    selectedItemLista: selectedItemLista,
+                    actualizarCantidad: actualizarCantidad(joinedCantidad),
+                    onTextIdentificadorTap: onTextIdentificadorTap,
+                    onBackIdentificador: onBackIdentificador,
+                    onAceptarIdentificador: onAceptarIdentificador,
+                    clearButton: clearButton,
+                    addAction: addAction,
+                    onTapNum: onTapNum,
+                    backspace: backspace,
+                    onTapItem: onTapItem,
+                    menuPrincipal: widget.menuPrincipal,
+                    productoPreOrdenado: _productoOrdenado,
+                  ),
                 ),
               )
             ],
@@ -332,22 +359,19 @@ class _MenuState extends State<Menu> {
 
   void onProductTap(int index, Producto producto, String joinedCantidad) {
     setState(() {
-      if (selectedProductoIndex.value == index) {
-        _productoPreOrdenado = ProductoPreOrdenado(
-            productoId: '',
-            nombreProducto: '',
-            precio: 0,
-            cantidad: '',
-            iva: 0);
-        selectedProductoIndex.value = null;
-      } else {
-        changeIndex(index, selectedProductoIndex);
-        _productoPreOrdenado = ProductoPreOrdenado(
+      if (cantidad.isNotEmpty) {
+        productosAgregados.add(ProductoOrdenado(
             productoId: producto.productoId,
             nombreProducto: producto.producto,
             precio: producto.precio,
             cantidad: joinedCantidad,
-            iva: producto.iva);
+            iva: producto.iva));
+
+        totalVenta +=
+            producto.precio * double.parse(_productoOrdenado.cantidad);
+        cantidad.clear();
+
+        setState(() {});
       }
     });
   }
@@ -361,7 +385,7 @@ class _MenuState extends State<Menu> {
 
   void onAceptarIdentificador() {
     if (identificadorVenta != '') {
-      final List<ProductoPreOrdenado?> productosEspera = [];
+      final List<ProductoOrdenado?> productosEspera = [];
       productosEspera.addAll(productosAgregados);
       context.read<VentaEsperaProvider>().addProductoEspera(
           producto: productosEspera,
@@ -403,18 +427,18 @@ class _MenuState extends State<Menu> {
   }
 
   void addAction(List<String> cantidad) {
-    if (cantidad.isNotEmpty && _productoPreOrdenado.nombreProducto.isNotEmpty) {
-      productosAgregados.add(ProductoPreOrdenado(
-          productoId: _productoPreOrdenado.productoId,
-          nombreProducto: _productoPreOrdenado.nombreProducto,
-          precio: _productoPreOrdenado.precio,
-          cantidad: _productoPreOrdenado.cantidad,
-          iva: _productoPreOrdenado.iva));
+    if (cantidad.isNotEmpty && _productoOrdenado.nombreProducto.isNotEmpty) {
+      productosAgregados.add(ProductoOrdenado(
+          productoId: _productoOrdenado.productoId,
+          nombreProducto: _productoOrdenado.nombreProducto,
+          precio: _productoOrdenado.precio,
+          cantidad: _productoOrdenado.cantidad,
+          iva: _productoOrdenado.iva));
 
-      totalVenta += _productoPreOrdenado.precio *
-          double.parse(_productoPreOrdenado.cantidad);
+      totalVenta +=
+          _productoOrdenado.precio * double.parse(_productoOrdenado.cantidad);
       cantidad.clear();
-      _productoPreOrdenado = ProductoPreOrdenado(
+      _productoOrdenado = ProductoOrdenado(
           productoId: '', nombreProducto: '', precio: 0, cantidad: '', iva: 0);
       selectedProductoIndex.value = null;
       setState(() {});
@@ -422,6 +446,6 @@ class _MenuState extends State<Menu> {
   }
 
   Future<void> actualizarCantidad(String joinedCantidad) async {
-    _productoPreOrdenado.cantidad = joinedCantidad;
+    _productoOrdenado.cantidad = joinedCantidad;
   }
 }
