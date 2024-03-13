@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jarv/src/utils/models/producto_preordenado.dart';
+import 'package:jarv/src/utils/models/producto_ordenado.dart';
 
 class FacturaFiscal extends StatelessWidget {
   const FacturaFiscal({
@@ -10,7 +10,7 @@ class FacturaFiscal extends StatelessWidget {
     required this.precioVenta,
   });
 
-  final List<ProductoPreOrdenado?> listaProducto;
+  final List<ProductoOrdenado?> listaProducto;
   final double impuesto;
   final double? precioVenta;
   final String tipoPago;
@@ -24,8 +24,12 @@ class FacturaFiscal extends StatelessWidget {
         width: MediaQuery.of(context).size.width * 0.5,
         child: Container(
           decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 255, 255, 254),
-              border: Border.all(color: const Color.fromARGB(59, 7, 7, 7))),
+              color: Theme.of(context).colorScheme.background,
+              border: Border.all(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onBackground
+                      .withOpacity(0.15))),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(

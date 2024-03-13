@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:jarv/src/utils/models/arguments_check_out.dart';
-import 'package:jarv/src/utils/models/producto_preordenado.dart';
+import 'package:jarv/src/utils/models/producto_ordenado.dart';
 import 'package:jarv/src/widgets/app_bar_item.dart';
 import 'package:jarv/src/widgets/menu/grid_producto.dart';
 import 'package:jarv/src/widgets/menu/list_familia.dart';

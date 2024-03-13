@@ -1,4 +1,4 @@
-import 'package:jarv/src/utils/models/producto_preordenado.dart';
+import 'package:jarv/src/utils/models/producto_ordenado.dart';
 
 class CheckOutArgument {
   CheckOutArgument(
@@ -7,7 +7,7 @@ class CheckOutArgument {
       this.fechaVenta,
       this.horaVenta});
 
-  List<ProductoPreOrdenado?> productoAgregado;
+  List<ProductoOrdenado?> productoAgregado;
   double totalVenta;
   String? horaVenta;
   String? fechaVenta;

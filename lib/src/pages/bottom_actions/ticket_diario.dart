@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/src/data_source/db.dart';
-import 'package:jarv/src/utils/models/producto_ordenado.dart';
+import 'package:jarv/src/utils/models/producto_espera.dart';
 
 class TicketDiario extends StatefulWidget {
   const TicketDiario({super.key, required this.ventas});
@@ -13,7 +13,7 @@ class TicketDiario extends StatefulWidget {
 
 class _TicketDiarioState extends State<TicketDiario> {
   final selectedVenta = ValueNotifier<int?>(null);
-  final List<ProductoOrdenado> listaVenta = [];
+  final List<ProductoEspera> listaVenta = [];
   @override
   Widget build(BuildContext context) {
     final venta = widget.ventas.findAllVentas();

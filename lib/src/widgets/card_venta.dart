@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../utils/models/producto_ordenado.dart';
+import '../utils/models/producto_espera.dart';
 
 class CardVenta extends StatelessWidget {
   final int index;
   final ValueNotifier<int?> selected;
-  final List<ProductoOrdenado> listaProductos;
+  final List<ProductoEspera> listaProductos;
   final Color color;
   final dynamic action;
 

@@ -1,12 +1,14 @@
-import 'package:jarv/src/utils/models/producto_preordenado.dart';
-
 class ProductoOrdenado {
   ProductoOrdenado(
-      {required this.identificadorVenta,
-      required this.listaProducto,
-      required this.totalVenta});
+      {required this.productoId,
+      required this.nombreProducto,
+      required this.iva,
+      required this.precio,
+      required this.cantidad});
 
-  List<ProductoPreOrdenado?> listaProducto;
-  String? identificadorVenta;
-  double? totalVenta;
+  String productoId;
+  String nombreProducto;
+  double precio;
+  double iva;
+  String cantidad;
 }

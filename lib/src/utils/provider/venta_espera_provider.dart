@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/src/utils/models/producto_espera.dart';
 import 'package:jarv/src/utils/models/producto_ordenado.dart';
-import 'package:jarv/src/utils/models/producto_preordenado.dart';
 
 class VentaEsperaProvider extends ChangeNotifier {
-  List<ProductoOrdenado> listaEspera;
+  List<ProductoEspera> listaEspera;
   bool? mostrarElementoEspera;
   int? posicionListaEspera;
 
@@ -14,11 +14,11 @@ class VentaEsperaProvider extends ChangeNotifier {
   });
 
   void addProductoEspera({
-    required List<ProductoPreOrdenado?> producto,
+    required List<ProductoOrdenado?> producto,
     required String? idVenta,
     required double? totalVenta,
   }) async {
-    listaEspera.add(ProductoOrdenado(
+    listaEspera.add(ProductoEspera(
         identificadorVenta: idVenta,
         listaProducto: producto,
         totalVenta: totalVenta));
