@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:jarv/src/utils/models/producto_ordenado.dart';
@@ -9,21 +8,16 @@ class CheckOut extends StatelessWidget {
       required this.mostrarIdentificador,
       required this.productosAgregados,
       required this.totalVenta,
-      required this.productoPreOrdenado,
+      required this.cantidadProducto,
       required this.actualizarCantidad,
       this.onTextIdentificadorTap,
       this.onBackIdentificador,
       this.onAceptarIdentificador,
       this.clearButton,
       this.onTapNum,
-      this.addAction,
-      required this.cantidad,
-      this.backspace,
       required this.showTeclado,
       this.dropDownIcon,
-      this.deslizarItem,
       required this.selectedItemLista,
-      this.onTapItem,
       required this.menuPrincipal});
 
   final bool mostrarIdentificador;
@@ -31,8 +25,7 @@ class CheckOut extends StatelessWidget {
   final bool menuPrincipal;
   final List<ProductoOrdenado?> productosAgregados;
   final double totalVenta;
-  final ProductoOrdenado productoPreOrdenado;
-  final List<String> cantidad;
+  final String cantidadProducto;
   final Future<void> actualizarCantidad;
   final ValueNotifier<int?> selectedItemLista;
   final dynamic onTextIdentificadorTap;
@@ -40,11 +33,7 @@ class CheckOut extends StatelessWidget {
   final dynamic onAceptarIdentificador;
   final dynamic clearButton;
   final dynamic onTapNum;
-  final dynamic addAction;
-  final dynamic backspace;
   final dynamic dropDownIcon;
-  final dynamic deslizarItem;
-  final dynamic onTapItem;
 
   @override
   Widget build(BuildContext context) {
@@ -213,7 +202,7 @@ class CheckOut extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(productoPreOrdenado.cantidad),
+                      Text(cantidadProducto),
                       GestureDetector(
                           onTap: () {
                             dropDownIcon();

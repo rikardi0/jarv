@@ -3,16 +3,12 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:jarv/src/utils/models/arguments_check_out.dart';
 import 'package:jarv/src/utils/models/producto_ordenado.dart';
-import 'package:jarv/src/widgets/app_bar_item.dart';
-import 'package:jarv/src/widgets/menu/grid_producto.dart';
-import 'package:jarv/src/widgets/menu/list_familia.dart';
-import 'package:jarv/src/widgets/menu/row_sub_familia.dart';
+import 'package:jarv/src/widgets/widgets.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:provider/provider.dart';
 
 import '../../data_source/db.dart';
 import '../../utils/provider/venta_espera_provider.dart';
-import '../../widgets/menu/check_out_card.dart';
 
 class Menu extends StatefulWidget {
   const Menu(
@@ -45,8 +41,7 @@ class _MenuState extends State<Menu> {
   final selectedProductoIndex = ValueNotifier<int?>(null);
   final selectedItemLista = ValueNotifier<int?>(null);
 
-  ProductoOrdenado _productoOrdenado = ProductoOrdenado(
-      productoId: '', nombreProducto: '', precio: 0, cantidad: '', iva: 0);
+  String cantidadProducto = '';
   double totalVenta = 0;
   double totalVentaEspera = 0;
 
@@ -290,7 +285,6 @@ class _MenuState extends State<Menu> {
                   child: CheckOut(
                     dropDownIcon: dropDownIcon,
                     showTeclado: showTeclado,
-                    cantidad: cantidad,
                     mostrarIdentificador: mostrarIdentificador,
                     productosAgregados: productosAgregados,
                     totalVenta: totalVenta,
@@ -300,12 +294,9 @@ class _MenuState extends State<Menu> {
                     onBackIdentificador: onBackIdentificador,
                     onAceptarIdentificador: onAceptarIdentificador,
                     clearButton: clearButton,
-                    addAction: addAction,
                     onTapNum: onTapNum,
-                    backspace: backspace,
-                    onTapItem: onTapItem,
                     menuPrincipal: widget.menuPrincipal,
-                    productoPreOrdenado: _productoOrdenado,
+                    cantidadProducto: cantidadProducto,
                   ),
                 ),
               )
@@ -314,15 +305,6 @@ class _MenuState extends State<Menu> {
         ),
       ],
     );
-  }
-
-  onTapItem(index) {
-    if (selectedItemLista.value != index) {
-      selectedItemLista.value = index;
-    } else {
-      selectedItemLista.value = null;
-    }
-    setState(() {});
   }
 
   dropDownIcon() {
@@ -367,9 +349,9 @@ class _MenuState extends State<Menu> {
             cantidad: joinedCantidad,
             iva: producto.iva));
 
-        totalVenta +=
-            producto.precio * double.parse(_productoOrdenado.cantidad);
+        totalVenta += producto.precio * double.parse(joinedCantidad);
         cantidad.clear();
+        showTeclado = false;
 
         setState(() {});
       }
@@ -395,9 +377,13 @@ class _MenuState extends State<Menu> {
       mostrarIdentificador = false;
       selectedProductoIndex.value = null;
       productosAgregados.clear();
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        backgroundColor: Color.fromARGB(206, 21, 10, 26),
-        content: Text('Venta agregada a lista de espera'),
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        content: Text(
+          'Venta agregada a lista de espera',
+          style: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimaryContainer),
+        ),
         duration: Durations.extralong4,
       ));
       setState(() {});
@@ -414,38 +400,12 @@ class _MenuState extends State<Menu> {
     setState(() {});
   }
 
-  void backspace(List<String> cantidad) {
-    if (cantidad.isNotEmpty) {
-      cantidad.removeLast();
-    }
-    setState(() {});
-  }
-
   void onTapNum(String label) {
     cantidad.add(label);
     setState(() {});
   }
 
-  void addAction(List<String> cantidad) {
-    if (cantidad.isNotEmpty && _productoOrdenado.nombreProducto.isNotEmpty) {
-      productosAgregados.add(ProductoOrdenado(
-          productoId: _productoOrdenado.productoId,
-          nombreProducto: _productoOrdenado.nombreProducto,
-          precio: _productoOrdenado.precio,
-          cantidad: _productoOrdenado.cantidad,
-          iva: _productoOrdenado.iva));
-
-      totalVenta +=
-          _productoOrdenado.precio * double.parse(_productoOrdenado.cantidad);
-      cantidad.clear();
-      _productoOrdenado = ProductoOrdenado(
-          productoId: '', nombreProducto: '', precio: 0, cantidad: '', iva: 0);
-      selectedProductoIndex.value = null;
-      setState(() {});
-    }
-  }
-
   Future<void> actualizarCantidad(String joinedCantidad) async {
-    _productoOrdenado.cantidad = joinedCantidad;
+    cantidadProducto = joinedCantidad;
   }
 }
