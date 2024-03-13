@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/src/data_source/db.dart';
-import 'package:jarv/src/widgets/card_button.dart';
 
 class RowSubFamilia extends StatelessWidget {
   const RowSubFamilia({
@@ -23,14 +22,30 @@ class RowSubFamilia extends StatelessWidget {
         SubFamilia? subFamilia = itemSubFamilia![index];
         return GestureDetector(
             onTap: () => onSubFamiliaTap(subFamilia, index),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.15,
-              child: CardButton(
-                  content: subFamilia!.nombreSub,
-                  valueNotifier: selectedSubFamiliaIndex,
-                  colorSelected: Theme.of(context).colorScheme.primary,
-                  posicion: index),
-            ));
+            child: Container(
+                color: Colors.transparent,
+                width: MediaQuery.of(context).size.width * 0.15,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      subFamilia!.nombreSub,
+                      style: TextStyle(
+                        color: selectedSubFamiliaIndex.value == index
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.black,
+                        fontSize:
+                            Theme.of(context).textTheme.titleMedium!.fontSize,
+                      ),
+                    ),
+                    Divider(
+                      color: selectedSubFamiliaIndex.value == index
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.black,
+                    )
+                  ],
+                )));
       },
     );
   }

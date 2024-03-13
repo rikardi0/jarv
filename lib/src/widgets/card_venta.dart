@@ -27,18 +27,40 @@ class CardVenta extends StatelessWidget {
       elevation:
           selected.value != index ? Theme.of(context).cardTheme.elevation : 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(15),
         side: BorderSide(
             color: selected.value == index ? color : Colors.transparent),
       ),
       child: ListTile(
+        visualDensity: VisualDensity.compact,
+        isThreeLine: true,
+        titleAlignment: ListTileTitleAlignment.center,
         onTap: () {
           action(index);
         },
-        leading: Text(listaProductos[index].identificadorVenta!),
+        trailing: const Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text('16 Diciembre'),
+            Text('15:31'),
+          ],
+        ),
+        leading: Container(
+            decoration: BoxDecoration(
+                border:
+                    Border.all(color: Theme.of(context).colorScheme.outline),
+                borderRadius: BorderRadius.circular(10)),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 25.0),
+              child: Text(
+                listaProductos[index].identificadorVenta!.toUpperCase(),
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            )),
         subtitle: Text('${listaProductos[index].totalVenta.toString()} €'),
         title: Text(
-          'Productos: ${listaProductos[index].listaProducto.length.toString()}',
+          'Total',
           style: TextStyle(
             color: selected.value == index
                 ? color

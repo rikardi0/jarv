@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:jarv/src/utils/models/producto_ordenado.dart';
 
@@ -202,7 +203,9 @@ class CheckOut extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(cantidadProducto),
+                      Text(cantidadProducto.isNotEmpty
+                          ? 'Cantidad: $cantidadProducto'
+                          : ''),
                       GestureDetector(
                           onTap: () {
                             dropDownIcon();
@@ -218,9 +221,8 @@ class CheckOut extends StatelessWidget {
   }
 
   Widget _teclado(BuildContext context) {
-    final ratio = menuPrincipal ? 0.15 : 0.3;
     final height = MediaQuery.of(context).size.height * 0.275;
-    final width = MediaQuery.of(context).size.width * ratio;
+    final width = MediaQuery.of(context).size.width * 0.15;
     final colorScheme = Theme.of(context).colorScheme;
     var totalHeight = height + height / 3;
     return Visibility(
@@ -228,7 +230,7 @@ class CheckOut extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(1.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
@@ -292,44 +294,51 @@ class CheckOut extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(
-              height: totalHeight,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _itemActionTeclado(
-                    context,
-                    height,
-                    width,
-                    'Devolucion',
-                    Icons.change_circle_outlined,
-                    colorScheme.onPrimaryContainer,
-                  ),
-                  _itemActionTeclado(
-                    context,
-                    height,
-                    width,
-                    'Cliente',
-                    Icons.group,
-                    colorScheme.primary,
-                  ),
-                  _itemActionTeclado(
-                    context,
-                    height,
-                    width,
-                    'Consumicion',
-                    Icons.dinner_dining,
-                    colorScheme.secondary,
-                  ),
-                  _itemActionTeclado(
-                    context,
-                    height,
-                    width,
-                    'Ticket Diario',
-                    Icons.change_circle_outlined,
-                    colorScheme.tertiary,
-                  ),
-                ],
+            Visibility(
+              visible: menuPrincipal,
+              child: SizedBox(
+                height: totalHeight,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _itemActionTeclado(
+                      context,
+                      height,
+                      width,
+                      'Devolucion',
+                      Icons.change_circle_outlined,
+                      colorScheme.onPrimaryContainer,
+                      '/devolucion',
+                    ),
+                    _itemActionTeclado(
+                      context,
+                      height,
+                      width,
+                      'Cliente',
+                      Icons.group,
+                      colorScheme.primary,
+                      '/cliente',
+                    ),
+                    _itemActionTeclado(
+                      context,
+                      height,
+                      width,
+                      'Consumicion',
+                      Icons.dinner_dining,
+                      colorScheme.secondary,
+                      '/consumicion',
+                    ),
+                    _itemActionTeclado(
+                      context,
+                      height,
+                      width,
+                      'Ticket Diario',
+                      Icons.change_circle_outlined,
+                      colorScheme.tertiary,
+                      '/ticket_diario',
+                    ),
+                  ],
+                ),
               ),
             )
           ],
@@ -338,33 +347,38 @@ class CheckOut extends StatelessWidget {
     );
   }
 
-  Container _itemActionTeclado(BuildContext context, double height,
-      double width, String label, IconData icon, Color colorIcon) {
-    return Container(
-      decoration: ShapeDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          shape: StadiumBorder(
-              side: BorderSide(
-            color: Theme.of(context).colorScheme.surfaceVariant,
-          ))),
-      height: height / 3.5,
-      width: width / 1.25,
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        alignment: AlignmentDirectional.centerStart,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2.5),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                color: colorIcon,
-              ),
-              Text(
-                label,
-                style: TextStyle(color: colorIcon),
-              ),
-            ],
+  Widget _itemActionTeclado(BuildContext context, double height, double width,
+      String label, IconData icon, Color colorIcon, String route) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, route);
+      },
+      child: Container(
+        decoration: ShapeDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            shape: StadiumBorder(
+                side: BorderSide(
+              color: Theme.of(context).colorScheme.surfaceVariant,
+            ))),
+        height: height / 3.5,
+        width: width / 1.25,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: AlignmentDirectional.centerStart,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2.5),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: colorIcon,
+                ),
+                Text(
+                  label,
+                  style: TextStyle(color: colorIcon),
+                ),
+              ],
+            ),
           ),
         ),
       ),
