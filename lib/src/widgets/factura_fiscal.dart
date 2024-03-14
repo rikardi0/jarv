@@ -5,19 +5,24 @@ class FacturaFiscal extends StatelessWidget {
   const FacturaFiscal({
     super.key,
     required this.listaProducto,
-    required this.impuesto,
     required this.tipoPago,
     required this.precioVenta,
   });
 
   final List<ProductoOrdenado?> listaProducto;
-  final double impuesto;
-  final double? precioVenta;
   final String tipoPago;
+  final double? precioVenta;
 
   @override
   Widget build(BuildContext context) {
-    final impuestoProducto = precioVenta! * impuesto;
+    final totalFactura = listaProducto.fold(
+      0.0,
+      (previousValue, element) =>
+          previousValue +
+          (element!.precio) *
+              double.parse(element.cantidad) *
+              (1 + (element.iva)),
+    );
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: Container(
@@ -86,20 +91,37 @@ class FacturaFiscal extends StatelessWidget {
                     const Divider(),
                     const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text('Impu'), Text('Base'), Text('Cuotas')],
+                      children: [Text('Impuesto'), Text('Base'), Text('Cuota')],
                     ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: listaProducto.length,
+                        itemBuilder: (context, index) {
+                          final productoOrdenado = listaProducto[index];
+                          final precio = productoOrdenado!.precio *
+                              double.parse(productoOrdenado.cantidad);
+                          final base = precio * productoOrdenado.iva;
+                          final ivaPorcentaje =
+                              (productoOrdenado.iva * 100).floor().toString();
+
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('$ivaPorcentaje%'),
+                              Text(base.toString()),
+                              Text('${precio + base}'),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    const Divider(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('${(impuesto * 100).floor().toString()} %'),
-                        Text(impuestoProducto.toString()),
-                        Text((precioVenta! + impuestoProducto).toString())
+                        const Text('Total'),
+                        Text('${totalFactura.floorToDouble().toString()} €')
                       ],
-                    ),
-                    const Divider(),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text('Total'), Text('8.5 €')],
                     ),
                     Visibility(
                       visible: tipoPago == 'tarjeta' || tipoPago == ''
