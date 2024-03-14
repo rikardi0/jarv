@@ -54,16 +54,24 @@ class FacturaFiscal extends StatelessWidget {
                     const Text('RIF'),
                     const Text('UBICACION'),
                     const Divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(tipoPago == ''
-                            ? 'Venta en Espera'
-                            : 'Venta $tipoPago'),
-                        const Text('16/02/2024'),
-                        const Text('12:15 pm')
-                      ],
-                    ),
+                    Expanded(child: Builder(
+                      builder: (context) {
+                        final productoOrdenado = listaProducto.last;
+                        final fecha = productoOrdenado!.fecha;
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text(tipoPago == ''
+                                ? 'Venta en Espera'
+                                : 'Venta $tipoPago'),
+                            Text(
+                                '${fecha.day.toString()}/${fecha.month.toString()}/${fecha.year.toString()}'),
+                            Text(
+                                '${fecha.hour.toString()}: ${fecha.minute.toString()}')
+                          ],
+                        );
+                      },
+                    )),
                     Expanded(
                       child: ListView.builder(
                         itemCount: listaProducto.length,

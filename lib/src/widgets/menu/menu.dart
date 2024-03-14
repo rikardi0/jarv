@@ -167,7 +167,8 @@ class _MenuState extends State<Menu> {
             Navigator.pushNamed(context, '/venta',
                 arguments: CheckOutArgument(
                     productoAgregado: productosAgregados,
-                    totalVenta: totalVenta));
+                    totalVenta: totalVenta,
+                    fechaVenta: DateTime.now()));
           },
           child:
               const AppBarItemButton(icon: Icons.euro_rounded, label: 'Pago'),
@@ -347,7 +348,8 @@ class _MenuState extends State<Menu> {
             nombreProducto: producto.producto,
             precio: producto.precio,
             cantidad: joinedCantidad,
-            iva: producto.iva));
+            iva: producto.iva,
+            fecha: DateTime.now()));
 
         totalVenta += producto.precio * double.parse(joinedCantidad);
         cantidad.clear();
