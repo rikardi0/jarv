@@ -27,7 +27,7 @@ class SubFamilia {
 @entity
 class Producto {
   @primaryKey
-  final String productoId;
+  final int productoId;
 
   final String producto;
 
@@ -145,7 +145,7 @@ class SeguridadSocial {
 
 @entity
 class DetalleVenta {
-  @primaryKey
+
   final int idVenta;
 
   @primaryKey

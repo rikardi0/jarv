@@ -1,7 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-// ignore_for_file: library_private_types_in_public_api
-
 part of 'database.dart';
 
 // **************************************************************************
@@ -131,7 +129,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `SubFamilia` (`idSubfamilia` TEXT NOT NULL, `nombreSub` TEXT NOT NULL, `idFamilia` TEXT NOT NULL, PRIMARY KEY (`idSubfamilia`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Producto` (`productoId` TEXT NOT NULL, `producto` TEXT NOT NULL, `precio` REAL NOT NULL, `medida` INTEGER NOT NULL, `coste` REAL NOT NULL, `iva` REAL NOT NULL, `idSubfamilia` TEXT NOT NULL, PRIMARY KEY (`productoId`))');
+            'CREATE TABLE IF NOT EXISTS `Producto` (`productoId` INTEGER NOT NULL, `producto` TEXT NOT NULL, `precio` REAL NOT NULL, `medida` INTEGER NOT NULL, `coste` REAL NOT NULL, `iva` REAL NOT NULL, `idSubfamilia` TEXT NOT NULL, PRIMARY KEY (`productoId`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Proveedor` (`cif` TEXT NOT NULL, `nombreEmpresa` TEXT NOT NULL, `numero` INTEGER NOT NULL, `email` TEXT NOT NULL, PRIMARY KEY (`cif`))');
         await database.execute(
@@ -147,7 +145,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `SeguridadSocial` (`puesto` TEXT NOT NULL, `paog` INTEGER NOT NULL, PRIMARY KEY (`puesto`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `DetalleVenta` (`idVenta` INTEGER NOT NULL, `idProducto` INTEGER NOT NULL, `cantidad` INTEGER NOT NULL, `precioUnitario` REAL NOT NULL, `descuento` REAL NOT NULL, `entregado` INTEGER NOT NULL, PRIMARY KEY (`idVenta`))');
+            'CREATE TABLE IF NOT EXISTS `DetalleVenta` (`idVenta` INTEGER NOT NULL, `idProducto` INTEGER NOT NULL, `cantidad` INTEGER NOT NULL, `precioUnitario` REAL NOT NULL, `descuento` REAL NOT NULL, `entregado` INTEGER NOT NULL, PRIMARY KEY (`idProducto`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Venta` (`idVenta` INTEGER NOT NULL, `costeTotal` REAL NOT NULL, `ingresoTotal` REAL NOT NULL, `idUsuario` INTEGER NOT NULL, `nombreCliente` TEXT NOT NULL, `fecha` TEXT NOT NULL, PRIMARY KEY (`idVenta`))');
         await database.execute(
@@ -447,7 +445,7 @@ class _$ProductoDao extends ProductoDao {
   Future<List<Producto>> findAllProductos() async {
     return _queryAdapter.queryList('SELECT * FROM Producto',
         mapper: (Map<String, Object?> row) => Producto(
-            row['productoId'] as String,
+            row['productoId'] as int,
             row['producto'] as String,
             row['precio'] as double,
             row['coste'] as double,
@@ -469,7 +467,7 @@ class _$ProductoDao extends ProductoDao {
     return _queryAdapter.queryStream(
         'SELECT * FROM Producto WHERE productoId = ?1',
         mapper: (Map<String, Object?> row) => Producto(
-            row['productoId'] as String,
+            row['productoId'] as int,
             row['producto'] as String,
             row['precio'] as double,
             row['coste'] as double,
@@ -486,7 +484,7 @@ class _$ProductoDao extends ProductoDao {
     return _queryAdapter.queryList(
         'SELECT * FROM Producto WHERE idSubfamilia = ?1',
         mapper: (Map<String, Object?> row) => Producto(
-            row['productoId'] as String,
+            row['productoId'] as int,
             row['producto'] as String,
             row['precio'] as double,
             row['coste'] as double,
