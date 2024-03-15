@@ -1063,6 +1063,54 @@ class _$VentaDao extends VentaDao {
   }
 
   @override
+  Stream<List<Venta?>> findVentaByRange(
+    int firstDate,
+    int secondDate,
+  ) {
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM Venta WHERE idVenta BETWEEN ?1 AND ?2 ORDER BY idVenta ASC',
+        mapper: (Map<String, Object?> row) => Venta(
+            idVenta: row['idVenta'] as int,
+            costeTotal: row['costeTotal'] as double,
+            ingresoTotal: row['ingresoTotal'] as double,
+            fecha: row['fecha'] as String,
+            idUsuario: row['idUsuario'] as int,
+            nombreCliente: row['nombreCliente'] as String),
+        arguments: [firstDate, secondDate],
+        queryableName: 'Venta',
+        isView: false);
+  }
+
+  @override
+  Future<List<Venta?>> findVentaByFecha(String fecha) async {
+    return _queryAdapter.queryList('SELECT * FROM Venta WHERE fecha = ?1',
+        mapper: (Map<String, Object?> row) => Venta(
+            idVenta: row['idVenta'] as int,
+            costeTotal: row['costeTotal'] as double,
+            ingresoTotal: row['ingresoTotal'] as double,
+            fecha: row['fecha'] as String,
+            idUsuario: row['idUsuario'] as int,
+            nombreCliente: row['nombreCliente'] as String),
+        arguments: [fecha]);
+  }
+
+  @override
+  Stream<List<Venta?>> findVentaByNombre(String nombre) {
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM Venta WHERE nombreCliente = ?1',
+        mapper: (Map<String, Object?> row) => Venta(
+            idVenta: row['idVenta'] as int,
+            costeTotal: row['costeTotal'] as double,
+            ingresoTotal: row['ingresoTotal'] as double,
+            fecha: row['fecha'] as String,
+            idUsuario: row['idUsuario'] as int,
+            nombreCliente: row['nombreCliente'] as String),
+        arguments: [nombre],
+        queryableName: 'Venta',
+        isView: false);
+  }
+
+  @override
   Future<void> insertVenta(Venta venta) async {
     await _ventaInsertionAdapter.insert(venta, OnConflictStrategy.abort);
   }

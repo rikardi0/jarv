@@ -145,10 +145,8 @@ class SeguridadSocial {
 
 @entity
 class DetalleVenta {
-
   final int idVenta;
 
-  @primaryKey
   final int idProducto;
 
   final int cantidad;

@@ -183,6 +183,16 @@ abstract class VentaDao {
   @Query('SELECT * FROM Venta WHERE idVenta = :id')
   Stream<Venta?> findVentaById(int id);
 
+  @Query(
+      'SELECT * FROM Venta WHERE idVenta BETWEEN :firstDate AND :secondDate ORDER BY idVenta ASC')
+  Stream<List<Venta?>> findVentaByRange(int firstDate, int secondDate);
+
+  @Query('SELECT * FROM Venta WHERE fecha = :fecha')
+  Future<List<Venta?>> findVentaByFecha(String fecha);
+
+  @Query('SELECT * FROM Venta WHERE nombreCliente = :nombre')
+  Stream<List<Venta?>> findVentaByNombre(String nombre);
+
   @insert
   Future<void> insertVenta(Venta venta);
 }
