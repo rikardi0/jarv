@@ -109,7 +109,7 @@ class _$AppDatabase extends AppDatabase {
     Callback? callback,
   ]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
-      version: 1,
+      version: 2,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
         await callback?.onConfigure?.call(database);
@@ -145,7 +145,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `SeguridadSocial` (`puesto` TEXT NOT NULL, `paog` INTEGER NOT NULL, PRIMARY KEY (`puesto`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `DetalleVenta` (`idVenta` INTEGER NOT NULL, `idProducto` INTEGER NOT NULL, `cantidad` INTEGER NOT NULL, `precioUnitario` REAL NOT NULL, `descuento` REAL NOT NULL, `entregado` INTEGER NOT NULL, PRIMARY KEY (`idProducto`))');
+            'CREATE TABLE IF NOT EXISTS `DetalleVenta` (`idDetalleVenta` TEXT NOT NULL, `idVenta` INTEGER NOT NULL, `productoId` INTEGER NOT NULL, `cantidad` INTEGER NOT NULL, `precioUnitario` REAL NOT NULL, `descuento` REAL NOT NULL, `entregado` INTEGER NOT NULL, PRIMARY KEY (`idDetalleVenta`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Venta` (`idVenta` INTEGER NOT NULL, `costeTotal` REAL NOT NULL, `ingresoTotal` REAL NOT NULL, `idUsuario` INTEGER NOT NULL, `nombreCliente` TEXT NOT NULL, `fecha` TEXT NOT NULL, PRIMARY KEY (`idVenta`))');
         await database.execute(
@@ -463,7 +463,7 @@ class _$ProductoDao extends ProductoDao {
   }
 
   @override
-  Stream<Producto?> findProductoById(String id) {
+  Stream<Producto?> findProductoById(int id) {
     return _queryAdapter.queryStream(
         'SELECT * FROM Producto WHERE productoId = ?1',
         mapper: (Map<String, Object?> row) => Producto(
@@ -936,19 +936,19 @@ class _$DetalleVentaDao extends DetalleVentaDao {
   _$DetalleVentaDao(
     this.database,
     this.changeListener,
-  )   : _queryAdapter = QueryAdapter(database, changeListener),
+  )   : _queryAdapter = QueryAdapter(database),
         _detalleVentaInsertionAdapter = InsertionAdapter(
             database,
             'DetalleVenta',
             (DetalleVenta item) => <String, Object?>{
+                  'idDetalleVenta': item.idDetalleVenta,
                   'idVenta': item.idVenta,
-                  'idProducto': item.idProducto,
+                  'productoId': item.productoId,
                   'cantidad': item.cantidad,
                   'precioUnitario': item.precioUnitario,
                   'descuento': item.descuento,
                   'entregado': item.entregado ? 1 : 0
-                },
-            changeListener);
+                });
 
   final sqflite.DatabaseExecutor database;
 
@@ -963,11 +963,12 @@ class _$DetalleVentaDao extends DetalleVentaDao {
     return _queryAdapter.queryList('SELECT * FROM DetalleVenta',
         mapper: (Map<String, Object?> row) => DetalleVenta(
             row['idVenta'] as int,
-            row['idProducto'] as int,
+            row['productoId'] as int,
             row['cantidad'] as int,
             row['precioUnitario'] as double,
             row['descuento'] as double,
-            (row['entregado'] as int) != 0));
+            (row['entregado'] as int) != 0,
+            row['idDetalleVenta'] as String));
   }
 
   @override
@@ -979,19 +980,18 @@ class _$DetalleVentaDao extends DetalleVentaDao {
   }
 
   @override
-  Stream<DetalleVenta?> findDetalleVentaById(int id) {
-    return _queryAdapter.queryStream(
+  Future<List<DetalleVenta?>> findDetalleVentaById(int id) async {
+    return _queryAdapter.queryList(
         'SELECT * FROM DetalleVenta WHERE idVenta = ?1',
         mapper: (Map<String, Object?> row) => DetalleVenta(
             row['idVenta'] as int,
-            row['idProducto'] as int,
+            row['productoId'] as int,
             row['cantidad'] as int,
             row['precioUnitario'] as double,
             row['descuento'] as double,
-            (row['entregado'] as int) != 0),
-        arguments: [id],
-        queryableName: 'DetalleVenta',
-        isView: false);
+            (row['entregado'] as int) != 0,
+            row['idDetalleVenta'] as String),
+        arguments: [id]);
   }
 
   @override
@@ -1058,25 +1058,6 @@ class _$VentaDao extends VentaDao {
             idUsuario: row['idUsuario'] as int,
             nombreCliente: row['nombreCliente'] as String),
         arguments: [id],
-        queryableName: 'Venta',
-        isView: false);
-  }
-
-  @override
-  Stream<List<Venta?>> findVentaByRange(
-    int firstDate,
-    int secondDate,
-  ) {
-    return _queryAdapter.queryListStream(
-        'SELECT * FROM Venta WHERE idVenta BETWEEN ?1 AND ?2 ORDER BY idVenta ASC',
-        mapper: (Map<String, Object?> row) => Venta(
-            idVenta: row['idVenta'] as int,
-            costeTotal: row['costeTotal'] as double,
-            ingresoTotal: row['ingresoTotal'] as double,
-            fecha: row['fecha'] as String,
-            idUsuario: row['idUsuario'] as int,
-            nombreCliente: row['nombreCliente'] as String),
-        arguments: [firstDate, secondDate],
         queryableName: 'Venta',
         isView: false);
   }

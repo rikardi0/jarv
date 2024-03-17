@@ -43,7 +43,7 @@ abstract class ProductoDao {
   Stream<List<String>> findAllProductoNombre();
 
   @Query('SELECT * FROM Producto WHERE productoId = :id')
-  Stream<Producto?> findProductoById(String id);
+  Stream<Producto?> findProductoById(int id);
 
   @Query('SELECT * FROM Producto WHERE idSubfamilia = :id')
   Future<List<Producto?>> findProductoBySubFamiliaId(String id);
@@ -166,7 +166,7 @@ abstract class DetalleVentaDao {
   Stream<List<String>> findAllDetalleVentaNombre();
 
   @Query('SELECT * FROM DetalleVenta WHERE idVenta = :id')
-  Stream<DetalleVenta?> findDetalleVentaById(int id);
+  Future<List<DetalleVenta?>> findDetalleVentaById(int id);
 
   @insert
   Future<void> insertDetalleVenta(DetalleVenta detalleVenta);
@@ -182,10 +182,6 @@ abstract class VentaDao {
 
   @Query('SELECT * FROM Venta WHERE idVenta = :id')
   Stream<Venta?> findVentaById(int id);
-
-  @Query(
-      'SELECT * FROM Venta WHERE idVenta BETWEEN :firstDate AND :secondDate ORDER BY idVenta ASC')
-  Stream<List<Venta?>> findVentaByRange(int firstDate, int secondDate);
 
   @Query('SELECT * FROM Venta WHERE fecha = :fecha')
   Future<List<Venta?>> findVentaByFecha(String fecha);

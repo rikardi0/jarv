@@ -145,17 +145,20 @@ class SeguridadSocial {
 
 @entity
 class DetalleVenta {
+  @primaryKey
+  final String idDetalleVenta;
+
   final int idVenta;
 
-  final int idProducto;
+  final int productoId;
 
   final int cantidad;
   final double precioUnitario;
   final double descuento;
   final bool entregado;
 
-  DetalleVenta(this.idVenta, this.idProducto, this.cantidad,
-      this.precioUnitario, this.descuento, this.entregado);
+  DetalleVenta(this.idVenta, this.productoId, this.cantidad,
+      this.precioUnitario, this.descuento, this.entregado, this.idDetalleVenta);
 }
 
 @entity

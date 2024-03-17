@@ -212,6 +212,7 @@ class _PagoState extends State<Pago> {
 
   void _registrarVenta(CheckOutArgument argument) {
     final idVenta = DateTime.now().millisecondsSinceEpoch;
+
     for (var element in argument.productoAgregado) {
       widget.detalleVenta.insertDetalleVenta(DetalleVenta(
           idVenta,
@@ -219,14 +220,17 @@ class _PagoState extends State<Pago> {
           int.parse(element.cantidad),
           element.precio,
           0,
-          true));
+          true,
+          UniqueKey().toString()));
     }
+    final fechaMes =
+        '${argument.fechaVenta.day}/${argument.fechaVenta.month}/${argument.fechaVenta.year}';
 
     widget.venta.insertVenta(Venta(
         idVenta: idVenta,
         costeTotal: totalFactura,
         ingresoTotal: argument.totalVenta,
-        fecha: argument.fechaVenta.toString(),
+        fecha: fechaMes,
         idUsuario: 01,
         nombreCliente: cliente));
 

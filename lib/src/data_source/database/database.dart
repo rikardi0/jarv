@@ -6,7 +6,7 @@ import '../db.dart';
 
 part 'database.g.dart';
 
-@Database(version: 1, entities: [
+@Database(version: 2, entities: [
   Familia,
   SubFamilia,
   Producto,
