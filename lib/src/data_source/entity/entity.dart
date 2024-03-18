@@ -166,6 +166,8 @@ class Venta {
   @primaryKey
   final int idVenta;
 
+  final bool consumicionPropia;
+  final String metodoPago;
   final double costeTotal;
   final double ingresoTotal;
 
@@ -175,7 +177,9 @@ class Venta {
   final String fecha;
 
   Venta({
+    required this.consumicionPropia,
     required this.idVenta,
+    required this.metodoPago,
     required this.costeTotal,
     required this.ingresoTotal,
     required this.fecha,
@@ -201,6 +205,9 @@ class CosteFijo {
 class Cliente {
   @primaryKey
   final String nombreCliente;
+  final String direccion;
+  final String nif;
+  final String fechaNacimiento;
 
   final String telefono;
   final String email;
@@ -210,6 +217,9 @@ class Cliente {
   final String nombreTienda;
 
   Cliente({
+    required this.fechaNacimiento,
+    required this.nif,
+    required this.direccion,
     required this.nombreCliente,
     required this.telefono,
     required this.email,

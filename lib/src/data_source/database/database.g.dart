@@ -147,11 +147,11 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `DetalleVenta` (`idDetalleVenta` TEXT NOT NULL, `idVenta` INTEGER NOT NULL, `productoId` INTEGER NOT NULL, `cantidad` INTEGER NOT NULL, `precioUnitario` REAL NOT NULL, `descuento` REAL NOT NULL, `entregado` INTEGER NOT NULL, PRIMARY KEY (`idDetalleVenta`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Venta` (`idVenta` INTEGER NOT NULL, `costeTotal` REAL NOT NULL, `ingresoTotal` REAL NOT NULL, `idUsuario` INTEGER NOT NULL, `nombreCliente` TEXT NOT NULL, `fecha` TEXT NOT NULL, PRIMARY KEY (`idVenta`))');
+            'CREATE TABLE IF NOT EXISTS `Venta` (`idVenta` INTEGER NOT NULL, `consumicionPropia` INTEGER NOT NULL, `metodoPago` TEXT NOT NULL, `costeTotal` REAL NOT NULL, `ingresoTotal` REAL NOT NULL, `idUsuario` INTEGER NOT NULL, `nombreCliente` TEXT NOT NULL, `fecha` TEXT NOT NULL, PRIMARY KEY (`idVenta`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `CosteFijo` (`nombre` TEXT NOT NULL, `coste` REAL NOT NULL, PRIMARY KEY (`nombre`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Cliente` (`nombreCliente` TEXT NOT NULL, `telefono` TEXT NOT NULL, `email` TEXT NOT NULL, `puntos` INTEGER NOT NULL, `nombreTienda` TEXT NOT NULL, PRIMARY KEY (`nombreCliente`))');
+            'CREATE TABLE IF NOT EXISTS `Cliente` (`nombreCliente` TEXT NOT NULL, `direccion` TEXT NOT NULL, `nif` TEXT NOT NULL, `fechaNacimiento` TEXT NOT NULL, `telefono` TEXT NOT NULL, `email` TEXT NOT NULL, `puntos` INTEGER NOT NULL, `nombreTienda` TEXT NOT NULL, PRIMARY KEY (`nombreCliente`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Tienda` (`nombreTienda` TEXT NOT NULL, `nombreFiscal` TEXT NOT NULL, `ciudad` TEXT NOT NULL, `codigoPostal` TEXT NOT NULL, `direccion` TEXT NOT NULL, `telefono` TEXT NOT NULL, `email` TEXT NOT NULL, `logo` TEXT NOT NULL, PRIMARY KEY (`nombreTienda`))');
         await database.execute(
@@ -1011,6 +1011,8 @@ class _$VentaDao extends VentaDao {
             'Venta',
             (Venta item) => <String, Object?>{
                   'idVenta': item.idVenta,
+                  'consumicionPropia': item.consumicionPropia ? 1 : 0,
+                  'metodoPago': item.metodoPago,
                   'costeTotal': item.costeTotal,
                   'ingresoTotal': item.ingresoTotal,
                   'idUsuario': item.idUsuario,
@@ -1031,7 +1033,9 @@ class _$VentaDao extends VentaDao {
   Future<List<Venta>> findAllVentas() async {
     return _queryAdapter.queryList('SELECT * FROM Venta',
         mapper: (Map<String, Object?> row) => Venta(
+            consumicionPropia: (row['consumicionPropia'] as int) != 0,
             idVenta: row['idVenta'] as int,
+            metodoPago: row['metodoPago'] as String,
             costeTotal: row['costeTotal'] as double,
             ingresoTotal: row['ingresoTotal'] as double,
             fecha: row['fecha'] as String,
@@ -1051,7 +1055,9 @@ class _$VentaDao extends VentaDao {
   Stream<Venta?> findVentaById(int id) {
     return _queryAdapter.queryStream('SELECT * FROM Venta WHERE idVenta = ?1',
         mapper: (Map<String, Object?> row) => Venta(
+            consumicionPropia: (row['consumicionPropia'] as int) != 0,
             idVenta: row['idVenta'] as int,
+            metodoPago: row['metodoPago'] as String,
             costeTotal: row['costeTotal'] as double,
             ingresoTotal: row['ingresoTotal'] as double,
             fecha: row['fecha'] as String,
@@ -1066,7 +1072,9 @@ class _$VentaDao extends VentaDao {
   Future<List<Venta?>> findVentaByFecha(String fecha) async {
     return _queryAdapter.queryList('SELECT * FROM Venta WHERE fecha = ?1',
         mapper: (Map<String, Object?> row) => Venta(
+            consumicionPropia: (row['consumicionPropia'] as int) != 0,
             idVenta: row['idVenta'] as int,
+            metodoPago: row['metodoPago'] as String,
             costeTotal: row['costeTotal'] as double,
             ingresoTotal: row['ingresoTotal'] as double,
             fecha: row['fecha'] as String,
@@ -1080,7 +1088,9 @@ class _$VentaDao extends VentaDao {
     return _queryAdapter.queryListStream(
         'SELECT * FROM Venta WHERE nombreCliente = ?1',
         mapper: (Map<String, Object?> row) => Venta(
+            consumicionPropia: (row['consumicionPropia'] as int) != 0,
             idVenta: row['idVenta'] as int,
+            metodoPago: row['metodoPago'] as String,
             costeTotal: row['costeTotal'] as double,
             ingresoTotal: row['ingresoTotal'] as double,
             fecha: row['fecha'] as String,
@@ -1160,6 +1170,9 @@ class _$ClienteDao extends ClienteDao {
             'Cliente',
             (Cliente item) => <String, Object?>{
                   'nombreCliente': item.nombreCliente,
+                  'direccion': item.direccion,
+                  'nif': item.nif,
+                  'fechaNacimiento': item.fechaNacimiento,
                   'telefono': item.telefono,
                   'email': item.email,
                   'puntos': item.puntos,
@@ -1179,6 +1192,9 @@ class _$ClienteDao extends ClienteDao {
   Future<List<Cliente>> findAllClientes() async {
     return _queryAdapter.queryList('SELECT * FROM Cliente',
         mapper: (Map<String, Object?> row) => Cliente(
+            fechaNacimiento: row['fechaNacimiento'] as String,
+            nif: row['nif'] as String,
+            direccion: row['direccion'] as String,
             nombreCliente: row['nombreCliente'] as String,
             telefono: row['telefono'] as String,
             email: row['email'] as String,
@@ -1199,6 +1215,9 @@ class _$ClienteDao extends ClienteDao {
     return _queryAdapter.queryStream(
         'SELECT * FROM Cliente WHERE nombreCliente = ?1',
         mapper: (Map<String, Object?> row) => Cliente(
+            fechaNacimiento: row['fechaNacimiento'] as String,
+            nif: row['nif'] as String,
+            direccion: row['direccion'] as String,
             nombreCliente: row['nombreCliente'] as String,
             telefono: row['telefono'] as String,
             email: row['email'] as String,
