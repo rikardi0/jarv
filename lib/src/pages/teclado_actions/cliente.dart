@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/src/data_source/db.dart';
 import '../../widgets/card_cliente.dart';
 
-class ClienteMenu extends StatelessWidget {
-  const ClienteMenu({super.key});
+class ClienteMenu extends StatefulWidget {
+  const ClienteMenu({super.key, required this.cliente});
 
   static const routeName = '/cliente';
+  final ClienteDao cliente;
 
   @override
+  State<ClienteMenu> createState() => _ClienteMenuState();
+}
+
+class _ClienteMenuState extends State<ClienteMenu> {
+  List<Cliente> items = [];
+  @override
   Widget build(BuildContext context) {
+    final clientes = widget.cliente.findAllClientes().asStream();
+
     final size = MediaQuery.of(context).size;
     return Scaffold(
         appBar: AppBar(
@@ -22,11 +32,31 @@ class ClienteMenu extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSurface,
             ),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: SizedBox(
-                  height: size.height,
-                  child: const CardCliente(),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: StreamBuilder(
+                      stream: clientes,
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Center(
+                            child: Text('Sin Cliente'),
+                          );
+                        } else {
+                          final clienteInfo = snapshot.data;
+
+                          return ListView.builder(
+                              itemCount: clienteInfo?.length,
+                              itemBuilder: (context, index) {
+                                return CardCliente(
+                                    direccionCliente:
+                                        clienteInfo![index].nombreTienda,
+                                    nombreCliente:
+                                        clienteInfo[index].nombreCliente);
+                              });
+                        }
+                      }),
                 ),
               ),
             ),
@@ -42,20 +72,16 @@ class ClienteMenu extends StatelessWidget {
         children: [
           Expanded(
             child: Container(
-              decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .surfaceVariant
-                      .withOpacity(0.25),
-                  borderRadius: BorderRadius.circular(10)),
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(10)),
               width: size.width * 0.35,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.5),
                 child: ListView(
                   children: [
                     textField('Nombre', TextInputType.name),
+                    textField('NIF', TextInputType.name),
                     textField('Telefono', TextInputType.phone),
-                    textField('NIF', TextInputType.none),
                   ],
                 ),
               ),
@@ -73,13 +99,20 @@ class ClienteMenu extends StatelessWidget {
     );
   }
 
-  TextFormField textField(String label, TextInputType type) {
-    return TextFormField(
-      onFieldSubmitted: (value) {},
-      keyboardType: type,
-      decoration: InputDecoration(
-        labelText: label,
-        suffixIcon: const Icon(Icons.search),
+  Widget textField(
+    String label,
+    TextInputType type,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        keyboardType: type,
+        decoration: InputDecoration(
+          border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(25.0))),
+          labelText: label,
+          suffixIcon: const Icon(Icons.search),
+        ),
       ),
     );
   }
