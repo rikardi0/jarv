@@ -3,7 +3,9 @@ import 'package:jarv/src/data_source/db.dart';
 import 'package:jarv/src/utils/models/arguments_check_out.dart';
 import 'package:flutter/services.dart';
 
+import '../../widgets/cliente_selector.dart';
 import '../../widgets/factura_fiscal.dart';
+import '../../widgets/metodo_pago_selector.dart';
 
 class Pago extends StatefulWidget {
   const Pago(
@@ -77,56 +79,26 @@ class _PagoState extends State<Pago> {
           style: Theme.of(context).textTheme.titleLarge,
           textAlign: TextAlign.center,
         ),
-        _dropDownMetodoPago(),
-        _dropDownCliente(clienteLista),
+        MetodoPagoSelector(
+            metodoPago: metodoPago,
+            onChanged: (value) {
+              metodoPago = value;
+              setState(() {});
+            }),
+        ClienteSelector(
+          cliente: cliente,
+          clienteLista: clienteLista,
+          onChanged: (value) {
+            cliente = value;
+            setState(() {});
+          },
+        ),
         _totalFactura(),
         _efectivoEntregado(),
         _cambioEntregar(cambio),
         _registrarButton(argument),
       ],
     );
-  }
-
-  StreamBuilder<List<String>> _dropDownCliente(
-      Stream<List<String>> clienteLista) {
-    return StreamBuilder(
-      stream: clienteLista,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return DropdownButton<String>(
-            isExpanded: true,
-            value: cliente,
-            items: snapshot.data!
-                .map((value) => DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    ))
-                .toList(),
-            onChanged: (value) {
-              cliente = value!;
-            },
-          );
-        } else {
-          return const CircularProgressIndicator();
-        }
-      },
-    );
-  }
-
-  DropdownButton<dynamic> _dropDownMetodoPago() {
-    return DropdownButton(
-        isExpanded: true,
-        icon: Icon(
-            metodoPago == 'tarjeta' ? Icons.payment : Icons.payments_outlined),
-        value: metodoPago,
-        items: const <DropdownMenuItem>[
-          DropdownMenuItem(value: 'efectivo', child: Text('Efectivo')),
-          DropdownMenuItem(value: 'tarjeta', child: Text('Tarjeta')),
-        ],
-        onChanged: (value) {
-          metodoPago = value;
-          setState(() {});
-        });
   }
 
   Padding _totalFactura() {
@@ -232,7 +204,9 @@ class _PagoState extends State<Pago> {
         ingresoTotal: argument.totalVenta,
         fecha: fechaMes,
         idUsuario: 01,
-        nombreCliente: cliente));
+        nombreCliente: cliente,
+        consumicionPropia: false,
+        metodoPago: metodoPago));
 
     Navigator.pushNamed(context, '/menu');
   }
