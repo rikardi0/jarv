@@ -72,6 +72,9 @@ class CustomThemeData {
     return ThemeData(
         useMaterial3: true,
         colorScheme: lightColorScheme,
+        datePickerTheme: DatePickerThemeData(
+            rangePickerHeaderBackgroundColor: lightColorScheme.primary,
+            rangePickerHeaderForegroundColor: lightColorScheme.onPrimary),
         cardColor: lightColorScheme.background,
         listTileTheme: ListTileThemeData(
           selectedColor: lightColorScheme.onPrimary,
@@ -82,6 +85,9 @@ class CustomThemeData {
     return ThemeData(
         useMaterial3: true,
         colorScheme: darkColorScheme,
+        datePickerTheme: DatePickerThemeData(
+            rangePickerHeaderBackgroundColor: darkColorScheme.primary,
+            rangePickerHeaderForegroundColor: darkColorScheme.onPrimary),
         listTileTheme: ListTileThemeData(
           selectedColor: darkColorScheme.onPrimary,
         ));

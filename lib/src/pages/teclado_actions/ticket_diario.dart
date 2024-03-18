@@ -1,8 +1,7 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:jarv/src/data_source/db.dart';
+import 'package:jarv/src/widgets/cliente_selector.dart';
+import 'package:jarv/src/widgets/metodo_pago_selector.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -11,12 +10,14 @@ class TicketDiario extends StatefulWidget {
     super.key,
     required this.ventas,
     required this.ventaDetalle,
+    required this.cliente,
     required this.producto,
     required this.databaseExecutor,
   });
   static const routeName = '/ticket_diario';
   final VentaDao ventas;
   final DetalleVentaDao ventaDetalle;
+  final ClienteDao cliente;
   final ProductoDao producto;
   final DatabaseExecutor databaseExecutor;
 
@@ -29,6 +30,10 @@ class _TicketDiarioState extends State<TicketDiario> {
   String fechaFactura = '';
   String horaFactura = '';
   double montoFactura = 0.0;
+  bool intervalo = false;
+  String cliente = 'nombreCliente 1';
+  String metodoPago = 'tarjeta';
+
   @override
   void initState() {
     super.initState();
@@ -54,14 +59,14 @@ WHERE DetalleVenta.idVenta = ?
   final selectedVenta = ValueNotifier<int?>(null);
   int ventaSeleccionada = 0;
   List<int> idProductosVenta = [];
+
   @override
   Widget build(BuildContext context) {
     final dateTime = DateTime.now();
     final fechaHoy = '${dateTime.day}/${dateTime.month}/${dateTime.year}';
 
     final ventaDiaria = widget.ventas.findVentaByFecha(fechaHoy).asStream();
-
-    final selectedVenta = ValueNotifier<int?>(null);
+    final clienteLista = widget.cliente.findAllClienteNombre();
 
     return Scaffold(
         appBar: AppBar(),
@@ -77,7 +82,8 @@ WHERE DetalleVenta.idVenta = ?
               return Row(
                 children: [
                   _tarjetaVenta(context, ventaItem),
-                  _containerFactura(context)
+                  _containerFactura(context),
+                  _filtroVenta(context, clienteLista),
                 ],
               );
             }
@@ -85,64 +91,120 @@ WHERE DetalleVenta.idVenta = ?
         ));
   }
 
-  Widget _containerFactura(BuildContext context) {
+  Padding _filtroVenta(
+      BuildContext context, Stream<List<String>> clienteLista) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-                color: Theme.of(context)
-                    .colorScheme
-                    .onBackground
-                    .withOpacity(0.15))),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.375,
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.background,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onBackground
-                          .withOpacity(0.15))),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    const Text('TITULO EMPRESA'),
-                    const Text('RIF'),
-                    const Text('UBICACION'),
-                    const Divider(),
-                    Expanded(
-                      child: SizedBox(
-                        child: _columnProducto(),
+      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+      child: Expanded(
+        child: Container(
+          decoration: BoxDecoration(
+              color: Theme.of(context)
+                  .colorScheme
+                  .surfaceVariant
+                  .withOpacity(0.25),
+              borderRadius: BorderRadius.circular(10)),
+          width: MediaQuery.of(context).size.width * 0.3,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.5),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                DatePicker(
+                  intervalo: intervalo,
+                  onChanged: (value) {
+                    setState(() {
+                      intervalo = value;
+                    });
+                  },
+                ),
+                ClienteSelector(
+                    cliente: cliente,
+                    clienteLista: clienteLista,
+                    onChanged: (value) {
+                      setState(() {
+                        cliente = value;
+                      });
+                    }),
+                MetodoPagoSelector(
+                    metodoPago: metodoPago,
+                    onChanged: (value) {
+                      setState(() {
+                        metodoPago = value;
+                      });
+                    })
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _containerFactura(BuildContext context) {
+    return Visibility(
+      visible: selectedVenta.value != null ? true : false,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 20.0),
+        child: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onBackground
+                      .withOpacity(0.15))),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.35,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.background,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onBackground
+                            .withOpacity(0.15))),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      const Text('TITULO EMPRESA'),
+                      const Text('RIF'),
+                      const Text('UBICACION'),
+                      const Divider(),
+                      Expanded(
+                        child: SizedBox(
+                          child: _columnProducto(),
+                        ),
                       ),
-                    ),
-                    const Divider(),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text('Impuesto'), Text('Base'), Text('Cuota')],
-                    ),
-                    Expanded(
-                      child: _columnImpuesto(),
-                    ),
-                    const Divider(),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 0, vertical: 8.0),
-                      child: Row(
+                      const Divider(),
+                      const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Total'),
-                          Text('$montoFactura €')
+                          Text('Impuesto'),
+                          Text('Base'),
+                          Text('Cuota')
                         ],
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        child: _columnImpuesto(),
+                      ),
+                      const Divider(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 0, vertical: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Total'),
+                            Text('$montoFactura €')
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -238,6 +300,9 @@ WHERE DetalleVenta.idVenta = ?
                         : Colors.transparent),
               ),
               child: ListTile(
+                visualDensity: VisualDensity.compact,
+                isThreeLine: true,
+                titleAlignment: ListTileTitleAlignment.center,
                 selected: selectedVenta.value == index ? true : false,
                 selectedColor: Theme.of(context).colorScheme.primary,
                 onTap: () {
@@ -254,8 +319,8 @@ WHERE DetalleVenta.idVenta = ?
                     _loadDataFromDatabase();
                   });
                 },
-                title: Text('Total'),
-                subtitle: Text(venta!.costeTotal.floorToDouble().toString()),
+                title: const Text('Total'),
+                subtitle: Text(venta.costeTotal.floorToDouble().toString()),
                 trailing: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -268,6 +333,61 @@ WHERE DetalleVenta.idVenta = ?
           },
         ),
       ),
+    );
+  }
+}
+
+class DatePicker extends StatelessWidget {
+  const DatePicker({
+    super.key,
+    required this.intervalo,
+    required this.onChanged,
+  });
+
+  final bool intervalo;
+  final dynamic onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextFormField(
+          readOnly: true,
+          onTap: () {
+            if (intervalo) {
+              showDateRangePicker(
+                  context: context,
+                  initialEntryMode: DatePickerEntryMode.calendarOnly,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now());
+            } else {
+              showDatePicker(
+                  context: context,
+                  initialEntryMode: DatePickerEntryMode.calendarOnly,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now());
+            }
+          },
+          decoration: InputDecoration(
+            helperText: intervalo ? 'dd/mm/aaaa - dd/mm/aaaa' : 'dd/mm/aaaa',
+            labelText: 'Fecha',
+            suffixIcon: const Icon(Icons.calendar_month),
+          ),
+        ),
+        Row(
+          children: [
+            Switch(
+                value: intervalo,
+                onChanged: (value) {
+                  onChanged(value);
+                }),
+            Text(
+              'Intervalo',
+              style: Theme.of(context).textTheme.bodyLarge,
+            )
+          ],
+        )
+      ],
     );
   }
 }
