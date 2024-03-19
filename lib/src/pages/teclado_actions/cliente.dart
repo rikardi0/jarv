@@ -13,7 +13,14 @@ class ClienteMenu extends StatefulWidget {
 }
 
 class _ClienteMenuState extends State<ClienteMenu> {
-  List<Cliente> items = [];
+  List<Cliente> clienteLista = [];
+  final TextEditingController _nameSearchController = TextEditingController();
+  final TextEditingController _nifSearchController = TextEditingController();
+  final TextEditingController _direccionSearchController =
+      TextEditingController();
+  String nameSearchText = '';
+  String nifSearchText = '';
+  String direccionSearchText = '';
   @override
   Widget build(BuildContext context) {
     final clientes = widget.cliente.findAllClientes().asStream();
@@ -44,16 +51,19 @@ class _ClienteMenuState extends State<ClienteMenu> {
                             child: Text('Sin Cliente'),
                           );
                         } else {
-                          final clienteInfo = snapshot.data;
+                          clienteLista = snapshot.data!;
+                          _searchFilter();
 
                           return ListView.builder(
-                              itemCount: clienteInfo?.length,
+                              itemCount: clienteLista.length,
                               itemBuilder: (context, index) {
                                 return CardCliente(
-                                    direccionCliente:
-                                        clienteInfo![index].nombreTienda,
-                                    nombreCliente:
-                                        clienteInfo[index].nombreCliente);
+                                  direccionCliente:
+                                      clienteLista[index].direccion,
+                                  nombreCliente:
+                                      clienteLista[index].nombreCliente,
+                                  nifCliente: clienteLista[index].nif,
+                                );
                               });
                         }
                       }),
@@ -62,6 +72,31 @@ class _ClienteMenuState extends State<ClienteMenu> {
             ),
           ],
         ));
+  }
+
+  void _searchFilter() {
+    if (nameSearchText.isNotEmpty ||
+        nifSearchText.isNotEmpty ||
+        direccionSearchText.isNotEmpty) {
+      clienteLista = clienteLista.where((element) {
+        return element.nombreCliente
+            .toString()
+            .toLowerCase()
+            .contains(nameSearchText.toLowerCase());
+      }).toList();
+      clienteLista = clienteLista.where((element) {
+        return element.nif
+            .toString()
+            .toLowerCase()
+            .contains(nifSearchText.toLowerCase());
+      }).toList();
+      clienteLista = clienteLista.where((element) {
+        return element.direccion
+            .toString()
+            .toLowerCase()
+            .contains(direccionSearchText.toLowerCase());
+      }).toList();
+    }
   }
 
   Widget filterCliente(BuildContext context, Size size) {
@@ -79,9 +114,22 @@ class _ClienteMenuState extends State<ClienteMenu> {
                 padding: const EdgeInsets.symmetric(horizontal: 12.5),
                 child: ListView(
                   children: [
-                    textField('Nombre', TextInputType.name),
-                    textField('NIF', TextInputType.name),
-                    textField('Telefono', TextInputType.phone),
+                    textField(
+                        'Nombre', TextInputType.name, _nameSearchController,
+                        (value) {
+                      nameSearchText = value;
+                      setState(() {});
+                    }),
+                    textField('NIF', TextInputType.name, _nifSearchController,
+                        (value) {
+                      nifSearchText = value;
+                      setState(() {});
+                    }),
+                    textField('Direccion', TextInputType.streetAddress,
+                        _direccionSearchController, (value) {
+                      direccionSearchText = value;
+                      setState(() {});
+                    }),
                   ],
                 ),
               ),
@@ -102,10 +150,16 @@ class _ClienteMenuState extends State<ClienteMenu> {
   Widget textField(
     String label,
     TextInputType type,
+    TextEditingController controller,
+    dynamic onChanged,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
+        controller: controller,
+        onChanged: (value) {
+          onChanged(value);
+        },
         keyboardType: type,
         decoration: InputDecoration(
           border: const OutlineInputBorder(

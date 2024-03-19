@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 
 class CardCliente extends StatelessWidget {
   const CardCliente(
-      {super.key, required this.direccionCliente, required this.nombreCliente});
+      {super.key,
+      required this.direccionCliente,
+      required this.nombreCliente,
+      required this.nifCliente});
   final String nombreCliente;
   final String direccionCliente;
+  final String nifCliente;
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -15,7 +19,7 @@ class CardCliente extends StatelessWidget {
           child: Column(
             children: [
               ElevatedButton(onPressed: () {}, child: const Text('Editar')),
-              const Text('B8bJKX')
+              Text(nifCliente)
             ],
           ),
         ),
