@@ -9,12 +9,14 @@ class LoginScreen extends StatefulWidget {
     required this.familia,
     required this.subFamilia,
     required this.producto,
+    required this.cliente,
   });
 
   final UsuarioDao usuarios;
   final FamiliaDao familia;
   final SubFamiliaDao subFamilia;
   final ProductoDao producto;
+  final ClienteDao cliente;
 
   static const routeName = "/login";
 
@@ -114,11 +116,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {
                         for (var i = 0; i < 12; i++) {
                           widget.producto.insertProducto(Producto(
-                              'productoId $i',
+                              i,
                               'producto $i',
                               10.0,
                               10.0,
-                              10.0,
+                              0.1,
                               'idSubfamilia $i',
                               5));
                           widget.familia.insertFamilia(Familia('idFamilia $i',
@@ -127,6 +129,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               'idSubfamilia $i',
                               'nombreSub $i',
                               'idFamilia $i'));
+                          widget.cliente.insertCliente(Cliente(
+                              nombreCliente: 'nombreCliente $i',
+                              telefono: 'telefono $i',
+                              email: 'email $i',
+                              puntos: i,
+                              nombreTienda: 'nombreTienda $i',
+                              nif: 'NIF $i',
+                              direccion: 'direccion $i',
+                              fechaNacimiento: 'fechaNacimiento $i'));
                         }
                       },
                       child: const Text("Agregar Datos")),

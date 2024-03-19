@@ -84,6 +84,7 @@ class MyApp extends StatelessWidget {
               familia: database.familiaDao,
               subFamilia: database.subFamiliaDao,
               producto: database.productoDao,
+              cliente: database.clienteDao,
             );
           case MenuScreen.routeName:
             return MenuScreen(
@@ -92,11 +93,17 @@ class MyApp extends StatelessWidget {
               subFamilia: database.subFamiliaDao,
             );
           case Pago.routeName:
-            return const Pago();
+            return Pago(
+              venta: database.ventaDao,
+              cliente: database.clienteDao,
+              detalleVenta: database.detalleVentaDao,
+            );
           case Espera.routeName:
             return const Espera();
           case ClienteMenu.routeName:
-            return const ClienteMenu();
+            return ClienteMenu(
+              cliente: database.clienteDao,
+            );
           case ConsumicionPropia.routeName:
             return ConsumicionPropia(
               familia: database.familiaDao,
@@ -105,7 +112,11 @@ class MyApp extends StatelessWidget {
             );
           case TicketDiario.routeName:
             return TicketDiario(
+              cliente: database.clienteDao,
               ventas: database.ventaDao,
+              ventaDetalle: database.detalleVentaDao,
+              producto: database.productoDao,
+              databaseExecutor: database.database,
             );
           case Devolucion.routeName:
             return const Devolucion();
@@ -119,6 +130,7 @@ class MyApp extends StatelessWidget {
               familia: database.familiaDao,
               subFamilia: database.subFamiliaDao,
               producto: database.productoDao,
+              cliente: database.clienteDao,
             );
         }
       },
