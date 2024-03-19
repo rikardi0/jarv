@@ -33,33 +33,37 @@ class _EsperaState extends State<Espera> {
       ),
       body: listaProductoEspera.isEmpty
           ? listaEsperaVacia()
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                SizedBox(
-                  width: size.width * 0.4,
-                  child: ListView.builder(
-                      itemCount: listaProductoEspera.length,
-                      itemBuilder: (context, index) {
-                        return CardVenta(
-                          index: index,
-                          selected: selectedVenta,
-                          listaProductos: listaProductoEspera,
-                          color: Theme.of(context).primaryColor,
-                          action: actionItem,
-                        );
-                      }),
-                ),
-                selectedVenta.value != null
-                    ? FacturaFiscal(
-                        listaProducto: listaProductoEspera[selectedVenta.value!]
-                            .listaProducto,
-                        impuesto: 0.25,
-                        tipoPago: '',
-                        precioVenta: listaProductoEspera[selectedVenta.value!]
-                            .totalVenta)
-                    : const SizedBox.shrink()
-              ],
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: size.width * 0.4,
+                    child: ListView.builder(
+                        itemCount: listaProductoEspera.length,
+                        itemBuilder: (context, index) {
+                          return CardVenta(
+                            index: index,
+                            selected: selectedVenta,
+                            listaProductos: listaProductoEspera,
+                            color: Theme.of(context).primaryColor,
+                            action: actionItem,
+                          );
+                        }),
+                  ),
+                  selectedVenta.value != null
+                      ? FacturaFiscal(
+                          listaProducto:
+                              listaProductoEspera[selectedVenta.value!]
+                                  .listaProducto,
+                          tipoPago: '',
+                          precioVenta: listaProductoEspera[selectedVenta.value!]
+                              .totalVenta,
+                        )
+                      : const SizedBox.shrink()
+                ],
+              ),
             ),
     );
   }
@@ -124,7 +128,11 @@ class _EsperaState extends State<Espera> {
                       productoAgregado:
                           listaProducto[selectedVenta.value!].listaProducto,
                       totalVenta:
-                          listaProducto[selectedVenta.value!].totalVenta!));
+                          listaProducto[selectedVenta.value!].totalVenta!,
+                      fechaVenta: listaProducto[selectedVenta.value!]
+                          .listaProducto
+                          .first!
+                          .fecha));
             },
             child: const AppBarItemButton(
                 icon: Icons.euro_rounded, label: 'Pagar'))
