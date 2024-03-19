@@ -7,7 +7,7 @@ class ProductoOrdenado {
       required this.fecha,
       required this.cantidad});
 
-  String productoId;
+  int productoId;
   String nombreProducto;
   DateTime fecha;
   double precio;
