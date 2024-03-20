@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'config/settings/settings_controller.dart';
-import 'config/settings/settings_service.dart';
-import 'src/app.dart';
+import 'core/settings/settings_controller.dart';
+import 'core/settings/settings_service.dart';
+import 'app/app.dart';
 
-import 'src/data_source/db.dart';
+import 'shared/data/database.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
