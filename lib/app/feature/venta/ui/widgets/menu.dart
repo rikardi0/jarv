@@ -24,23 +24,24 @@ class Menu extends StatefulWidget {
 class _MenuState extends State<Menu> {
   String familiaSeleccionada = "";
   String subFamiliaSeleccionada = "";
+  String cantidadProducto = '';
+
+  String? identificadorVenta;
 
   bool mostrarUsuario = true;
-  bool showTeclado = true;
+  bool mostrarTeclado = true;
   bool mostrarIdentificador = false;
+
   List<String> cantidad = [];
+  List<ProductoOrdenado?> productosAgregados = [];
+
+  double totalVenta = 0;
+  double totalVentaEspera = 0;
 
   final selectedFamiliaIndex = ValueNotifier<int?>(null);
   final selectedSubFamiliaIndex = ValueNotifier<int?>(null);
   final selectedProductoIndex = ValueNotifier<int?>(null);
   final selectedItemLista = ValueNotifier<int?>(null);
-
-  String cantidadProducto = '';
-  double totalVenta = 0;
-  double totalVentaEspera = 0;
-
-  List<ProductoOrdenado?> productosAgregados = [];
-  String? identificadorVenta;
 
   @override
   void initState() {
@@ -282,7 +283,7 @@ class _MenuState extends State<Menu> {
                   padding: const EdgeInsets.all(5.0),
                   child: CheckOut(
                     dropDownIcon: dropDownIcon,
-                    showTeclado: showTeclado,
+                    mostrarTeclado: mostrarTeclado,
                     mostrarIdentificador: mostrarIdentificador,
                     productosAgregados: productosAgregados,
                     totalVenta: totalVenta,
@@ -293,7 +294,7 @@ class _MenuState extends State<Menu> {
                     onAceptarIdentificador: onAceptarIdentificador,
                     clearButton: clearButton,
                     onTapNum: onTapNum,
-                    menuPrincipal: widget.menuPrincipal,
+                    isMenuPrincipal: widget.menuPrincipal,
                     cantidadProducto: cantidadProducto,
                   ),
                 ),
@@ -306,7 +307,7 @@ class _MenuState extends State<Menu> {
   }
 
   dropDownIcon() {
-    showTeclado = !showTeclado;
+    mostrarTeclado = !mostrarTeclado;
     setState(() {});
   }
 
@@ -350,7 +351,7 @@ class _MenuState extends State<Menu> {
 
         totalVenta += producto.precio * double.parse(joinedCantidad);
         cantidad.clear();
-        showTeclado = false;
+        mostrarTeclado = false;
 
         setState(() {});
       }

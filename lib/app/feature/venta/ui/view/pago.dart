@@ -25,7 +25,7 @@ class _PagoState extends State<Pago> {
   String metodoPago = 'tarjeta';
   String cliente = 'nombreCliente 1';
   double totalFactura = 0;
-  int entregado = 0;
+  int efectivoEntregado = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -65,10 +65,8 @@ class _PagoState extends State<Pago> {
   }
 
   Widget _columnMetodoPago(BuildContext context, CheckOutArgument argument) {
-    final cambio = entregado - argument.totalVenta;
-
-    final Stream<List<String>> clienteLista =
-        widget.fecthRepository.findAllClienteNombre();
+    final cambio = efectivoEntregado - argument.totalVenta;
+    final clienteLista = widget.fecthRepository.findAllClienteNombre();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,9 +125,9 @@ class _PagoState extends State<Pago> {
             keyboardType: TextInputType.number,
             onChanged: (value) {
               if (value.isNotEmpty) {
-                entregado = int.parse(value);
+                efectivoEntregado = int.parse(value);
               } else {
-                entregado = 0;
+                efectivoEntregado = 0;
               }
               setState(() {});
             },
@@ -140,7 +138,7 @@ class _PagoState extends State<Pago> {
   Widget _cambioEntregar(double cambio) {
     return rowColumn(
         'Cambio',
-        Text(entregado == 0
+        Text(efectivoEntregado == 0
             ? 'SIN CAMBIO'
             : cambio.isNegative
                 ? 'Faltan ${cambio.abs().toString()}'
@@ -184,6 +182,8 @@ class _PagoState extends State<Pago> {
 
   void _registrarVenta(CheckOutArgument argument) {
     final idVenta = DateTime.now().millisecondsSinceEpoch;
+    final fechaFormatoVenta =
+        '${argument.fechaVenta.day}/${argument.fechaVenta.month}/${argument.fechaVenta.year}';
 
     for (var element in argument.productoAgregado) {
       widget.fecthRepository.insertDetalleVenta(DetalleVenta(
@@ -195,14 +195,12 @@ class _PagoState extends State<Pago> {
           true,
           UniqueKey().toString()));
     }
-    final fechaMes =
-        '${argument.fechaVenta.day}/${argument.fechaVenta.month}/${argument.fechaVenta.year}';
 
     widget.fecthRepository.insertVenta(Venta(
         idVenta: idVenta,
         costeTotal: totalFactura,
         ingresoTotal: argument.totalVenta,
-        fecha: fechaMes,
+        fecha: fechaFormatoVenta,
         idUsuario: 01,
         nombreCliente: cliente,
         consumicionPropia: false,

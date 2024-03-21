@@ -22,10 +22,14 @@ class _TicketDiarioState extends State<TicketDiario> {
   List<Map<String, Object?>> listaProducto = [];
   String fechaFactura = '';
   String horaFactura = '';
-  double montoFactura = 0.0;
-  bool intervalo = false;
   String cliente = 'nombreCliente 1';
   String metodoPago = 'tarjeta';
+  List<int> idProductosVenta = [];
+  bool isRangeActive = false;
+  int ventaSeleccionada = 0;
+  double montoFactura = 0.0;
+
+  final selectedVenta = ValueNotifier<int?>(null);
 
   @override
   void initState() {
@@ -46,17 +50,14 @@ class _TicketDiarioState extends State<TicketDiario> {
     }
   }
 
-  final selectedVenta = ValueNotifier<int?>(null);
-  int ventaSeleccionada = 0;
-  List<int> idProductosVenta = [];
-
   @override
   Widget build(BuildContext context) {
-    final dateTime = DateTime.now();
-    final fechaHoy = '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+    final fechaActual = DateTime.now();
+    final fechaFormateada =
+        '${fechaActual.day}/${fechaActual.month}/${fechaActual.year}';
 
     final ventaDiaria =
-        widget.fecthRepository.findVentaByFecha(fechaHoy).asStream();
+        widget.fecthRepository.findVentaByFecha(fechaFormateada).asStream();
     final clienteLista = widget.fecthRepository.findAllClienteNombre();
 
     return Scaffold(
@@ -86,45 +87,37 @@ class _TicketDiarioState extends State<TicketDiario> {
       BuildContext context, Stream<List<String>> clienteLista) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
-      child: Expanded(
-        child: Container(
-          decoration: BoxDecoration(
-              color: Theme.of(context)
-                  .colorScheme
-                  .surfaceVariant
-                  .withOpacity(0.25),
-              borderRadius: BorderRadius.circular(10)),
-          width: MediaQuery.of(context).size.width * 0.3,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.5),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                DatePicker(
-                  intervalo: intervalo,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.3,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.5),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              DatePicker(
+                intervalo: isRangeActive,
+                onChanged: (value) {
+                  setState(() {
+                    isRangeActive = value;
+                  });
+                },
+              ),
+              ClienteSelector(
+                  cliente: cliente,
+                  clienteLista: clienteLista,
                   onChanged: (value) {
                     setState(() {
-                      intervalo = value;
+                      cliente = value;
                     });
-                  },
-                ),
-                ClienteSelector(
-                    cliente: cliente,
-                    clienteLista: clienteLista,
-                    onChanged: (value) {
-                      setState(() {
-                        cliente = value;
-                      });
-                    }),
-                MetodoPagoSelector(
-                    metodoPago: metodoPago,
-                    onChanged: (value) {
-                      setState(() {
-                        metodoPago = value;
-                      });
-                    })
-              ],
-            ),
+                  }),
+              MetodoPagoSelector(
+                  metodoPago: metodoPago,
+                  onChanged: (value) {
+                    setState(() {
+                      metodoPago = value;
+                    });
+                  })
+            ],
           ),
         ),
       ),
@@ -305,7 +298,7 @@ class _TicketDiarioState extends State<TicketDiario> {
                     }
                     ventaSeleccionada = venta.idVenta;
                     fechaFactura = venta.fecha;
-                    montoFactura = venta.costeTotal;
+                    montoFactura = venta.costeTotal.floorToDouble();
                     horaFactura = hora;
                     _loadDataFromDatabase();
                   });

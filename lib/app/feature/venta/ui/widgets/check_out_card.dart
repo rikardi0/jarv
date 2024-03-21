@@ -15,17 +15,17 @@ class CheckOut extends StatelessWidget {
       this.onAceptarIdentificador,
       this.clearButton,
       this.onTapNum,
-      required this.showTeclado,
+      required this.mostrarTeclado,
       this.dropDownIcon,
       required this.selectedItemLista,
-      required this.menuPrincipal});
+      required this.isMenuPrincipal});
 
+  final String cantidadProducto;
   final bool mostrarIdentificador;
-  final bool showTeclado;
-  final bool menuPrincipal;
+  final bool mostrarTeclado;
+  final bool isMenuPrincipal;
   final List<ProductoOrdenado?> productosAgregados;
   final double totalVenta;
-  final String cantidadProducto;
   final Future<void> actualizarCantidad;
   final ValueNotifier<int?> selectedItemLista;
   final dynamic onTextIdentificadorTap;
@@ -189,7 +189,7 @@ class CheckOut extends StatelessWidget {
         builder: (context, snapshot) {
           return ClipRRect(
             borderRadius: BorderRadius.vertical(
-              bottom: showTeclado
+              bottom: mostrarTeclado
                   ? const Radius.circular(0)
                   : const Radius.circular(20),
             ),
@@ -209,7 +209,7 @@ class CheckOut extends StatelessWidget {
                           onTap: () {
                             dropDownIcon();
                           },
-                          child: Icon(showTeclado
+                          child: Icon(mostrarTeclado
                               ? Icons.arrow_drop_down
                               : Icons.arrow_drop_up)),
                     ],
@@ -225,7 +225,7 @@ class CheckOut extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     var totalHeight = height + height / 3;
     return Visibility(
-      visible: showTeclado,
+      visible: mostrarTeclado,
       child: Padding(
         padding: const EdgeInsets.all(1.0),
         child: Row(
@@ -294,7 +294,7 @@ class CheckOut extends StatelessWidget {
               ],
             ),
             Visibility(
-              visible: menuPrincipal,
+              visible: isMenuPrincipal,
               child: SizedBox(
                 height: totalHeight,
                 child: Column(

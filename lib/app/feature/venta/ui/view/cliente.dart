@@ -15,19 +15,18 @@ class ClienteMenu extends StatefulWidget {
 }
 
 class _ClienteMenuState extends State<ClienteMenu> {
-  List<Cliente> clienteLista = [];
-  final TextEditingController _nameSearchController = TextEditingController();
-  final TextEditingController _nifSearchController = TextEditingController();
-  final TextEditingController _direccionSearchController =
-      TextEditingController();
   String nameSearchText = '';
   String nifSearchText = '';
   String direccionSearchText = '';
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _nifController = TextEditingController();
+  final TextEditingController _direccionController = TextEditingController();
+  List<Cliente> clienteLista = [];
   @override
   Widget build(BuildContext context) {
     final clientes = widget.fetchRepository.findAllClientes();
-
     final size = MediaQuery.of(context).size;
+
     return Scaffold(
         appBar: AppBar(
           title: const Text('Clientes'),
@@ -116,19 +115,18 @@ class _ClienteMenuState extends State<ClienteMenu> {
                 padding: const EdgeInsets.symmetric(horizontal: 12.5),
                 child: ListView(
                   children: [
-                    textField(
-                        'Nombre', TextInputType.name, _nameSearchController,
+                    textField('Nombre', TextInputType.name, _nameController,
                         (value) {
                       nameSearchText = value;
                       setState(() {});
                     }),
-                    textField('NIF', TextInputType.name, _nifSearchController,
+                    textField('NIF', TextInputType.name, _nifController,
                         (value) {
                       nifSearchText = value;
                       setState(() {});
                     }),
                     textField('Direccion', TextInputType.streetAddress,
-                        _direccionSearchController, (value) {
+                        _direccionController, (value) {
                       direccionSearchText = value;
                       setState(() {});
                     }),
