@@ -3,19 +3,18 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:jarv/app/feature/venta/data/model/producto_ordenado.dart';
-import 'package:jarv/app/feature/venta/data/repositories/menu_repository.dart';
 import 'package:jarv/app/feature/venta/ui/provider/venta_espera_provider.dart';
-import 'package:jarv/shared/data/database.dart';
+import 'package:jarv/core/di/locator.dart';
 import 'package:jarv/shared/ui/widgets.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/model/entity_venta.dart';
+import '../../data/repositories/interfaces/menu_repository.dart';
 
 class Menu extends StatefulWidget {
-  const Menu({super.key, required this.menuPrincipal, required this.db});
+  const Menu({super.key, required this.menuPrincipal});
 
-  final AppDatabase db;
   final bool menuPrincipal;
 
   @override
@@ -71,7 +70,7 @@ class _MenuState extends State<Menu> {
 
   @override
   Widget build(BuildContext context) {
-    final MenuRepositoryImpl fecthRepository = MenuRepositoryImpl(widget.db);
+    final MenuRepository fecthRepository = localService.get<MenuRepository>();
 
     const borderColor = Color.fromARGB(59, 7, 7, 7);
 

@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 
 import '../core/settings/settings_controller.dart';
 import '../core/settings/settings_view.dart';
-import '../shared/data/database.dart';
 import 'feature/venta/ui/view/view_venta.dart';
 import 'feature/venta/ui/provider/venta_espera_provider.dart';
 
@@ -17,9 +16,7 @@ class MyApp extends StatelessWidget {
   const MyApp({
     super.key,
     required this.settingsController,
-    required this.database,
   });
-  final AppDatabase database;
   final SettingsController settingsController;
 
   @override
@@ -79,41 +76,19 @@ class MyApp extends StatelessWidget {
       builder: (BuildContext context) {
         switch (routeSettings.name) {
           case LoginScreen.routeName:
-            return LoginScreen(
-              usuarios: database.usuarioDao,
-              familia: database.familiaDao,
-              subFamilia: database.subFamiliaDao,
-              producto: database.productoDao,
-              cliente: database.clienteDao,
-            );
+            return LoginScreen();
           case MenuScreen.routeName:
-            return MenuScreen(
-              database: database,
-            );
+            return const MenuScreen();
           case Pago.routeName:
-            return Pago(
-              venta: database.ventaDao,
-              cliente: database.clienteDao,
-              detalleVenta: database.detalleVentaDao,
-            );
+            return Pago();
           case Espera.routeName:
             return const Espera();
           case ClienteMenu.routeName:
-            return ClienteMenu(
-              cliente: database.clienteDao,
-            );
+            return ClienteMenu();
           case ConsumicionPropia.routeName:
-            return ConsumicionPropia(
-              database: database,
-            );
+            return ConsumicionPropia();
           case TicketDiario.routeName:
-            return TicketDiario(
-              cliente: database.clienteDao,
-              ventas: database.ventaDao,
-              ventaDetalle: database.detalleVentaDao,
-              producto: database.productoDao,
-              databaseExecutor: database.database,
-            );
+            return TicketDiario();
           case Devolucion.routeName:
             return const Devolucion();
           case CierreDiario.routeName:
@@ -121,13 +96,7 @@ class MyApp extends StatelessWidget {
           case SettingsView.routeName:
             return SettingsView(controller: settingsController);
           default:
-            return LoginScreen(
-              usuarios: database.usuarioDao,
-              familia: database.familiaDao,
-              subFamilia: database.subFamiliaDao,
-              producto: database.productoDao,
-              cliente: database.clienteDao,
-            );
+            return LoginScreen();
         }
       },
     );

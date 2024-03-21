@@ -1,27 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/venta/data/repositories/interfaces/ticket_diario_repository.dart';
+import 'package:jarv/core/di/locator.dart';
 import 'package:jarv/shared/ui/cliente_selector.dart';
 import 'package:jarv/shared/ui/metodo_pago_selector.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
-import 'package:sqflite/sqflite.dart';
 
-import '../../data/data-sources/dao_venta.dart';
 import '../../data/model/entity_venta.dart';
 
 class TicketDiario extends StatefulWidget {
-  const TicketDiario({
+  TicketDiario({
     super.key,
-    required this.ventas,
-    required this.ventaDetalle,
-    required this.cliente,
-    required this.producto,
-    required this.databaseExecutor,
   });
   static const routeName = '/ticket_diario';
-  final VentaDao ventas;
-  final DetalleVentaDao ventaDetalle;
-  final ClienteDao cliente;
-  final ProductoDao producto;
-  final DatabaseExecutor databaseExecutor;
+  final fecthRepository = localService<TicketDiarioRepository>();
 
   @override
   State<TicketDiario> createState() => _TicketDiarioState();
@@ -44,12 +35,8 @@ class _TicketDiarioState extends State<TicketDiario> {
 
   Future<void> _loadDataFromDatabase() async {
     try {
-      final data = await widget.databaseExecutor.rawQuery('''
-SELECT Producto.*, Producto.iva, DetalleVenta.cantidad
-FROM DetalleVenta
-INNER JOIN Producto ON Producto.productoId = DetalleVenta.productoId
-WHERE DetalleVenta.idVenta = ?
-''', [ventaSeleccionada]);
+      final data = await widget.fecthRepository
+          .findProductoByVentaId([ventaSeleccionada]);
       setState(() {
         listaProducto = data;
       });
@@ -68,8 +55,9 @@ WHERE DetalleVenta.idVenta = ?
     final dateTime = DateTime.now();
     final fechaHoy = '${dateTime.day}/${dateTime.month}/${dateTime.year}';
 
-    final ventaDiaria = widget.ventas.findVentaByFecha(fechaHoy).asStream();
-    final clienteLista = widget.cliente.findAllClienteNombre();
+    final ventaDiaria =
+        widget.fecthRepository.findVentaByFecha(fechaHoy).asStream();
+    final clienteLista = widget.fecthRepository.findAllClienteNombre();
 
     return Scaffold(
         appBar: AppBar(),

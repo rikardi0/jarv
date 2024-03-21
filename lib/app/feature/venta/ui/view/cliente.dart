@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/venta/data/repositories/interfaces/cliente_repository.dart';
+import 'package:jarv/core/di/locator.dart';
 import '../../../../../shared/ui/card_cliente.dart';
-import '../../data/data-sources/dao_venta.dart';
 import '../../data/model/entity_venta.dart';
 
 class ClienteMenu extends StatefulWidget {
-  const ClienteMenu({super.key, required this.cliente});
+  ClienteMenu({super.key});
 
   static const routeName = '/cliente';
-  final ClienteDao cliente;
+  final fetchRepository = localService<ClienteRepository>();
 
   @override
   State<ClienteMenu> createState() => _ClienteMenuState();
@@ -24,7 +25,7 @@ class _ClienteMenuState extends State<ClienteMenu> {
   String direccionSearchText = '';
   @override
   Widget build(BuildContext context) {
-    final clientes = widget.cliente.findAllClientes().asStream();
+    final clientes = widget.fetchRepository.findAllClientes();
 
     final size = MediaQuery.of(context).size;
     return Scaffold(

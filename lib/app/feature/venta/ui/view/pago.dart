@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:flutter/services.dart';
+import 'package:jarv/app/feature/venta/data/repositories/interfaces/pago_repository.dart';
+import 'package:jarv/core/di/locator.dart';
 
 import '../../../../../shared/ui/cliente_selector.dart';
 import '../../../../../shared/ui/factura_fiscal.dart';
 import '../../../../../shared/ui/metodo_pago_selector.dart';
-import '../../data/data-sources/dao_venta.dart';
 import '../../data/model/entity_venta.dart';
 
 class Pago extends StatefulWidget {
-  const Pago(
-      {super.key,
-      required this.venta,
-      required this.cliente,
-      required this.detalleVenta});
+  Pago({
+    super.key,
+  });
 
   static const routeName = "/venta";
-  final VentaDao venta;
-  final DetalleVentaDao detalleVenta;
-  final ClienteDao cliente;
+  final fecthRepository = localService<PagoRepository>();
 
   @override
   State<Pago> createState() => _PagoState();
@@ -69,8 +66,10 @@ class _PagoState extends State<Pago> {
 
   Widget _columnMetodoPago(BuildContext context, CheckOutArgument argument) {
     final cambio = entregado - argument.totalVenta;
+
     final Stream<List<String>> clienteLista =
-        widget.cliente.findAllClienteNombre();
+        widget.fecthRepository.findAllClienteNombre();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -187,7 +186,7 @@ class _PagoState extends State<Pago> {
     final idVenta = DateTime.now().millisecondsSinceEpoch;
 
     for (var element in argument.productoAgregado) {
-      widget.detalleVenta.insertDetalleVenta(DetalleVenta(
+      widget.fecthRepository.insertDetalleVenta(DetalleVenta(
           idVenta,
           element!.productoId,
           int.parse(element.cantidad),
@@ -199,7 +198,7 @@ class _PagoState extends State<Pago> {
     final fechaMes =
         '${argument.fechaVenta.day}/${argument.fechaVenta.month}/${argument.fechaVenta.year}';
 
-    widget.venta.insertVenta(Venta(
+    widget.fecthRepository.insertVenta(Venta(
         idVenta: idVenta,
         costeTotal: totalFactura,
         ingresoTotal: argument.totalVenta,
