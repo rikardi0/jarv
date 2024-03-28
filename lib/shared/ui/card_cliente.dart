@@ -5,10 +5,12 @@ class CardCliente extends StatelessWidget {
       {super.key,
       required this.direccionCliente,
       required this.nombreCliente,
-      required this.nifCliente});
+      required this.nifCliente,
+      required this.onPressEditar});
   final String nombreCliente;
   final String direccionCliente;
   final String nifCliente;
+  final dynamic onPressEditar;
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -18,7 +20,11 @@ class CardCliente extends StatelessWidget {
         trailing: FittedBox(
           child: Column(
             children: [
-              ElevatedButton(onPressed: () {}, child: const Text('Editar')),
+              ElevatedButton(
+                  onPressed: () {
+                    onPressEditar();
+                  },
+                  child: const Text('Editar')),
               Text(nifCliente)
             ],
           ),

@@ -10,4 +10,14 @@ class ClienteRepositoryImpl extends ClienteRepository {
   Stream<List<Cliente>> findAllClientes() {
     return _appDatabase.clienteDao.findAllClientes().asStream();
   }
+
+  @override
+  Future<void> insertCliente(Cliente cliente) {
+    return _appDatabase.clienteDao.insertCliente(cliente);
+  }
+
+  @override
+  Future<void> updateCliente(Cliente cliente) {
+    return _appDatabase.clienteDao.updateCliente(cliente);
+  }
 }

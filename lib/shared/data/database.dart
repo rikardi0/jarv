@@ -11,7 +11,7 @@ import '../../app/feature/venta/data/model/entity_venta.dart';
 
 part 'database.g.dart';
 
-@Database(version: 2, entities: [
+@Database(version: 1, entities: [
   Familia,
   SubFamilia,
   Producto,

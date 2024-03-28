@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/venta/data/model/arguments_cliente.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/cliente_repository.dart';
 import 'package:jarv/core/di/locator.dart';
 import '../../../../../shared/ui/card_cliente.dart';
@@ -64,6 +65,11 @@ class _ClienteMenuState extends State<ClienteMenu> {
                                   nombreCliente:
                                       clienteLista[index].nombreCliente,
                                   nifCliente: clienteLista[index].nif,
+                                  onPressEditar: () {
+                                    Navigator.popAndPushNamed(
+                                        context, '/cliente_field',
+                                        arguments: setArgument(index));
+                                  },
                                 );
                               });
                         }
@@ -73,6 +79,22 @@ class _ClienteMenuState extends State<ClienteMenu> {
             ),
           ],
         ));
+  }
+
+  ClienteArgument setArgument(int index) {
+    return ClienteArgument(
+        fechaNacimiento: clienteLista[index].fechaNacimiento,
+        nif: clienteLista[index].nif,
+        direccion: clienteLista[index].direccion,
+        nombreCliente: clienteLista[index].nombreCliente,
+        telefono: clienteLista[index].telefono,
+        email: clienteLista[index].email,
+        puntos: clienteLista[index].puntos,
+        pedidos: clienteLista[index].pedidos,
+        nombreTienda: clienteLista[index].nombreTienda,
+        genero: clienteLista[index].genero,
+        idCliente: clienteLista[index].idCliente,
+        clienteNuevo: false);
   }
 
   void _searchFilter() {
@@ -138,7 +160,10 @@ class _ClienteMenuState extends State<ClienteMenu> {
           Padding(
             padding: const EdgeInsets.all(2.0),
             child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.popAndPushNamed(context, '/cliente_field',
+                      arguments: ClienteArgument.empty());
+                },
                 icon: const Icon(Icons.add),
                 label: const Text('Nuevo Cliente')),
           )

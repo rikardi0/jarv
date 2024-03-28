@@ -111,7 +111,7 @@ class _$AppDatabase extends AppDatabase {
     Callback? callback,
   ]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
-      version: 2,
+      version: 1,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
         await callback?.onConfigure?.call(database);
@@ -153,7 +153,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `CosteFijo` (`nombre` TEXT NOT NULL, `coste` REAL NOT NULL, PRIMARY KEY (`nombre`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Cliente` (`nombreCliente` TEXT NOT NULL, `direccion` TEXT NOT NULL, `nif` TEXT NOT NULL, `fechaNacimiento` TEXT NOT NULL, `telefono` TEXT NOT NULL, `email` TEXT NOT NULL, `puntos` INTEGER NOT NULL, `nombreTienda` TEXT NOT NULL, PRIMARY KEY (`nombreCliente`))');
+            'CREATE TABLE IF NOT EXISTS `Cliente` (`idCliente` INTEGER NOT NULL, `nombreCliente` TEXT NOT NULL, `nombreTienda` TEXT NOT NULL, `direccion` TEXT NOT NULL, `nif` TEXT NOT NULL, `fechaNacimiento` TEXT NOT NULL, `genero` INTEGER NOT NULL, `telefono` TEXT NOT NULL, `email` TEXT NOT NULL, `puntos` INTEGER NOT NULL, `pedidos` INTEGER NOT NULL, PRIMARY KEY (`idCliente`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Tienda` (`nombreTienda` TEXT NOT NULL, `nombreFiscal` TEXT NOT NULL, `ciudad` TEXT NOT NULL, `codigoPostal` TEXT NOT NULL, `direccion` TEXT NOT NULL, `telefono` TEXT NOT NULL, `email` TEXT NOT NULL, `logo` TEXT NOT NULL, PRIMARY KEY (`nombreTienda`))');
         await database.execute(
@@ -1171,14 +1171,35 @@ class _$ClienteDao extends ClienteDao {
             database,
             'Cliente',
             (Cliente item) => <String, Object?>{
+                  'idCliente': item.idCliente,
                   'nombreCliente': item.nombreCliente,
+                  'nombreTienda': item.nombreTienda,
                   'direccion': item.direccion,
                   'nif': item.nif,
                   'fechaNacimiento': item.fechaNacimiento,
+                  'genero': item.genero ? 1 : 0,
                   'telefono': item.telefono,
                   'email': item.email,
                   'puntos': item.puntos,
-                  'nombreTienda': item.nombreTienda
+                  'pedidos': item.pedidos
+                },
+            changeListener),
+        _clienteUpdateAdapter = UpdateAdapter(
+            database,
+            'Cliente',
+            ['idCliente'],
+            (Cliente item) => <String, Object?>{
+                  'idCliente': item.idCliente,
+                  'nombreCliente': item.nombreCliente,
+                  'nombreTienda': item.nombreTienda,
+                  'direccion': item.direccion,
+                  'nif': item.nif,
+                  'fechaNacimiento': item.fechaNacimiento,
+                  'genero': item.genero ? 1 : 0,
+                  'telefono': item.telefono,
+                  'email': item.email,
+                  'puntos': item.puntos,
+                  'pedidos': item.pedidos
                 },
             changeListener);
 
@@ -1190,11 +1211,16 @@ class _$ClienteDao extends ClienteDao {
 
   final InsertionAdapter<Cliente> _clienteInsertionAdapter;
 
+  final UpdateAdapter<Cliente> _clienteUpdateAdapter;
+
   @override
   Future<List<Cliente>> findAllClientes() async {
     return _queryAdapter.queryList('SELECT * FROM Cliente',
         mapper: (Map<String, Object?> row) => Cliente(
             fechaNacimiento: row['fechaNacimiento'] as String,
+            idCliente: row['idCliente'] as int,
+            genero: (row['genero'] as int) != 0,
+            pedidos: row['pedidos'] as int,
             nif: row['nif'] as String,
             direccion: row['direccion'] as String,
             nombreCliente: row['nombreCliente'] as String,
@@ -1218,6 +1244,9 @@ class _$ClienteDao extends ClienteDao {
         'SELECT * FROM Cliente WHERE nombreCliente = ?1',
         mapper: (Map<String, Object?> row) => Cliente(
             fechaNacimiento: row['fechaNacimiento'] as String,
+            idCliente: row['idCliente'] as int,
+            genero: (row['genero'] as int) != 0,
+            pedidos: row['pedidos'] as int,
             nif: row['nif'] as String,
             direccion: row['direccion'] as String,
             nombreCliente: row['nombreCliente'] as String,
@@ -1233,6 +1262,11 @@ class _$ClienteDao extends ClienteDao {
   @override
   Future<void> insertCliente(Cliente cliente) async {
     await _clienteInsertionAdapter.insert(cliente, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateCliente(Cliente cliente) async {
+    await _clienteUpdateAdapter.update(cliente, OnConflictStrategy.abort);
   }
 }
 

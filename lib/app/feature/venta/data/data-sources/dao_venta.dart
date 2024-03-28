@@ -63,6 +63,9 @@ abstract class ClienteDao {
   @Query('SELECT * FROM Cliente WHERE nombreCliente = :id')
   Stream<Cliente?> findClienteById(String id);
 
+  @update
+  Future<void> updateCliente(Cliente cliente);
+
   @insert
   Future<void> insertCliente(Cliente cliente);
 }
