@@ -10,6 +10,7 @@ class ConsumicionPropia extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
         body: Menu(
+      false,
       menuPrincipal: false,
       titleSection: 'Consumicion Propia',
     ));

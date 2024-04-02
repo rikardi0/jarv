@@ -3,7 +3,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:jarv/app/feature/venta/data/model/producto_ordenado.dart';
+import 'package:jarv/app/feature/venta/data/repositories/interfaces/pago_repository.dart';
 import 'package:jarv/app/feature/venta/ui/provider/venta_espera_provider.dart';
+import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
 import 'package:jarv/core/di/locator.dart';
 import 'package:jarv/shared/ui/widgets.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
@@ -13,9 +15,16 @@ import '../../data/model/entity_venta.dart';
 import '../../data/repositories/interfaces/menu_repository.dart';
 
 class Menu extends StatefulWidget {
-  const Menu({super.key, required this.menuPrincipal});
+  const Menu(
+    this.devolucion, {
+    super.key,
+    required this.menuPrincipal,
+    required this.titleSection,
+  });
 
   final bool menuPrincipal;
+  final bool devolucion;
+  final String titleSection;
 
   @override
   State<Menu> createState() => _MenuState();
@@ -71,18 +80,19 @@ class _MenuState extends State<Menu> {
 
   @override
   Widget build(BuildContext context) {
-    final MenuRepository fecthRepository = localService.get<MenuRepository>();
+    final MenuRepository fecthMenuRepository =
+        localService.get<MenuRepository>();
 
     const borderColor = Color.fromARGB(59, 7, 7, 7);
 
     final String joinedCantidad =
         cantidad.map((e) => int.parse(e)).toList().join();
 
-    final listaFamilia = fecthRepository.findAllFamilias();
+    final listaFamilia = fecthMenuRepository.findAllFamilias();
     final listaSubFamilia =
-        fecthRepository.findSubFamiliaByFamilia(familiaSeleccionada);
+        fecthMenuRepository.findSubFamiliaByFamilia(familiaSeleccionada);
     final listaProducto =
-        fecthRepository.findProductoById(subFamiliaSeleccionada);
+        fecthMenuRepository.findProductoById(subFamiliaSeleccionada);
 
     final Size size = MediaQuery.of(context).size;
 
@@ -108,7 +118,7 @@ class _MenuState extends State<Menu> {
             ? productosAgregados.isEmpty
                 ? null
                 : appBarCheckOut()
-            : const Text('Consumicion Propia'),
+            : Text(widget.titleSection),
         toolbarHeight: 35,
         leading: widget.menuPrincipal
             ? productosAgregados.isEmpty
@@ -228,6 +238,8 @@ class _MenuState extends State<Menu> {
       List<Producto?>? itemProducto,
       String joinedCantidad,
       Color borderColor) {
+    final PagoRepository fecthPagoRepository =
+        localService.get<PagoRepository>();
     return Column(
       children: [
         Expanded(
@@ -282,20 +294,26 @@ class _MenuState extends State<Menu> {
                 child: Padding(
                   padding: const EdgeInsets.all(5.0),
                   child: CheckOut(
-                    dropDownIcon: dropDownIcon,
                     mostrarTeclado: mostrarTeclado,
                     mostrarIdentificador: mostrarIdentificador,
                     productosAgregados: productosAgregados,
                     totalVenta: totalVenta,
                     selectedItemLista: selectedItemLista,
+                    isMenuPrincipal: widget.menuPrincipal,
+                    cantidadProducto: cantidadProducto,
+                    titleSection: widget.titleSection,
+                    hideKeyboard: dropDownIcon,
                     actualizarCantidad: actualizarCantidad(joinedCantidad),
                     onTextIdentificadorTap: onTextIdentificadorTap,
                     onBackIdentificador: onBackIdentificador,
                     onAceptarIdentificador: onAceptarIdentificador,
                     clearButton: clearButton,
                     onTapNum: onTapNum,
-                    isMenuPrincipal: widget.menuPrincipal,
-                    cantidadProducto: cantidadProducto,
+                    sectionActionButton: () {
+                      productosAgregados.isNotEmpty
+                          ? _builAlertDialog(fecthPagoRepository)
+                          : null;
+                    },
                   ),
                 ),
               )
@@ -304,6 +322,63 @@ class _MenuState extends State<Menu> {
         ),
       ],
     );
+  }
+
+  Future<dynamic> _builAlertDialog(PagoRepository fecthPagoRepository) {
+    return showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text(widget.titleSection),
+            content: Text(
+                'Los productos agregados a la lista seran guardados como una ${widget.titleSection}.'),
+            actions: [
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Cancelar')),
+              FilledButton(
+                  onPressed: () {
+                    widget.devolucion
+                        ? _saveVenta(fecthPagoRepository, 2)
+                        : _saveVenta(fecthPagoRepository, 1);
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Aceptar'))
+            ],
+          );
+        });
+  }
+
+  Future<void> _saveVenta(
+      PagoRepository fecthPagoRepository, int idTipoVenta) async {
+    final idVenta = DateTime.now().millisecondsSinceEpoch;
+    final tipoVenta = await fecthPagoRepository.findTipoVentaById(idTipoVenta);
+
+    fecthPagoRepository.insertVenta(Venta(
+        idVenta: idVenta,
+        metodoPago: 'Tarjeta',
+        costeTotal: totalVenta,
+        ingresoTotal: totalVenta,
+        fecha: fechaFormatter(DateTime.now()),
+        idUsuario: 0,
+        nombreCliente: widget.titleSection,
+        tipoVenta: tipoVenta!));
+
+    for (var element in productosAgregados) {
+      fecthPagoRepository.insertDetalleVenta(DetalleVenta(
+          idVenta: idVenta,
+          productoId: element!.productoId,
+          cantidad: int.parse(element.cantidad),
+          precioUnitario: element.precio,
+          descuento: 0,
+          entregado: true,
+          idDetalleVenta: UniqueKey().toString()));
+    }
+    cantidad.clear();
+    productosAgregados.clear();
+    setState(() {});
   }
 
   dropDownIcon() {

@@ -9,6 +9,7 @@ class Devolucion extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Menu(
+        true,
         menuPrincipal: false,
         titleSection: 'Devolucion',
       ),

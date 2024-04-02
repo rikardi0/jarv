@@ -14,6 +14,7 @@ class MenuScreen extends StatelessWidget {
         children: [
           Expanded(
             child: Menu(
+              false,
               menuPrincipal: true,
               titleSection: 'Menu Principal',
             ),
