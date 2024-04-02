@@ -3,22 +3,25 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:jarv/app/feature/venta/data/model/producto_ordenado.dart';
 
 class CheckOut extends StatelessWidget {
-  const CheckOut(
-      {super.key,
-      required this.mostrarIdentificador,
-      required this.productosAgregados,
-      required this.totalVenta,
-      required this.cantidadProducto,
-      required this.actualizarCantidad,
-      this.onTextIdentificadorTap,
-      this.onBackIdentificador,
-      this.onAceptarIdentificador,
-      this.clearButton,
-      this.onTapNum,
-      required this.mostrarTeclado,
-      this.dropDownIcon,
-      required this.selectedItemLista,
-      required this.isMenuPrincipal});
+  const CheckOut({
+    super.key,
+    required this.mostrarIdentificador,
+    required this.productosAgregados,
+    required this.totalVenta,
+    required this.cantidadProducto,
+    required this.actualizarCantidad,
+    required this.mostrarTeclado,
+    required this.selectedItemLista,
+    required this.isMenuPrincipal,
+    required this.titleSection,
+    this.onTextIdentificadorTap,
+    this.onBackIdentificador,
+    this.onAceptarIdentificador,
+    this.sectionActionButton,
+    this.onTapNum,
+    this.clearButton,
+    this.hideKeyboard,
+  });
 
   final String cantidadProducto;
   final bool mostrarIdentificador;
@@ -28,12 +31,14 @@ class CheckOut extends StatelessWidget {
   final double totalVenta;
   final Future<void> actualizarCantidad;
   final ValueNotifier<int?> selectedItemLista;
+  final String titleSection;
   final dynamic onTextIdentificadorTap;
   final dynamic onBackIdentificador;
   final dynamic onAceptarIdentificador;
   final dynamic clearButton;
   final dynamic onTapNum;
-  final dynamic dropDownIcon;
+  final dynamic hideKeyboard;
+  final dynamic sectionActionButton;
 
   @override
   Widget build(BuildContext context) {
@@ -207,7 +212,7 @@ class CheckOut extends StatelessWidget {
                           : ''),
                       GestureDetector(
                           onTap: () {
-                            dropDownIcon();
+                            hideKeyboard();
                           },
                           child: Icon(mostrarTeclado
                               ? Icons.arrow_drop_down
@@ -230,7 +235,7 @@ class CheckOut extends StatelessWidget {
         padding: const EdgeInsets.all(1.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -293,55 +298,97 @@ class CheckOut extends StatelessWidget {
                 ),
               ],
             ),
-            Visibility(
-              visible: isMenuPrincipal,
-              child: SizedBox(
-                height: totalHeight,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _itemActionTeclado(
-                      context,
-                      height,
-                      width,
-                      'Devolucion',
-                      Icons.change_circle_outlined,
-                      colorScheme.onPrimaryContainer,
-                      '/devolucion',
-                    ),
-                    _itemActionTeclado(
-                      context,
-                      height,
-                      width,
-                      'Cliente',
-                      Icons.group,
-                      colorScheme.primary,
-                      '/cliente',
-                    ),
-                    _itemActionTeclado(
-                      context,
-                      height,
-                      width,
-                      'Consumicion',
-                      Icons.dinner_dining,
-                      colorScheme.secondary,
-                      '/consumicion',
-                    ),
-                    _itemActionTeclado(
-                      context,
-                      height,
-                      width,
-                      'Ticket Diario',
-                      Icons.change_circle_outlined,
-                      colorScheme.tertiary,
-                      '/ticket_diario',
-                    ),
-                  ],
-                ),
-              ),
-            )
+            isMenuPrincipal
+                ? _buildColumnAction(
+                    totalHeight, context, height, width, colorScheme)
+                : _buildActionButton(context),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          sectionActionButton();
+        },
+        child: Container(
+          decoration: BoxDecoration(
+              color: productosAgregados.isEmpty
+                  ? Theme.of(context).disabledColor
+                  : Theme.of(context).colorScheme.primary,
+              borderRadius:
+                  const BorderRadius.only(bottomRight: Radius.circular(20))),
+          height: MediaQuery.of(context).size.height * 0.375,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.add_box,
+                size: 40,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+              Text(
+                titleSection,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColumnAction(double totalHeight, BuildContext context,
+      double height, double width, ColorScheme colorScheme) {
+    return SizedBox(
+      height: totalHeight,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _itemActionTeclado(
+            context,
+            height,
+            width,
+            'Devolucion',
+            Icons.change_circle_outlined,
+            colorScheme.onPrimaryContainer,
+            '/devolucion',
+          ),
+          _itemActionTeclado(
+            context,
+            height,
+            width,
+            'Consumicion',
+            Icons.dinner_dining,
+            colorScheme.secondary,
+            '/consumicion',
+          ),
+          _itemActionTeclado(
+            context,
+            height,
+            width,
+            'Ticket Diario',
+            Icons.change_circle_outlined,
+            colorScheme.tertiary,
+            '/ticket_diario',
+          ),
+          _itemActionTeclado(
+            context,
+            height,
+            width,
+            'Cliente',
+            Icons.group,
+            colorScheme.primary,
+            '/cliente',
+          ),
+        ],
       ),
     );
   }

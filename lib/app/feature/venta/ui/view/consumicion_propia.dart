@@ -11,6 +11,7 @@ class ConsumicionPropia extends StatelessWidget {
     return const Scaffold(
         body: Menu(
       menuPrincipal: false,
+      titleSection: 'Consumicion Propia',
     ));
   }
 }

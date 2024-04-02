@@ -13,7 +13,10 @@ class MenuScreen extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: Menu(menuPrincipal: true),
+            child: Menu(
+              menuPrincipal: true,
+              titleSection: 'Menu Principal',
+            ),
           ),
           BottomActions()
         ],
