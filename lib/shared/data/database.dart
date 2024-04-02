@@ -14,6 +14,7 @@ part 'database.g.dart';
 @Database(version: 1, entities: [
   Familia,
   SubFamilia,
+  TipoVenta,
   Producto,
   Proveedor,
   Pedido,
@@ -47,6 +48,7 @@ abstract class AppDatabase extends FloorDatabase {
   SeguridadSocialDao get seguridadSocialDao;
   DetalleVentaDao get detalleVentaDao;
   VentaDao get ventaDao;
+  TipoVentaDao get tipoVentaDao;
   CosteFijoDao get costeFijoDao;
   ClienteDao get clienteDao;
   TiendaDao get tiendaDao;

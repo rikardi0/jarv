@@ -24,4 +24,9 @@ class PruebaRepositoryImpl extends PruebaRepository {
   Future<void> insertarSubFamilia(SubFamilia subFamilia) {
     return _appDatabase.subFamiliaDao.insertSubFamilia(subFamilia);
   }
+
+  @override
+  Future<void> insertarTipoVenta(TipoVenta tipoVenta) {
+    return _appDatabase.tipoVentaDao.insertTipoVenta(tipoVenta);
+  }
 }

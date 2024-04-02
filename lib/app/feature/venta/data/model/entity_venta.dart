@@ -1,5 +1,6 @@
 import 'package:floor/floor.dart';
 
+@entity
 class Familia {
   @primaryKey
   final String idFamilia;
@@ -47,20 +48,25 @@ class Producto {
 @entity
 class Cliente {
   @primaryKey
+  final int idCliente;
+
   final String nombreCliente;
+  final String nombreTienda;
   final String direccion;
   final String nif;
   final String fechaNacimiento;
+  final bool genero;
 
   final String telefono;
   final String email;
   final int puntos;
-
-  @primaryKey
-  final String nombreTienda;
+  final int pedidos;
 
   Cliente({
     required this.fechaNacimiento,
+    required this.idCliente,
+    required this.genero,
+    required this.pedidos,
     required this.nif,
     required this.direccion,
     required this.nombreCliente,
@@ -85,8 +91,14 @@ class DetalleVenta {
   final double descuento;
   final bool entregado;
 
-  DetalleVenta(this.idVenta, this.productoId, this.cantidad,
-      this.precioUnitario, this.descuento, this.entregado, this.idDetalleVenta);
+  DetalleVenta(
+      {required this.idVenta,
+      required this.productoId,
+      required this.cantidad,
+      required this.precioUnitario,
+      required this.descuento,
+      required this.entregado,
+      required this.idDetalleVenta});
 }
 
 @entity
@@ -94,7 +106,8 @@ class Venta {
   @primaryKey
   final int idVenta;
 
-  final bool consumicionPropia;
+  final String tipoVenta;
+
   final String metodoPago;
   final double costeTotal;
   final double ingresoTotal;
@@ -105,7 +118,7 @@ class Venta {
   final String fecha;
 
   Venta({
-    required this.consumicionPropia,
+    required this.tipoVenta,
     required this.idVenta,
     required this.metodoPago,
     required this.costeTotal,
@@ -114,4 +127,14 @@ class Venta {
     required this.idUsuario,
     required this.nombreCliente,
   });
+}
+
+@entity
+class TipoVenta {
+  @primaryKey
+  final int idTipoVenta;
+
+  final String tipoVenta;
+
+  TipoVenta({required this.idTipoVenta, required this.tipoVenta});
 }

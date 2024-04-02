@@ -105,3 +105,12 @@ abstract class VentaDao {
   @insert
   Future<void> insertVenta(Venta venta);
 }
+
+@dao
+abstract class TipoVentaDao {
+  @Query('SELECT tipoVenta FROM TipoVenta WHERE idTipoVenta = :id')
+  Future<String?> findTipoVentaByID(int id);
+
+  @insert
+  Future<void> insertTipoVenta(TipoVenta venta);
+}

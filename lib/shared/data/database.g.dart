@@ -87,6 +87,8 @@ class _$AppDatabase extends AppDatabase {
 
   VentaDao? _ventaDaoInstance;
 
+  TipoVentaDao? _tipoVentaDaoInstance;
+
   CosteFijoDao? _costeFijoDaoInstance;
 
   ClienteDao? _clienteDaoInstance;
@@ -131,6 +133,8 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `SubFamilia` (`idSubfamilia` TEXT NOT NULL, `nombreSub` TEXT NOT NULL, `idFamilia` TEXT NOT NULL, PRIMARY KEY (`idSubfamilia`))');
         await database.execute(
+            'CREATE TABLE IF NOT EXISTS `TipoVenta` (`idTipoVenta` INTEGER NOT NULL, `tipoVenta` TEXT NOT NULL, PRIMARY KEY (`idTipoVenta`))');
+        await database.execute(
             'CREATE TABLE IF NOT EXISTS `Producto` (`productoId` INTEGER NOT NULL, `producto` TEXT NOT NULL, `precio` REAL NOT NULL, `medida` INTEGER NOT NULL, `coste` REAL NOT NULL, `iva` REAL NOT NULL, `idSubfamilia` TEXT NOT NULL, PRIMARY KEY (`productoId`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Proveedor` (`cif` TEXT NOT NULL, `nombreEmpresa` TEXT NOT NULL, `numero` INTEGER NOT NULL, `email` TEXT NOT NULL, PRIMARY KEY (`cif`))');
@@ -149,7 +153,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `DetalleVenta` (`idDetalleVenta` TEXT NOT NULL, `idVenta` INTEGER NOT NULL, `productoId` INTEGER NOT NULL, `cantidad` INTEGER NOT NULL, `precioUnitario` REAL NOT NULL, `descuento` REAL NOT NULL, `entregado` INTEGER NOT NULL, PRIMARY KEY (`idDetalleVenta`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Venta` (`idVenta` INTEGER NOT NULL, `consumicionPropia` INTEGER NOT NULL, `metodoPago` TEXT NOT NULL, `costeTotal` REAL NOT NULL, `ingresoTotal` REAL NOT NULL, `idUsuario` INTEGER NOT NULL, `nombreCliente` TEXT NOT NULL, `fecha` TEXT NOT NULL, PRIMARY KEY (`idVenta`))');
+            'CREATE TABLE IF NOT EXISTS `Venta` (`idVenta` INTEGER NOT NULL, `tipoVenta` TEXT NOT NULL, `metodoPago` TEXT NOT NULL, `costeTotal` REAL NOT NULL, `ingresoTotal` REAL NOT NULL, `idUsuario` INTEGER NOT NULL, `nombreCliente` TEXT NOT NULL, `fecha` TEXT NOT NULL, PRIMARY KEY (`idVenta`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `CosteFijo` (`nombre` TEXT NOT NULL, `coste` REAL NOT NULL, PRIMARY KEY (`nombre`))');
         await database.execute(
@@ -236,6 +240,11 @@ class _$AppDatabase extends AppDatabase {
   @override
   VentaDao get ventaDao {
     return _ventaDaoInstance ??= _$VentaDao(database, changeListener);
+  }
+
+  @override
+  TipoVentaDao get tipoVentaDao {
+    return _tipoVentaDaoInstance ??= _$TipoVentaDao(database, changeListener);
   }
 
   @override
@@ -964,13 +973,13 @@ class _$DetalleVentaDao extends DetalleVentaDao {
   Future<List<DetalleVenta>> findAllDetalleVentas() async {
     return _queryAdapter.queryList('SELECT * FROM DetalleVenta',
         mapper: (Map<String, Object?> row) => DetalleVenta(
-            row['idVenta'] as int,
-            row['productoId'] as int,
-            row['cantidad'] as int,
-            row['precioUnitario'] as double,
-            row['descuento'] as double,
-            (row['entregado'] as int) != 0,
-            row['idDetalleVenta'] as String));
+            idVenta: row['idVenta'] as int,
+            productoId: row['productoId'] as int,
+            cantidad: row['cantidad'] as int,
+            precioUnitario: row['precioUnitario'] as double,
+            descuento: row['descuento'] as double,
+            entregado: (row['entregado'] as int) != 0,
+            idDetalleVenta: row['idDetalleVenta'] as String));
   }
 
   @override
@@ -986,13 +995,13 @@ class _$DetalleVentaDao extends DetalleVentaDao {
     return _queryAdapter.queryList(
         'SELECT * FROM DetalleVenta WHERE idVenta = ?1',
         mapper: (Map<String, Object?> row) => DetalleVenta(
-            row['idVenta'] as int,
-            row['productoId'] as int,
-            row['cantidad'] as int,
-            row['precioUnitario'] as double,
-            row['descuento'] as double,
-            (row['entregado'] as int) != 0,
-            row['idDetalleVenta'] as String),
+            idVenta: row['idVenta'] as int,
+            productoId: row['productoId'] as int,
+            cantidad: row['cantidad'] as int,
+            precioUnitario: row['precioUnitario'] as double,
+            descuento: row['descuento'] as double,
+            entregado: (row['entregado'] as int) != 0,
+            idDetalleVenta: row['idDetalleVenta'] as String),
         arguments: [id]);
   }
 
@@ -1013,7 +1022,7 @@ class _$VentaDao extends VentaDao {
             'Venta',
             (Venta item) => <String, Object?>{
                   'idVenta': item.idVenta,
-                  'consumicionPropia': item.consumicionPropia ? 1 : 0,
+                  'tipoVenta': item.tipoVenta,
                   'metodoPago': item.metodoPago,
                   'costeTotal': item.costeTotal,
                   'ingresoTotal': item.ingresoTotal,
@@ -1035,7 +1044,7 @@ class _$VentaDao extends VentaDao {
   Future<List<Venta>> findAllVentas() async {
     return _queryAdapter.queryList('SELECT * FROM Venta',
         mapper: (Map<String, Object?> row) => Venta(
-            consumicionPropia: (row['consumicionPropia'] as int) != 0,
+            tipoVenta: row['tipoVenta'] as String,
             idVenta: row['idVenta'] as int,
             metodoPago: row['metodoPago'] as String,
             costeTotal: row['costeTotal'] as double,
@@ -1057,7 +1066,7 @@ class _$VentaDao extends VentaDao {
   Stream<Venta?> findVentaById(int id) {
     return _queryAdapter.queryStream('SELECT * FROM Venta WHERE idVenta = ?1',
         mapper: (Map<String, Object?> row) => Venta(
-            consumicionPropia: (row['consumicionPropia'] as int) != 0,
+            tipoVenta: row['tipoVenta'] as String,
             idVenta: row['idVenta'] as int,
             metodoPago: row['metodoPago'] as String,
             costeTotal: row['costeTotal'] as double,
@@ -1074,7 +1083,7 @@ class _$VentaDao extends VentaDao {
   Future<List<Venta?>> findVentaByFecha(String fecha) async {
     return _queryAdapter.queryList('SELECT * FROM Venta WHERE fecha = ?1',
         mapper: (Map<String, Object?> row) => Venta(
-            consumicionPropia: (row['consumicionPropia'] as int) != 0,
+            tipoVenta: row['tipoVenta'] as String,
             idVenta: row['idVenta'] as int,
             metodoPago: row['metodoPago'] as String,
             costeTotal: row['costeTotal'] as double,
@@ -1090,7 +1099,7 @@ class _$VentaDao extends VentaDao {
     return _queryAdapter.queryListStream(
         'SELECT * FROM Venta WHERE nombreCliente = ?1',
         mapper: (Map<String, Object?> row) => Venta(
-            consumicionPropia: (row['consumicionPropia'] as int) != 0,
+            tipoVenta: row['tipoVenta'] as String,
             idVenta: row['idVenta'] as int,
             metodoPago: row['metodoPago'] as String,
             costeTotal: row['costeTotal'] as double,
@@ -1106,6 +1115,41 @@ class _$VentaDao extends VentaDao {
   @override
   Future<void> insertVenta(Venta venta) async {
     await _ventaInsertionAdapter.insert(venta, OnConflictStrategy.abort);
+  }
+}
+
+class _$TipoVentaDao extends TipoVentaDao {
+  _$TipoVentaDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _tipoVentaInsertionAdapter = InsertionAdapter(
+            database,
+            'TipoVenta',
+            (TipoVenta item) => <String, Object?>{
+                  'idTipoVenta': item.idTipoVenta,
+                  'tipoVenta': item.tipoVenta
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<TipoVenta> _tipoVentaInsertionAdapter;
+
+  @override
+  Future<String?> findTipoVentaByID(int id) async {
+    return _queryAdapter.query(
+        'SELECT tipoVenta FROM TipoVenta WHERE idTipoVenta = ?1',
+        mapper: (Map<String, Object?> row) => row.values.first as String,
+        arguments: [id]);
+  }
+
+  @override
+  Future<void> insertTipoVenta(TipoVenta venta) async {
+    await _tipoVentaInsertionAdapter.insert(venta, OnConflictStrategy.abort);
   }
 }
 

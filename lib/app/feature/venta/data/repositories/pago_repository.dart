@@ -20,4 +20,9 @@ class PagoRepositoryImpl extends PagoRepository {
   Future<void> insertVenta(Venta venta) {
     return _appDatabase.ventaDao.insertVenta(venta);
   }
+
+  @override
+  Future<String?> findTipoVentaById(int id) {
+    return _appDatabase.tipoVentaDao.findTipoVentaByID(id);
+  }
 }

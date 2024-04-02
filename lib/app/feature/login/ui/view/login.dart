@@ -110,6 +110,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text("Ingresar")),
                   ElevatedButton(
                       onPressed: () {
+                        widget.fetchPrueba.insertarTipoVenta(
+                            TipoVenta(idTipoVenta: 0, tipoVenta: 'regular'));
+                        widget.fetchPrueba.insertarTipoVenta(TipoVenta(
+                            idTipoVenta: 1, tipoVenta: 'consumicion propia'));
+                        widget.fetchPrueba.insertarTipoVenta(
+                            TipoVenta(idTipoVenta: 2, tipoVenta: 'devolucion'));
                         for (var i = 0; i < 12; i++) {
                           widget.fetchPrueba.insertarProducto(Producto(
                               i,
@@ -128,6 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               'nombreSub $i',
                               'idFamilia $i'));
                           widget.fetchPrueba.insertarCliente(Cliente(
+                              idCliente: i,
                               nombreCliente: 'nombreCliente $i',
                               telefono: 'telefono $i',
                               email: 'email $i',
@@ -135,7 +142,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               nombreTienda: 'nombreTienda $i',
                               nif: 'NIF $i',
                               direccion: 'direccion $i',
-                              fechaNacimiento: 'fechaNacimiento $i'));
+                              fechaNacimiento: 'fechaNacimiento $i',
+                              genero: true,
+                              pedidos: 0));
                         }
                       },
                       child: const Text("Agregar Datos")),
