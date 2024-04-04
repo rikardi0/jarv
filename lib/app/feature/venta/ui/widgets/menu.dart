@@ -1,18 +1,20 @@
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:multiple_stream_builder/multiple_stream_builder.dart';
+
 import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:jarv/app/feature/venta/data/model/producto_ordenado.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/pago_repository.dart';
+import '../../data/repositories/interfaces/menu_repository.dart';
+import '../../data/model/entity_venta.dart';
+import 'package:jarv/core/di/locator.dart';
+
 import 'package:jarv/app/feature/venta/ui/provider/venta_espera_provider.dart';
 import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
-import 'package:jarv/core/di/locator.dart';
-import 'package:jarv/shared/ui/widgets.dart';
-import 'package:multiple_stream_builder/multiple_stream_builder.dart';
-import 'package:provider/provider.dart';
 
-import '../../data/model/entity_venta.dart';
-import '../../data/repositories/interfaces/menu_repository.dart';
+import 'package:jarv/shared/ui/widgets.dart';
 
 class Menu extends StatefulWidget {
   const Menu(
@@ -34,6 +36,7 @@ class _MenuState extends State<Menu> {
   String familiaSeleccionada = "";
   String subFamiliaSeleccionada = "";
   String cantidadProducto = '';
+  String? tipoDevolucion;
 
   String? identificadorVenta;
 
@@ -86,7 +89,7 @@ class _MenuState extends State<Menu> {
     const borderColor = Color.fromARGB(59, 7, 7, 7);
 
     final String joinedCantidad =
-        cantidad.map((e) => int.parse(e)).toList().join();
+        cantidad.map((value) => int.parse(value)).toList().join();
 
     final listaFamilia = fecthMenuRepository.findAllFamilias();
     final listaSubFamilia =
@@ -329,13 +332,20 @@ class _MenuState extends State<Menu> {
         context: context,
         builder: (_) {
           return AlertDialog(
-            title: Text(widget.titleSection),
-            content: Text(
-                'Los productos agregados a la lista seran guardados como una ${widget.titleSection}.'),
+            title: Text(
+              widget.titleSection,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            content: widget.devolucion
+                ? _buildContentDevolucion(fecthPagoRepository)
+                : const Text(
+                    'Los productos agregados a la lista seran guardados como una consumicion propia.'),
             actions: [
               ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
+                    tipoDevolucion = null;
                   },
                   child: const Text('Cancelar')),
               FilledButton(
@@ -351,6 +361,55 @@ class _MenuState extends State<Menu> {
         });
   }
 
+  StatefulBuilder _buildContentDevolucion(PagoRepository repository) {
+    return StatefulBuilder(builder: (context, setState) {
+      return StreamBuilder(
+        stream: repository.findAllTipoDevolucion().asStream(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return SizedBox(
+              width: MediaQuery.of(context).size.width * 0.5,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Seleccione la razon de la devolucion:',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  DropdownButton(
+                    value: tipoDevolucion,
+                    hint: const Text('Razon de devolucion'),
+                    isExpanded: true,
+                    items: snapshot.data!
+                        .map((value) => DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (String? value) {
+                      setState(() => tipoDevolucion = value);
+                    },
+                  ),
+                  tipoDevolucion != null
+                      ? Text(
+                          'Los productos seran registrados como una devolucion por $tipoDevolucion',
+                          style: Theme.of(context).textTheme.labelSmall,
+                        )
+                      : const SizedBox.shrink(),
+                ],
+              ),
+            );
+          } else {
+            return const CircularProgressIndicator();
+          }
+        },
+      );
+    });
+  }
+
   Future<void> _saveVenta(
       PagoRepository fecthPagoRepository, int idTipoVenta) async {
     final idVenta = DateTime.now().millisecondsSinceEpoch;
@@ -359,11 +418,12 @@ class _MenuState extends State<Menu> {
     fecthPagoRepository.insertVenta(Venta(
         idVenta: idVenta,
         metodoPago: 'Tarjeta',
-        costeTotal: totalVenta,
-        ingresoTotal: totalVenta,
+        costeTotal: 0,
+        ingresoTotal: 0,
         fecha: fechaFormatter(DateTime.now()),
         idUsuario: 0,
-        nombreCliente: widget.titleSection,
+        nombreCliente:
+            widget.devolucion ? tipoDevolucion! : widget.titleSection,
         tipoVenta: tipoVenta!));
 
     for (var element in productosAgregados) {
