@@ -25,4 +25,9 @@ class PagoRepositoryImpl extends PagoRepository {
   Future<String?> findTipoVentaById(int id) {
     return _appDatabase.tipoVentaDao.findTipoVentaByID(id);
   }
+
+  @override
+  Future<List<String>> findAllTipoDevolucion() {
+    return _appDatabase.devolucionDao.findAllTipoDevolucion();
+  }
 }

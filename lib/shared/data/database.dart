@@ -15,6 +15,7 @@ part 'database.g.dart';
   Familia,
   SubFamilia,
   TipoVenta,
+  Devolucion,
   Producto,
   Proveedor,
   Pedido,
@@ -40,6 +41,7 @@ abstract class AppDatabase extends FloorDatabase {
   SubFamiliaDao get subFamiliaDao;
   ProductoDao get productoDao;
   ProveedorDao get proveedorDao;
+  DevolucionDao get devolucionDao;
   PedidoDao get pedidoDao;
   StockDao get stockDao;
   MermaDao get mermaDao;

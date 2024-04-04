@@ -71,6 +71,8 @@ class _$AppDatabase extends AppDatabase {
 
   ProveedorDao? _proveedorDaoInstance;
 
+  DevolucionDao? _devolucionDaoInstance;
+
   PedidoDao? _pedidoDaoInstance;
 
   StockDao? _stockDaoInstance;
@@ -135,6 +137,8 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `TipoVenta` (`idTipoVenta` INTEGER NOT NULL, `tipoVenta` TEXT NOT NULL, PRIMARY KEY (`idTipoVenta`))');
         await database.execute(
+            'CREATE TABLE IF NOT EXISTS `Devolucion` (`idDevolucion` INTEGER NOT NULL, `devolucion` TEXT NOT NULL, PRIMARY KEY (`idDevolucion`))');
+        await database.execute(
             'CREATE TABLE IF NOT EXISTS `Producto` (`productoId` INTEGER NOT NULL, `producto` TEXT NOT NULL, `precio` REAL NOT NULL, `medida` INTEGER NOT NULL, `coste` REAL NOT NULL, `iva` REAL NOT NULL, `idSubfamilia` TEXT NOT NULL, PRIMARY KEY (`productoId`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Proveedor` (`cif` TEXT NOT NULL, `nombreEmpresa` TEXT NOT NULL, `numero` INTEGER NOT NULL, `email` TEXT NOT NULL, PRIMARY KEY (`cif`))');
@@ -197,6 +201,11 @@ class _$AppDatabase extends AppDatabase {
   @override
   ProveedorDao get proveedorDao {
     return _proveedorDaoInstance ??= _$ProveedorDao(database, changeListener);
+  }
+
+  @override
+  DevolucionDao get devolucionDao {
+    return _devolucionDaoInstance ??= _$DevolucionDao(database, changeListener);
   }
 
   @override
@@ -570,6 +579,39 @@ class _$ProveedorDao extends ProveedorDao {
   Future<void> insertProveedor(Proveedor proveedor) async {
     await _proveedorInsertionAdapter.insert(
         proveedor, OnConflictStrategy.abort);
+  }
+}
+
+class _$DevolucionDao extends DevolucionDao {
+  _$DevolucionDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _devolucionInsertionAdapter = InsertionAdapter(
+            database,
+            'Devolucion',
+            (Devolucion item) => <String, Object?>{
+                  'idDevolucion': item.idDevolucion,
+                  'devolucion': item.devolucion
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<Devolucion> _devolucionInsertionAdapter;
+
+  @override
+  Future<List<String>> findAllTipoDevolucion() async {
+    return _queryAdapter.queryList('SELECT devolucion FROM Devolucion',
+        mapper: (Map<String, Object?> row) => row.values.first as String);
+  }
+
+  @override
+  Future<void> insertTipoDevolucion(Devolucion venta) async {
+    await _devolucionInsertionAdapter.insert(venta, OnConflictStrategy.abort);
   }
 }
 

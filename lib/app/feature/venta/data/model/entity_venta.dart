@@ -130,6 +130,15 @@ class Venta {
 }
 
 @entity
+class Devolucion {
+  @primaryKey
+  final int idDevolucion;
+  final String devolucion;
+
+  Devolucion({required this.idDevolucion, required this.devolucion});
+}
+
+@entity
 class TipoVenta {
   @primaryKey
   final int idTipoVenta;

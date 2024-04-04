@@ -5,4 +5,5 @@ abstract class PagoRepository {
   Future<void> insertVenta(Venta venta);
   Future<String?> findTipoVentaById(int id);
   Stream<List<String>> findAllClienteNombre();
+  Future<List<String>> findAllTipoDevolucion();
 }
