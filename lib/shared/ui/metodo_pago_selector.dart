@@ -5,17 +5,26 @@ class MetodoPagoSelector extends StatelessWidget {
     super.key,
     required this.metodoPago,
     required this.onChanged,
+    this.onCancel,
   });
 
-  final String metodoPago;
+  final String? metodoPago;
   final dynamic onChanged;
+  final dynamic onCancel;
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButton(
+    return DropdownButtonFormField(
+        hint: const Text('Metodo de Pago'),
         isExpanded: true,
-        icon: Icon(
-            metodoPago == 'tarjeta' ? Icons.payment : Icons.payments_outlined),
+        icon: metodoPago == null
+            ? const Icon(Icons.arrow_drop_down)
+            : GestureDetector(
+                onTap: () {
+                  onCancel();
+                },
+                child: const Icon(Icons.cancel_outlined),
+              ),
         value: metodoPago,
         items: const <DropdownMenuItem>[
           DropdownMenuItem(value: 'efectivo', child: Text('Efectivo')),

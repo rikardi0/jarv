@@ -8,7 +8,7 @@ class ClienteSelector extends StatelessWidget {
     required this.onChanged,
   });
 
-  final String cliente;
+  final String? cliente;
   final Stream<List<String>> clienteLista;
   final dynamic onChanged;
 
@@ -20,6 +20,7 @@ class ClienteSelector extends StatelessWidget {
         if (snapshot.hasData) {
           return DropdownButton<String>(
             isExpanded: true,
+            hint: const Text('Nombre Cliente'),
             value: cliente,
             items: snapshot.data!
                 .map((value) => DropdownMenuItem<String>(
@@ -29,7 +30,6 @@ class ClienteSelector extends StatelessWidget {
                 .toList(),
             onChanged: (value) {
               onChanged(value);
-              // cliente = value!;
             },
           );
         } else {

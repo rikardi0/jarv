@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/ticket_diario_repository.dart';
+import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
 import 'package:jarv/core/di/locator.dart';
-import 'package:jarv/shared/ui/cliente_selector.dart';
 import 'package:jarv/shared/ui/metodo_pago_selector.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 
@@ -20,14 +20,21 @@ class TicketDiario extends StatefulWidget {
 
 class _TicketDiarioState extends State<TicketDiario> {
   List<Map<String, Object?>> listaProducto = [];
+  TextEditingController fechaTextController = TextEditingController();
   String fechaFactura = '';
   String horaFactura = '';
-  String cliente = 'nombreCliente 1';
-  String metodoPago = 'tarjeta';
-  List<int> idProductosVenta = [];
+
+  String? cliente;
+  String? metodoPago;
+
+  List<Venta?>? listaVenta;
   bool isRangeActive = false;
   int ventaSeleccionada = 0;
   double montoFactura = 0.0;
+
+  DateTimeRange rangoFechaFiltro =
+      DateTimeRange(start: DateTime.now(), end: DateTime.now());
+  DateTime fechaActual = DateTime.now();
 
   final selectedVenta = ValueNotifier<int?>(null);
 
@@ -52,13 +59,11 @@ class _TicketDiarioState extends State<TicketDiario> {
 
   @override
   Widget build(BuildContext context) {
-    final fechaActual = DateTime.now();
-    final fechaFormateada =
-        '${fechaActual.day}/${fechaActual.month}/${fechaActual.year}';
+    final fechaFormateada = fechaFormatter(fechaActual);
 
     final ventaDiaria =
         widget.fecthRepository.findVentaByFecha(fechaFormateada).asStream();
-    final clienteLista = widget.fecthRepository.findAllClienteNombre();
+    final List<String> clienteLista = [];
 
     return Scaffold(
         appBar: AppBar(),
@@ -69,11 +74,31 @@ class _TicketDiarioState extends State<TicketDiario> {
             if (!snapshot.snapshot1.hasData) {
               return const Center(child: CircularProgressIndicator());
             } else {
-              final ventaItem = snapshot.snapshot1.data;
-
+              listaVenta = snapshot.snapshot1.data;
+              final itemVenta = snapshot.snapshot1.data;
+              if (cliente != null) {
+                listaVenta = listaVenta!.where((element) {
+                  return element!.nombreCliente
+                      .toString()
+                      .toLowerCase()
+                      .contains(cliente!.toLowerCase());
+                }).toList();
+              } else if (metodoPago != null) {
+                listaVenta = listaVenta!.where((element) {
+                  return element!.metodoPago
+                      .toString()
+                      .toLowerCase()
+                      .contains(metodoPago!.toLowerCase());
+                }).toList();
+              }
+              for (var element in itemVenta!) {
+                if (!clienteLista.contains(element!.nombreCliente)) {
+                  clienteLista.add(element.nombreCliente);
+                }
+              }
               return Row(
                 children: [
-                  _tarjetaVenta(context, ventaItem),
+                  _tarjetaVenta(context, listaVenta),
                   _containerFactura(context),
                   _filtroVenta(context, clienteLista),
                 ],
@@ -83,8 +108,7 @@ class _TicketDiarioState extends State<TicketDiario> {
         ));
   }
 
-  Padding _filtroVenta(
-      BuildContext context, Stream<List<String>> clienteLista) {
+  Padding _filtroVenta(BuildContext context, List<String> clienteLista) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
       child: SizedBox(
@@ -93,34 +117,129 @@ class _TicketDiarioState extends State<TicketDiario> {
           padding: const EdgeInsets.symmetric(horizontal: 12.5),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DatePicker(
-                intervalo: isRangeActive,
-                onChanged: (value) {
-                  setState(() {
-                    isRangeActive = value;
-                  });
-                },
-              ),
-              ClienteSelector(
-                  cliente: cliente,
-                  clienteLista: clienteLista,
-                  onChanged: (value) {
-                    setState(() {
-                      cliente = value;
-                    });
-                  }),
+              _buildDatePciker(context),
+              _buildCliente(clienteLista),
               MetodoPagoSelector(
                   metodoPago: metodoPago,
+                  onCancel: () {
+                    setState(() {
+                      metodoPago = null;
+                    });
+                  },
                   onChanged: (value) {
                     setState(() {
                       metodoPago = value;
+                      cliente = null;
                     });
-                  })
+                  }),
+              FilledButton(onPressed: () {}, child: const Text('Imprimir'))
             ],
           ),
         ),
       ),
+    );
+  }
+
+  DropdownButtonFormField<String> _buildCliente(List<String> clienteLista) {
+    return DropdownButtonFormField<String>(
+      value: cliente,
+      hint: const Text('Cliente'),
+      isExpanded: true,
+      icon: cliente != null
+          ? GestureDetector(
+              onTap: () {
+                cliente = null;
+                setState(() {});
+              },
+              child: const Icon(Icons.cancel_outlined),
+            )
+          : const Icon(Icons.arrow_drop_down),
+      items: clienteLista.map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          metodoPago = null;
+          cliente = value;
+        });
+      },
+    );
+  }
+
+  Column _buildDatePciker(BuildContext context) {
+    String fechaValue = fechaFormatter(fechaActual);
+    String fechaRangeHint =
+        '${fechaFormatter(rangoFechaFiltro.start)} - ${fechaFormatter(rangoFechaFiltro.end)}';
+
+    return Column(
+      children: [
+        TextFormField(
+          readOnly: true,
+          controller: fechaTextController,
+          onTap: () async {
+            setState(() {
+              metodoPago = null;
+              cliente = null;
+            });
+            if (isRangeActive) {
+              final rangoSeleccionado = await showDateRangePicker(
+                  context: context,
+                  initialEntryMode: DatePickerEntryMode.calendarOnly,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now());
+              fechaTextController.text = fechaRangeHint;
+              fechaTextController.text = fechaRangeHint;
+              if (rangoSeleccionado != null) {
+                setState(() {
+                  rangoFechaFiltro = rangoSeleccionado;
+                });
+              }
+            } else {
+              final fechaSeleccionada = await showDatePicker(
+                  context: context,
+                  initialEntryMode: DatePickerEntryMode.calendarOnly,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now());
+              fechaTextController.text = fechaValue;
+              if (fechaSeleccionada != null) {
+                setState(() {
+                  fechaActual = fechaSeleccionada;
+                });
+              }
+            }
+          },
+          decoration: InputDecoration(
+            helperText:
+                isRangeActive ? 'dd/mm/aaaa - dd/mm/aaaa' : 'dd/mm/aaaa',
+            labelText: 'Fecha',
+            suffixIcon: const Icon(Icons.calendar_month),
+          ),
+        ),
+        Row(
+          children: [
+            Switch(
+                value: isRangeActive,
+                onChanged: (value) {
+                  setState(() {
+                    fechaTextController.text = '';
+                    isRangeActive = value;
+                    fechaActual = DateTime.now();
+                    rangoFechaFiltro = DateTimeRange(
+                        start: DateTime.now(), end: DateTime.now());
+                  });
+                }),
+            Text(
+              'Intervalo',
+              style: Theme.of(context).textTheme.bodyLarge,
+            )
+          ],
+        )
+      ],
     );
   }
 
@@ -267,8 +386,7 @@ class _TicketDiarioState extends State<TicketDiario> {
             final venta = ventaItem[index];
             final dateTime =
                 DateTime.fromMillisecondsSinceEpoch(venta!.idVenta);
-            final String hora =
-                '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+            final String hora = hourFormatter(dateTime);
             return Card(
               color: selectedVenta.value != index
                   ? Theme.of(context).cardTheme.color
@@ -303,7 +421,7 @@ class _TicketDiarioState extends State<TicketDiario> {
                     _loadDataFromDatabase();
                   });
                 },
-                title: const Text('Total'),
+                title: Text(venta.nombreCliente),
                 subtitle: Text(venta.costeTotal.floorToDouble().toString()),
                 trailing: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -317,61 +435,6 @@ class _TicketDiarioState extends State<TicketDiario> {
           },
         ),
       ),
-    );
-  }
-}
-
-class DatePicker extends StatelessWidget {
-  const DatePicker({
-    super.key,
-    required this.intervalo,
-    required this.onChanged,
-  });
-
-  final bool intervalo;
-  final dynamic onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextFormField(
-          readOnly: true,
-          onTap: () {
-            if (intervalo) {
-              showDateRangePicker(
-                  context: context,
-                  initialEntryMode: DatePickerEntryMode.calendarOnly,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime.now());
-            } else {
-              showDatePicker(
-                  context: context,
-                  initialEntryMode: DatePickerEntryMode.calendarOnly,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime.now());
-            }
-          },
-          decoration: InputDecoration(
-            helperText: intervalo ? 'dd/mm/aaaa - dd/mm/aaaa' : 'dd/mm/aaaa',
-            labelText: 'Fecha',
-            suffixIcon: const Icon(Icons.calendar_month),
-          ),
-        ),
-        Row(
-          children: [
-            Switch(
-                value: intervalo,
-                onChanged: (value) {
-                  onChanged(value);
-                }),
-            Text(
-              'Intervalo',
-              style: Theme.of(context).textTheme.bodyLarge,
-            )
-          ],
-        )
-      ],
     );
   }
 }
