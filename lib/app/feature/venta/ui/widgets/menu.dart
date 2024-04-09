@@ -1,3 +1,4 @@
+import 'package:jarv/app/feature/proveedor/ui/view/proveedor.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -205,29 +206,22 @@ class _MenuState extends State<Menu> {
       overlayOpacity: 0.0,
       animatedIcon: AnimatedIcons.view_list,
       children: [
-        speedDialItems('Proveedores', Icons.forklift),
+        speedDialItems('Proveedores', Icons.forklift, Proveedor.routeName),
         speedDialItems(
-          'Estadistica',
-          Icons.stacked_bar_chart,
-        ),
+            'Estadistica', Icons.stacked_bar_chart, Proveedor.routeName),
         speedDialItems(
-          'Inventario',
-          Icons.inventory_rounded,
-        ),
-        speedDialItems(
-          'Horario',
-          Icons.schedule,
-        ),
-        speedDialItems(
-          'Configuracion',
-          Icons.settings,
-        ),
+            'Inventario', Icons.inventory_rounded, Proveedor.routeName),
+        speedDialItems('Horario', Icons.schedule, Proveedor.routeName),
+        speedDialItems('Configuracion', Icons.settings, Proveedor.routeName),
       ],
     );
   }
 
-  SpeedDialChild speedDialItems(String label, IconData icono) {
+  SpeedDialChild speedDialItems(String label, IconData icono, String route) {
     return SpeedDialChild(
+      onTap: () {
+        Navigator.pushNamed(context, route);
+      },
       labelWidget: AppBarItemButton(icon: icono, label: label),
       elevation: 0,
     );

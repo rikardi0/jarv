@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:jarv/app/feature/login/ui/view/login.dart';
+import 'package:jarv/app/feature/proveedor/ui/view/proveedor.dart';
 import 'package:jarv/core/theme/custom_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -91,6 +92,8 @@ class MyApp extends StatelessWidget {
             return TicketDiario();
           case Devolucion.routeName:
             return const Devolucion();
+          case Proveedor.routeName:
+            return Proveedor();
           case CierreDiario.routeName:
             return const CierreDiario();
           case SettingsView.routeName:
