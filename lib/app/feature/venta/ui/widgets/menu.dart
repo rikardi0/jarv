@@ -17,16 +17,9 @@ import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
 import 'package:jarv/shared/ui/widgets.dart';
 
 class Menu extends StatefulWidget {
-  const Menu(
-    this.devolucion, {
+  const Menu({
     super.key,
-    required this.menuPrincipal,
-    required this.titleSection,
   });
-
-  final bool menuPrincipal;
-  final bool devolucion;
-  final String titleSection;
 
   @override
   State<Menu> createState() => _MenuState();
@@ -37,12 +30,14 @@ class _MenuState extends State<Menu> {
   String subFamiliaSeleccionada = "";
   String cantidadProducto = '';
   String? tipoDevolucion;
-
   String? identificadorVenta;
 
   bool mostrarUsuario = true;
   bool mostrarTeclado = true;
   bool mostrarIdentificador = false;
+
+  bool devolucion = false;
+  bool consumicionPropia = false;
 
   List<String> cantidad = [];
   List<ProductoOrdenado?> productosAgregados = [];
@@ -57,12 +52,10 @@ class _MenuState extends State<Menu> {
 
   @override
   void initState() {
-    if (widget.menuPrincipal) {
-      super.initState();
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        _changeState();
-      });
-    }
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _changeState();
+    });
   }
 
   _changeState() async {
@@ -98,11 +91,14 @@ class _MenuState extends State<Menu> {
         fecthMenuRepository.findProductoById(subFamiliaSeleccionada);
 
     final Size size = MediaQuery.of(context).size;
+    final PagoRepository fecthPagoRepository =
+        localService.get<PagoRepository>();
 
     return Scaffold(
       appBar: AppBar(
-        actions: widget.menuPrincipal
-            ? mostrarUsuario
+        actions: devolucion || consumicionPropia
+            ? null
+            : mostrarUsuario
                 ? const [
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 15.0),
@@ -111,45 +107,121 @@ class _MenuState extends State<Menu> {
                           label: 'Usuario'),
                     )
                   ]
-                : null
-            : null,
-        backgroundColor: mostrarUsuario
-            ? null
-            : Theme.of(context).colorScheme.primaryContainer,
-        centerTitle: widget.menuPrincipal ? true : false,
-        title: widget.menuPrincipal
-            ? productosAgregados.isEmpty
+                : null,
+        backgroundColor: devolucion || consumicionPropia
+            ? devolucion
+                ? Theme.of(context).colorScheme.onPrimaryContainer
+                : Theme.of(context).colorScheme.secondary
+            : mostrarUsuario
                 ? null
-                : appBarCheckOut()
-            : Text(widget.titleSection),
+                : Theme.of(context).colorScheme.primaryContainer,
+        centerTitle: true,
+        title: devolucion || consumicionPropia
+            ? Text(
+                devolucion ? 'Devolucion' : 'Consumicion Propia',
+                style: TextStyle(color: Theme.of(context).colorScheme.surface),
+              )
+            : productosAgregados.isEmpty
+                ? null
+                : appBarCheckOut(),
         toolbarHeight: 35,
-        leading: widget.menuPrincipal
-            ? productosAgregados.isEmpty
+        leading: devolucion || consumicionPropia
+            ? const SizedBox.shrink()
+            : productosAgregados.isEmpty
                 ? speedDial()
-                : const SizedBox.shrink()
-            : null,
+                : const SizedBox.shrink(),
       ),
-      body: StreamBuilder3(
-        streams: StreamTuple3(listaFamilia, listaSubFamilia, listaProducto),
-        builder: (context, snapshot) {
-          if (!snapshot.snapshot1.hasData &&
-              !snapshot.snapshot2.hasData &&
-              !snapshot.snapshot3.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            final itemFamilia = snapshot.snapshot1.data;
-            final itemSubFamilia = snapshot.snapshot2.data;
-            final itemProducto = snapshot.snapshot3.data;
-            return _buildMenuBody(
-              size,
-              itemFamilia,
-              itemSubFamilia,
-              itemProducto,
-              joinedCantidad,
-              borderColor,
-            );
-          }
-        },
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder3(
+              streams:
+                  StreamTuple3(listaFamilia, listaSubFamilia, listaProducto),
+              builder: (context, snapshot) {
+                if (!snapshot.snapshot1.hasData &&
+                    !snapshot.snapshot2.hasData &&
+                    !snapshot.snapshot3.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                } else {
+                  final itemFamilia = snapshot.snapshot1.data;
+                  final itemSubFamilia = snapshot.snapshot2.data;
+                  final itemProducto = snapshot.snapshot3.data;
+                  return _buildMenuBody(
+                    size,
+                    itemFamilia,
+                    itemSubFamilia,
+                    itemProducto,
+                    joinedCantidad,
+                    borderColor,
+                  );
+                }
+              },
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.16,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/cierre_diario');
+                      },
+                      icon: const Icon(Icons.account_balance_outlined),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.secondaryContainer,
+                          foregroundColor: Theme.of(context)
+                              .colorScheme
+                              .onSecondaryContainer),
+                      label: const Text('Cierre Diario')),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: devolucion || consumicionPropia
+                          ? productosAgregados.isEmpty
+                              ? Colors.black12
+                              : devolucion
+                                  ? Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer
+                                  : Theme.of(context).colorScheme.secondary
+                          : null,
+                    ),
+                    onPressed: () {
+                      devolucion || consumicionPropia
+                          ? productosAgregados.isNotEmpty
+                              ? _builAlertDialog(fecthPagoRepository)
+                              : null
+                          : Navigator.pushNamed(context, '/espera');
+                    },
+                    icon: Icon(
+                      devolucion || consumicionPropia
+                          ? Icons.add_box_outlined
+                          : Icons.list_alt_rounded,
+                      color: devolucion || consumicionPropia
+                          ? Theme.of(context).colorScheme.surface
+                          : null,
+                    ),
+                    label: Text(
+                      devolucion
+                          ? 'Agregar Devolucion'
+                          : consumicionPropia
+                              ? 'Agregar Consumicion'
+                              : 'Venta en Espera',
+                      style: TextStyle(
+                        color: devolucion || consumicionPropia
+                            ? Theme.of(context).colorScheme.surface
+                            : null,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -241,8 +313,6 @@ class _MenuState extends State<Menu> {
       List<Producto?>? itemProducto,
       String joinedCantidad,
       Color borderColor) {
-    final PagoRepository fecthPagoRepository =
-        localService.get<PagoRepository>();
     return Column(
       children: [
         Expanded(
@@ -293,18 +363,28 @@ class _MenuState extends State<Menu> {
                           .onBackground
                           .withOpacity(0.15),
                     )),
-                width: size.width * 0.3,
+                width: size.width * 0.325,
                 child: Padding(
                   padding: const EdgeInsets.all(5.0),
                   child: CheckOut(
+                    tapConsumicion: () {
+                      setState(() {
+                        consumicionPropia = !consumicionPropia;
+                        devolucion = false;
+                      });
+                    },
+                    tapDevolucion: () {
+                      setState(() {
+                        devolucion = !devolucion;
+                        consumicionPropia = false;
+                      });
+                    },
                     mostrarTeclado: mostrarTeclado,
                     mostrarIdentificador: mostrarIdentificador,
                     productosAgregados: productosAgregados,
                     totalVenta: totalVenta,
                     selectedItemLista: selectedItemLista,
-                    isMenuPrincipal: widget.menuPrincipal,
                     cantidadProducto: cantidadProducto,
-                    titleSection: widget.titleSection,
                     hideKeyboard: dropDownIcon,
                     actualizarCantidad: actualizarCantidad(joinedCantidad),
                     onTextIdentificadorTap: onTextIdentificadorTap,
@@ -312,11 +392,8 @@ class _MenuState extends State<Menu> {
                     onAceptarIdentificador: onAceptarIdentificador,
                     clearButton: clearButton,
                     onTapNum: onTapNum,
-                    sectionActionButton: () {
-                      productosAgregados.isNotEmpty
-                          ? _builAlertDialog(fecthPagoRepository)
-                          : null;
-                    },
+                    devolucion: devolucion,
+                    consumicionPropia: consumicionPropia,
                   ),
                 ),
               )
@@ -333,11 +410,11 @@ class _MenuState extends State<Menu> {
         builder: (_) {
           return AlertDialog(
             title: Text(
-              widget.titleSection,
+              devolucion ? 'Devolucion' : 'Consumicion Propia',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            content: widget.devolucion
+            content: devolucion
                 ? _buildContentDevolucion(fecthPagoRepository)
                 : const Text(
                     'Los productos agregados a la lista seran guardados como una consumicion propia.'),
@@ -350,7 +427,7 @@ class _MenuState extends State<Menu> {
                   child: const Text('Cancelar')),
               FilledButton(
                   onPressed: () {
-                    widget.devolucion
+                    devolucion
                         ? _saveVenta(fecthPagoRepository, 2)
                         : _saveVenta(fecthPagoRepository, 1);
                     Navigator.pop(context);
@@ -422,8 +499,7 @@ class _MenuState extends State<Menu> {
         ingresoTotal: 0,
         fecha: fechaFormatter(DateTime.now()),
         idUsuario: 0,
-        nombreCliente:
-            widget.devolucion ? tipoDevolucion! : widget.titleSection,
+        nombreCliente: devolucion ? tipoDevolucion! : 'consumicion propia',
         tipoVenta: tipoVenta!));
 
     for (var element in productosAgregados) {

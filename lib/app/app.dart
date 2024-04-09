@@ -85,12 +85,8 @@ class MyApp extends StatelessWidget {
             return const Espera();
           case ClienteMenu.routeName:
             return ClienteMenu();
-          case ConsumicionPropia.routeName:
-            return ConsumicionPropia();
           case TicketDiario.routeName:
             return TicketDiario();
-          case Devolucion.routeName:
-            return const Devolucion();
           case CierreDiario.routeName:
             return const CierreDiario();
           case SettingsView.routeName:

@@ -12,8 +12,8 @@ class CheckOut extends StatelessWidget {
     required this.actualizarCantidad,
     required this.mostrarTeclado,
     required this.selectedItemLista,
-    required this.isMenuPrincipal,
-    required this.titleSection,
+    required this.devolucion,
+    required this.consumicionPropia,
     this.onTextIdentificadorTap,
     this.onBackIdentificador,
     this.onAceptarIdentificador,
@@ -21,17 +21,19 @@ class CheckOut extends StatelessWidget {
     this.onTapNum,
     this.clearButton,
     this.hideKeyboard,
+    this.tapDevolucion,
+    this.tapConsumicion,
   });
 
   final String cantidadProducto;
   final bool mostrarIdentificador;
   final bool mostrarTeclado;
-  final bool isMenuPrincipal;
+  final bool devolucion;
+  final bool consumicionPropia;
   final List<ProductoOrdenado?> productosAgregados;
   final double totalVenta;
   final Future<void> actualizarCantidad;
   final ValueNotifier<int?> selectedItemLista;
-  final String titleSection;
   final dynamic onTextIdentificadorTap;
   final dynamic onBackIdentificador;
   final dynamic onAceptarIdentificador;
@@ -39,6 +41,8 @@ class CheckOut extends StatelessWidget {
   final dynamic onTapNum;
   final dynamic hideKeyboard;
   final dynamic sectionActionButton;
+  final dynamic tapDevolucion;
+  final dynamic tapConsumicion;
 
   @override
   Widget build(BuildContext context) {
@@ -298,48 +302,8 @@ class CheckOut extends StatelessWidget {
                 ),
               ],
             ),
-            isMenuPrincipal
-                ? _buildColumnAction(
-                    totalHeight, context, height, width, colorScheme)
-                : _buildActionButton(context),
+            _buildColumnAction(totalHeight, context, height, width, colorScheme)
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionButton(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          sectionActionButton();
-        },
-        child: Container(
-          decoration: BoxDecoration(
-              color: productosAgregados.isEmpty
-                  ? Theme.of(context).disabledColor
-                  : Theme.of(context).colorScheme.primary,
-              borderRadius:
-                  const BorderRadius.only(bottomRight: Radius.circular(20))),
-          height: MediaQuery.of(context).size.height * 0.375,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.add_box,
-                size: 40,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-              Text(
-                titleSection,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -352,30 +316,96 @@ class CheckOut extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _itemActionTeclado(
-            context,
-            height,
-            width,
-            'Devolucion',
-            Icons.change_circle_outlined,
-            colorScheme.onPrimaryContainer,
-            '/devolucion',
+          GestureDetector(
+            onTap: () {
+              tapDevolucion();
+            },
+            child: Container(
+              decoration: ShapeDecoration(
+                  color: devolucion
+                      ? Theme.of(context).colorScheme.onPrimaryContainer
+                      : Theme.of(context).colorScheme.surface,
+                  shape: StadiumBorder(
+                      side: BorderSide(
+                    color: Theme.of(context).colorScheme.surfaceVariant,
+                  ))),
+              height: height / 3.5,
+              width: width / 1.25,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2.5),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.change_circle_outlined,
+                        color: devolucion
+                            ? Theme.of(context).colorScheme.surface
+                            : Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                      Text(
+                        'Devolucion',
+                        style: TextStyle(
+                          color: devolucion
+                              ? Theme.of(context).colorScheme.surface
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
-          _itemActionTeclado(
-            context,
-            height,
-            width,
-            'Consumicion',
-            Icons.dinner_dining,
-            colorScheme.secondary,
-            '/consumicion',
+          GestureDetector(
+            onTap: () {
+              tapConsumicion();
+            },
+            child: Container(
+              decoration: ShapeDecoration(
+                  color: consumicionPropia
+                      ? Theme.of(context).colorScheme.secondary
+                      : Theme.of(context).colorScheme.surface,
+                  shape: StadiumBorder(
+                      side: BorderSide(
+                    color: Theme.of(context).colorScheme.surfaceVariant,
+                  ))),
+              height: height / 3.5,
+              width: width / 1.25,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2.5),
+                  child: Row(
+                    children: [
+                      Icon(Icons.dinner_dining_sharp,
+                          color: consumicionPropia
+                              ? Theme.of(context).colorScheme.surface
+                              : Theme.of(context).colorScheme.secondary),
+                      Text(
+                        'Consumicion',
+                        style: TextStyle(
+                          color: consumicionPropia
+                              ? Theme.of(context).colorScheme.surface
+                              : Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
           _itemActionTeclado(
             context,
             height,
             width,
             'Ticket Diario',
-            Icons.change_circle_outlined,
+            Icons.list_alt_rounded,
             colorScheme.tertiary,
             '/ticket_diario',
           ),

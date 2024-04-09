@@ -1,5 +1,3 @@
-export 'package:jarv/app/feature/venta/ui/view/consumicion_propia.dart';
-export 'package:jarv/app/feature/venta/ui/view/devolucion.dart';
 export 'package:jarv/app/feature/venta/ui/view/espera.dart';
 export 'package:jarv/app/feature/venta/ui/view/menu.dart';
 export 'package:jarv/app/feature/venta/ui/view/pago.dart';
