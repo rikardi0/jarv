@@ -29,4 +29,9 @@ class PruebaRepositoryImpl extends PruebaRepository {
   Future<void> insertarTipoVenta(TipoVenta tipoVenta) {
     return _appDatabase.tipoVentaDao.insertTipoVenta(tipoVenta);
   }
+
+  @override
+  Future<void> insertarTipoDevolucion(Devolucion tipoDevolucion) {
+    return _appDatabase.devolucionDao.insertTipoDevolucion(tipoDevolucion);
+  }
 }

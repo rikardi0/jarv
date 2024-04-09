@@ -6,4 +6,5 @@ abstract class PruebaRepository {
   Future<void> insertarSubFamilia(SubFamilia subFamilia);
   Future<void> insertarCliente(Cliente cliente);
   Future<void> insertarTipoVenta(TipoVenta tipoVenta);
+  Future<void> insertarTipoDevolucion(Devolucion tipoDevolucion);
 }

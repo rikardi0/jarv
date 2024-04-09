@@ -116,6 +116,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             idTipoVenta: 1, tipoVenta: 'consumicion propia'));
                         widget.fetchPrueba.insertarTipoVenta(
                             TipoVenta(idTipoVenta: 2, tipoVenta: 'devolucion'));
+                        widget.fetchPrueba.insertarTipoDevolucion(Devolucion(
+                            idDevolucion: 0,
+                            devolucion: 'producto incorrecto'));
+                        widget.fetchPrueba.insertarTipoDevolucion(Devolucion(
+                            idDevolucion: 1,
+                            devolucion: 'producto en mal estado'));
                         for (var i = 0; i < 12; i++) {
                           widget.fetchPrueba.insertarProducto(Producto(
                               i,
