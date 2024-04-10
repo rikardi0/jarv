@@ -3,6 +3,7 @@ import 'package:jarv/app/feature/venta/data/model/arguments_cliente.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/cliente_repository.dart';
 import 'package:jarv/core/di/locator.dart';
 import '../../../../../shared/ui/card_cliente.dart';
+import '../../../../../shared/ui/search_field.dart';
 import '../../data/model/entity_venta.dart';
 
 class ClienteMenu extends StatefulWidget {
@@ -137,21 +138,33 @@ class _ClienteMenuState extends State<ClienteMenu> {
                 padding: const EdgeInsets.symmetric(horizontal: 12.5),
                 child: ListView(
                   children: [
-                    textField('Nombre', TextInputType.name, _nameController,
-                        (value) {
-                      nameSearchText = value;
-                      setState(() {});
-                    }),
-                    textField('NIF', TextInputType.name, _nifController,
-                        (value) {
-                      nifSearchText = value;
-                      setState(() {});
-                    }),
-                    textField('Direccion', TextInputType.streetAddress,
-                        _direccionController, (value) {
-                      direccionSearchText = value;
-                      setState(() {});
-                    }),
+                    SearchField(
+                      label: 'Nombre',
+                      type: TextInputType.name,
+                      controller: _nameController,
+                      onChanged: (value) {
+                        nameSearchText = value;
+                        setState(() {});
+                      },
+                    ),
+                    SearchField(
+                      label: 'NIF',
+                      type: TextInputType.number,
+                      controller: _nifController,
+                      onChanged: (value) {
+                        nifSearchText = value;
+                        setState(() {});
+                      },
+                    ),
+                    SearchField(
+                      label: 'Direccion',
+                      type: TextInputType.streetAddress,
+                      controller: _direccionController,
+                      onChanged: (value) {
+                        direccionSearchText = value;
+                        setState(() {});
+                      },
+                    )
                   ],
                 ),
               ),
@@ -168,30 +181,6 @@ class _ClienteMenuState extends State<ClienteMenu> {
                 label: const Text('Nuevo Cliente')),
           )
         ],
-      ),
-    );
-  }
-
-  Widget textField(
-    String label,
-    TextInputType type,
-    TextEditingController controller,
-    dynamic onChanged,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextField(
-        controller: controller,
-        onChanged: (value) {
-          onChanged(value);
-        },
-        keyboardType: type,
-        decoration: InputDecoration(
-          border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(25.0))),
-          labelText: label,
-          suffixIcon: const Icon(Icons.search),
-        ),
       ),
     );
   }
