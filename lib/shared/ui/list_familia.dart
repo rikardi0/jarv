@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/shared/ui/card_button.dart';
 
-import '../../data/model/entity_venta.dart';
+import '../../app/feature/venta/data/model/entity_venta.dart';
 
 class ListFamilia extends StatelessWidget {
   const ListFamilia({

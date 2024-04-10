@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../data/model/entity_venta.dart';
+import '../../app/feature/venta/data/model/entity_venta.dart';
 
 class RowSubFamilia extends StatelessWidget {
   const RowSubFamilia({
