@@ -141,7 +141,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Producto` (`productoId` INTEGER NOT NULL, `producto` TEXT NOT NULL, `precio` REAL NOT NULL, `medida` INTEGER NOT NULL, `coste` REAL NOT NULL, `iva` REAL NOT NULL, `idSubfamilia` TEXT NOT NULL, PRIMARY KEY (`productoId`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Proveedor` (`cif` TEXT NOT NULL, `nombreEmpresa` TEXT NOT NULL, `numero` INTEGER NOT NULL, `email` TEXT NOT NULL, PRIMARY KEY (`cif`))');
+            'CREATE TABLE IF NOT EXISTS `Proveedor` (`cif` TEXT NOT NULL, `nombreEmpresa` TEXT NOT NULL, `numero` TEXT NOT NULL, `email` TEXT NOT NULL, PRIMARY KEY (`cif`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Pedido` (`cifProveedor` TEXT NOT NULL, `producto` TEXT NOT NULL, `unidades` INTEGER NOT NULL, `costeFinal` REAL NOT NULL, `fecha` TEXT NOT NULL, PRIMARY KEY (`cifProveedor`))');
         await database.execute(
@@ -545,13 +545,13 @@ class _$ProveedorDao extends ProveedorDao {
   final InsertionAdapter<Proveedor> _proveedorInsertionAdapter;
 
   @override
-  Future<List<Proveedor>> findAllProveedors() async {
+  Future<List<Proveedor>> findAllProveedores() async {
     return _queryAdapter.queryList('SELECT * FROM Proveedor',
         mapper: (Map<String, Object?> row) => Proveedor(
-            row['cif'] as String,
-            row['nombreEmpresa'] as String,
-            row['numero'] as int,
-            row['email'] as String));
+            cif: row['cif'] as String,
+            nombreEmpresa: row['nombreEmpresa'] as String,
+            numero: row['numero'] as String,
+            email: row['email'] as String));
   }
 
   @override
@@ -566,10 +566,10 @@ class _$ProveedorDao extends ProveedorDao {
   Stream<Proveedor?> findProveedorById(String id) {
     return _queryAdapter.queryStream('SELECT * FROM Proveedor WHERE cif = ?1',
         mapper: (Map<String, Object?> row) => Proveedor(
-            row['cif'] as String,
-            row['nombreEmpresa'] as String,
-            row['numero'] as int,
-            row['email'] as String),
+            cif: row['cif'] as String,
+            nombreEmpresa: row['nombreEmpresa'] as String,
+            numero: row['numero'] as String,
+            email: row['email'] as String),
         arguments: [id],
         queryableName: 'Proveedor',
         isView: false);

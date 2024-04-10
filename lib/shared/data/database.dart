@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'package:floor/floor.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
-import 'package:floor/floor.dart';
+import '../../app/feature/proveedor/data/data-sources/dao_proveedor.dart';
+import '../../app/feature/proveedor/data/model/entity_proveedor.dart';
 import 'data-source/dao.dart';
 import 'model/entity.dart';
+
 import '../../app/feature/login/data/data-source/dao_login.dart';
 import '../../app/feature/login/data/model/entity_login.dart';
+
 import '../../app/feature/venta/data/data-sources/dao_venta.dart';
 import '../../app/feature/venta/data/model/entity_venta.dart';
 

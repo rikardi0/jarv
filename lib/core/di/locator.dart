@@ -3,6 +3,8 @@ import 'package:jarv/app/feature/login/data/repository/interface/login_repositor
 import 'package:jarv/app/feature/login/data/repository/interface/prueba_repository.dart';
 import 'package:jarv/app/feature/login/data/repository/login_repository.dart';
 import 'package:jarv/app/feature/login/data/repository/prueba_repository.dart';
+import 'package:jarv/app/feature/proveedor/data/repositories/interfaces/proveedor_repository.dart';
+import 'package:jarv/app/feature/proveedor/data/repositories/proveedor_repository.dart';
 import 'package:jarv/app/feature/venta/data/repositories/cliente_repository.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/menu_repository.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/ticket_diario_repository.dart';
@@ -39,4 +41,7 @@ Future<void> initializeDependencies() async {
 
   localService.registerFactory<PruebaRepository>(
       () => PruebaRepositoryImpl(localService<AppDatabase>()));
+
+  localService.registerFactory<ProveedorRepository>(
+      () => ProveedorRepositoryImpl(localService<AppDatabase>()));
 }

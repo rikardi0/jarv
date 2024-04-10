@@ -1,20 +1,6 @@
 import 'package:floor/floor.dart';
 
 @entity
-class Proveedor {
-  @primaryKey
-  final String cif;
-
-  final String nombreEmpresa;
-
-  final int numero;
-
-  final String email;
-
-  Proveedor(this.cif, this.nombreEmpresa, this.numero, this.email);
-}
-
-@entity
 class Pedido {
   @primaryKey
   final String cifProveedor;

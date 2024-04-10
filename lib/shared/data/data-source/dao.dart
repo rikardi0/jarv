@@ -3,21 +3,6 @@ import 'package:floor/floor.dart';
 import '../model/entity.dart';
 
 @dao
-abstract class ProveedorDao {
-  @Query('SELECT * FROM Proveedor')
-  Future<List<Proveedor>> findAllProveedors();
-
-  @Query('SELECT nombreEmpresa FROM Proveedor')
-  Stream<List<String>> findAllProveedorNombre();
-
-  @Query('SELECT * FROM Proveedor WHERE cif = :id')
-  Stream<Proveedor?> findProveedorById(String id);
-
-  @insert
-  Future<void> insertProveedor(Proveedor proveedor);
-}
-
-@dao
 abstract class PedidoDao {
   @Query('SELECT * FROM Pedido')
   Future<List<Pedido>> findAllPedidos();
