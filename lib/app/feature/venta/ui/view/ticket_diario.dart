@@ -66,7 +66,9 @@ class _TicketDiarioState extends State<TicketDiario> {
     final List<String> clienteLista = [];
 
     return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          title: const Text('Ticket Diario'),
+        ),
         body: StreamBuilder2(
           streams:
               StreamTuple2(ventaDiaria, _loadDataFromDatabase().asStream()),
@@ -98,7 +100,26 @@ class _TicketDiarioState extends State<TicketDiario> {
               }
               return Row(
                 children: [
-                  _tarjetaVenta(context, listaVenta),
+                  listaVenta!.isEmpty
+                      ? const Expanded(
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.info_outline),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Sin ventas Registradas',
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.black54),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : _tarjetaVenta(context, listaVenta),
                   _containerFactura(context),
                   _filtroVenta(context, clienteLista),
                 ],
@@ -387,6 +408,7 @@ class _TicketDiarioState extends State<TicketDiario> {
             final dateTime =
                 DateTime.fromMillisecondsSinceEpoch(venta!.idVenta);
             final String hora = hourFormatter(dateTime);
+
             return Card(
               color: selectedVenta.value != index
                   ? Theme.of(context).cardTheme.color
