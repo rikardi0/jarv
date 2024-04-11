@@ -4,6 +4,7 @@ import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/cliente_repository.dart';
 import 'package:jarv/core/di/locator.dart';
 
+import '../../../../../shared/ui/custom_text_field.dart';
 import '../utils/date_format.dart';
 
 class ClienteField extends StatefulWidget {
@@ -70,30 +71,36 @@ class _ClienteFieldState extends State<ClienteField> {
                             Row(
                               children: [
                                 Expanded(
-                                    child: textField(
-                                        'Nombre Cliente',
-                                        argument.nombreCliente,
-                                        _nameController,
-                                        TextInputType.name)),
+                                    child: CustomTextField(
+                                        label: 'Nombre Cliente',
+                                        value: argument.nombreCliente,
+                                        controller: _nameController,
+                                        keyboard: TextInputType.name)),
                                 SizedBox(
                                     width: MediaQuery.of(context).size.width *
                                         0.15,
-                                    child: textField('NIF', argument.nif,
-                                        _nifController, TextInputType.number))
+                                    child: CustomTextField(
+                                        label: 'NIF',
+                                        value: argument.nif,
+                                        controller: _nifController,
+                                        keyboard: TextInputType.number))
                               ],
                             ),
-                            textField('Correo', argument.email,
-                                _emailController, TextInputType.emailAddress),
+                            CustomTextField(
+                                label: 'Correo',
+                                value: argument.email,
+                                controller: _emailController,
+                                keyboard: TextInputType.emailAddress),
                             Row(
                               children: [
                                 _buildNacimientoPicker(
                                     argument, context, fechaHint),
                                 Expanded(
-                                    child: textField(
-                                        'Telefono',
-                                        argument.telefono,
-                                        _telefonoController,
-                                        TextInputType.phone)),
+                                    child: CustomTextField(
+                                        label: 'Telefono',
+                                        value: argument.telefono,
+                                        controller: _telefonoController,
+                                        keyboard: TextInputType.phone)),
                               ],
                             ),
                             Row(
@@ -102,19 +109,19 @@ class _ClienteFieldState extends State<ClienteField> {
                                 SizedBox(
                                     width: MediaQuery.of(context).size.width *
                                         0.25,
-                                    child: textField(
-                                        'Pts Acumulados',
-                                        argument.puntos.toString(),
-                                        _ptsController,
-                                        TextInputType.number)),
+                                    child: CustomTextField(
+                                        label: 'Pts Acumulados',
+                                        value: argument.puntos.toString(),
+                                        controller: _ptsController,
+                                        keyboard: TextInputType.number)),
                                 SizedBox(
                                     width: MediaQuery.of(context).size.width *
                                         0.25,
-                                    child: textField(
-                                        'Pedidos',
-                                        argument.pedidos.toString(),
-                                        _pedidosController,
-                                        TextInputType.number)),
+                                    child: CustomTextField(
+                                        label: 'Pedidos',
+                                        value: argument.pedidos.toString(),
+                                        controller: _pedidosController,
+                                        keyboard: TextInputType.number)),
                               ],
                             ),
                           ],
@@ -215,22 +222,6 @@ class _ClienteFieldState extends State<ClienteField> {
             labelText: 'Fecha',
             suffixIcon: const Icon(Icons.calendar_month),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget textField(String label, String value, TextEditingController controller,
-      TextInputType keyboard) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-      child: TextFormField(
-        keyboardType: keyboard,
-        controller: controller,
-        decoration: InputDecoration(
-          label: Text(label),
-          border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0))),
         ),
       ),
     );
