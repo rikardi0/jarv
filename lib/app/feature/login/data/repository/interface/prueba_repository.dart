@@ -1,4 +1,5 @@
 import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
+import 'package:jarv/shared/data/model/entity.dart';
 
 abstract class PruebaRepository {
   Future<void> insertarProducto(Producto producto);

@@ -1,6 +1,6 @@
-import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/menu_repository.dart';
 import '../../../../../shared/data/database.dart';
+import '../../../../../shared/data/model/entity.dart';
 
 class MenuRepositoryImpl implements MenuRepository {
   MenuRepositoryImpl(this._database);

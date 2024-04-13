@@ -1,4 +1,4 @@
-import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
+import '../../../../../../shared/data/model/entity.dart';
 
 abstract class MenuRepository {
   Stream<List<Familia>> findAllFamilias();

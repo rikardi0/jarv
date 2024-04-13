@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../app/feature/venta/data/model/entity_venta.dart';
+import '../data/model/entity.dart';
 
 class GridProducto extends StatelessWidget {
   const GridProducto({

@@ -1,4 +1,4 @@
-import 'package:jarv/app/feature/proveedor/ui/view/proveedor.dart';
+import 'package:jarv/app/feature/proveedor/ui/view/proveedor_view.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -8,6 +8,7 @@ import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:jarv/app/feature/venta/data/model/producto_ordenado.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/pago_repository.dart';
+import '../../../../../shared/data/model/entity.dart';
 import '../../data/repositories/interfaces/menu_repository.dart';
 import '../../data/model/entity_venta.dart';
 import 'package:jarv/core/di/locator.dart';
@@ -206,13 +207,14 @@ class _MenuState extends State<Menu> {
       overlayOpacity: 0.0,
       animatedIcon: AnimatedIcons.view_list,
       children: [
-        speedDialItems('Proveedores', Icons.forklift, Proveedor.routeName),
+        speedDialItems('Proveedores', Icons.forklift, ProveedorView.routeName),
         speedDialItems(
-            'Estadistica', Icons.stacked_bar_chart, Proveedor.routeName),
+            'Estadistica', Icons.stacked_bar_chart, ProveedorView.routeName),
         speedDialItems(
-            'Inventario', Icons.inventory_rounded, Proveedor.routeName),
-        speedDialItems('Horario', Icons.schedule, Proveedor.routeName),
-        speedDialItems('Configuracion', Icons.settings, Proveedor.routeName),
+            'Inventario', Icons.inventory_rounded, ProveedorView.routeName),
+        speedDialItems('Horario', Icons.schedule, ProveedorView.routeName),
+        speedDialItems(
+            'Configuracion', Icons.settings, ProveedorView.routeName),
       ],
     );
   }

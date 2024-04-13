@@ -186,6 +186,51 @@ class Impuestos {
 }
 
 @entity
+class Familia {
+  @primaryKey
+  final String idFamilia;
+
+  final String nombreFamilia;
+  @primaryKey
+  final String idUsuario;
+
+  Familia(this.idFamilia, this.nombreFamilia, this.idUsuario);
+}
+
+@entity
+class SubFamilia {
+  @primaryKey
+  final String idSubfamilia;
+
+  final String nombreSub;
+
+  final String idFamilia;
+
+  SubFamilia(this.idSubfamilia, this.nombreSub, this.idFamilia);
+}
+
+@entity
+class Producto {
+  @primaryKey
+  final int productoId;
+
+  final String producto;
+
+  final double precio;
+
+  final int medida;
+
+  final double coste;
+
+  final double iva;
+
+  final String idSubfamilia;
+
+  Producto(this.productoId, this.producto, this.precio, this.coste, this.iva,
+      this.idSubfamilia, this.medida);
+}
+
+@entity
 class Oferta {
   @primaryKey
   final int idOferta;

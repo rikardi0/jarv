@@ -2,6 +2,8 @@ import 'package:jarv/app/feature/login/data/repository/interface/prueba_reposito
 import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
 import 'package:jarv/shared/data/database.dart';
 
+import '../../../../../shared/data/model/entity.dart';
+
 class PruebaRepositoryImpl extends PruebaRepository {
   final AppDatabase _appDatabase;
   PruebaRepositoryImpl(this._appDatabase);
