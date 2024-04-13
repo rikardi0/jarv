@@ -60,6 +60,9 @@ abstract class FamiliaDao {
 
   @insert
   Future<void> insertFamilia(Familia familia);
+
+  @update
+  Future<void> updateFamilia(Familia familia);
 }
 
 @dao
@@ -78,6 +81,9 @@ abstract class SubFamiliaDao {
 
   @insert
   Future<void> insertSubFamilia(SubFamilia subfamilia);
+
+  @update
+  Future<void> updateSubFamilia(SubFamilia subfamilia);
 }
 
 @dao
@@ -96,6 +102,9 @@ abstract class ProductoDao {
 
   @insert
   Future<void> insertProducto(Producto producto);
+
+  @update
+  Future<void> updateProducto(Producto producto);
 }
 
 @dao

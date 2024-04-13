@@ -317,6 +317,16 @@ class _$FamiliaDao extends FamiliaDao {
                   'nombreFamilia': item.nombreFamilia,
                   'idUsuario': item.idUsuario
                 },
+            changeListener),
+        _familiaUpdateAdapter = UpdateAdapter(
+            database,
+            'Familia',
+            ['idFamilia'],
+            (Familia item) => <String, Object?>{
+                  'idFamilia': item.idFamilia,
+                  'nombreFamilia': item.nombreFamilia,
+                  'idUsuario': item.idUsuario
+                },
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -326,6 +336,8 @@ class _$FamiliaDao extends FamiliaDao {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<Familia> _familiaInsertionAdapter;
+
+  final UpdateAdapter<Familia> _familiaUpdateAdapter;
 
   @override
   Future<List<Familia>> findAllFamilias() async {
@@ -361,6 +373,11 @@ class _$FamiliaDao extends FamiliaDao {
   Future<void> insertFamilia(Familia familia) async {
     await _familiaInsertionAdapter.insert(familia, OnConflictStrategy.abort);
   }
+
+  @override
+  Future<void> updateFamilia(Familia familia) async {
+    await _familiaUpdateAdapter.update(familia, OnConflictStrategy.abort);
+  }
 }
 
 class _$SubFamiliaDao extends SubFamiliaDao {
@@ -376,6 +393,16 @@ class _$SubFamiliaDao extends SubFamiliaDao {
                   'nombreSub': item.nombreSub,
                   'idFamilia': item.idFamilia
                 },
+            changeListener),
+        _subFamiliaUpdateAdapter = UpdateAdapter(
+            database,
+            'SubFamilia',
+            ['idSubfamilia'],
+            (SubFamilia item) => <String, Object?>{
+                  'idSubfamilia': item.idSubfamilia,
+                  'nombreSub': item.nombreSub,
+                  'idFamilia': item.idFamilia
+                },
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -385,6 +412,8 @@ class _$SubFamiliaDao extends SubFamiliaDao {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<SubFamilia> _subFamiliaInsertionAdapter;
+
+  final UpdateAdapter<SubFamilia> _subFamiliaUpdateAdapter;
 
   @override
   Future<List<SubFamilia>> findAllSubFamilias() async {
@@ -432,6 +461,11 @@ class _$SubFamiliaDao extends SubFamiliaDao {
     await _subFamiliaInsertionAdapter.insert(
         subfamilia, OnConflictStrategy.abort);
   }
+
+  @override
+  Future<void> updateSubFamilia(SubFamilia subfamilia) async {
+    await _subFamiliaUpdateAdapter.update(subfamilia, OnConflictStrategy.abort);
+  }
 }
 
 class _$ProductoDao extends ProductoDao {
@@ -451,6 +485,20 @@ class _$ProductoDao extends ProductoDao {
                   'iva': item.iva,
                   'idSubfamilia': item.idSubfamilia
                 },
+            changeListener),
+        _productoUpdateAdapter = UpdateAdapter(
+            database,
+            'Producto',
+            ['productoId'],
+            (Producto item) => <String, Object?>{
+                  'productoId': item.productoId,
+                  'producto': item.producto,
+                  'precio': item.precio,
+                  'medida': item.medida,
+                  'coste': item.coste,
+                  'iva': item.iva,
+                  'idSubfamilia': item.idSubfamilia
+                },
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -460,6 +508,8 @@ class _$ProductoDao extends ProductoDao {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<Producto> _productoInsertionAdapter;
+
+  final UpdateAdapter<Producto> _productoUpdateAdapter;
 
   @override
   Future<List<Producto>> findAllProductos() async {
@@ -518,6 +568,11 @@ class _$ProductoDao extends ProductoDao {
   Future<void> insertProducto(Producto producto) async {
     await _productoInsertionAdapter.insert(producto, OnConflictStrategy.abort);
   }
+
+  @override
+  Future<void> updateProducto(Producto producto) async {
+    await _productoUpdateAdapter.update(producto, OnConflictStrategy.abort);
+  }
 }
 
 class _$ProveedorDao extends ProveedorDao {
@@ -534,6 +589,17 @@ class _$ProveedorDao extends ProveedorDao {
                   'numero': item.numero,
                   'email': item.email
                 },
+            changeListener),
+        _proveedorUpdateAdapter = UpdateAdapter(
+            database,
+            'Proveedor',
+            ['cif'],
+            (Proveedor item) => <String, Object?>{
+                  'cif': item.cif,
+                  'nombreEmpresa': item.nombreEmpresa,
+                  'numero': item.numero,
+                  'email': item.email
+                },
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -543,6 +609,8 @@ class _$ProveedorDao extends ProveedorDao {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<Proveedor> _proveedorInsertionAdapter;
+
+  final UpdateAdapter<Proveedor> _proveedorUpdateAdapter;
 
   @override
   Future<List<Proveedor>> findAllProveedores() async {
@@ -579,6 +647,11 @@ class _$ProveedorDao extends ProveedorDao {
   Future<void> insertProveedor(Proveedor proveedor) async {
     await _proveedorInsertionAdapter.insert(
         proveedor, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateProveedor(Proveedor proveedor) async {
+    await _proveedorUpdateAdapter.update(proveedor, OnConflictStrategy.abort);
   }
 }
 
