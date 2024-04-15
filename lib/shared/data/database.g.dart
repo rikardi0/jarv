@@ -1,7 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-// ignore_for_file: library_private_types_in_public_api
-
 part of 'database.dart';
 
 // **************************************************************************
@@ -135,13 +133,19 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `SubFamilia` (`idSubfamilia` TEXT NOT NULL, `nombreSub` TEXT NOT NULL, `idFamilia` TEXT NOT NULL, PRIMARY KEY (`idSubfamilia`))');
         await database.execute(
+            'CREATE TABLE IF NOT EXISTS `Proveedor` (`cif` TEXT NOT NULL, `nombreEmpresa` TEXT NOT NULL, `numero` TEXT NOT NULL, `email` TEXT NOT NULL, `idFamilia` TEXT NOT NULL, `idSubFamilia` TEXT NOT NULL, PRIMARY KEY (`cif`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `FamiliaProveedor` (`familiaId` TEXT NOT NULL, `cif` TEXT NOT NULL, `nombreFamilia` TEXT NOT NULL, PRIMARY KEY (`familiaId`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `SubFamiliaProveedor` (`subFamiliaId` TEXT NOT NULL, `nombreSubFamilia` TEXT NOT NULL, `cif` TEXT NOT NULL, PRIMARY KEY (`subFamiliaId`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `Familia` (`idFamilia` TEXT NOT NULL, `nombreFamilia` TEXT NOT NULL, `idUsuario` TEXT NOT NULL, PRIMARY KEY (`idFamilia`))');
+        await database.execute(
             'CREATE TABLE IF NOT EXISTS `TipoVenta` (`idTipoVenta` INTEGER NOT NULL, `tipoVenta` TEXT NOT NULL, PRIMARY KEY (`idTipoVenta`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Devolucion` (`idDevolucion` INTEGER NOT NULL, `devolucion` TEXT NOT NULL, PRIMARY KEY (`idDevolucion`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Producto` (`productoId` INTEGER NOT NULL, `producto` TEXT NOT NULL, `precio` REAL NOT NULL, `medida` INTEGER NOT NULL, `coste` REAL NOT NULL, `iva` REAL NOT NULL, `idSubfamilia` TEXT NOT NULL, PRIMARY KEY (`productoId`))');
-        await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Proveedor` (`cif` TEXT NOT NULL, `nombreEmpresa` TEXT NOT NULL, `numero` TEXT NOT NULL, `email` TEXT NOT NULL, PRIMARY KEY (`cif`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Pedido` (`cifProveedor` TEXT NOT NULL, `producto` TEXT NOT NULL, `unidades` INTEGER NOT NULL, `costeFinal` REAL NOT NULL, `fecha` TEXT NOT NULL, PRIMARY KEY (`cifProveedor`))');
         await database.execute(
@@ -587,7 +591,9 @@ class _$ProveedorDao extends ProveedorDao {
                   'cif': item.cif,
                   'nombreEmpresa': item.nombreEmpresa,
                   'numero': item.numero,
-                  'email': item.email
+                  'email': item.email,
+                  'idFamilia': item.idFamilia,
+                  'idSubFamilia': item.idSubFamilia
                 },
             changeListener),
         _proveedorUpdateAdapter = UpdateAdapter(
@@ -598,7 +604,9 @@ class _$ProveedorDao extends ProveedorDao {
                   'cif': item.cif,
                   'nombreEmpresa': item.nombreEmpresa,
                   'numero': item.numero,
-                  'email': item.email
+                  'email': item.email,
+                  'idFamilia': item.idFamilia,
+                  'idSubFamilia': item.idSubFamilia
                 },
             changeListener);
 
@@ -618,6 +626,8 @@ class _$ProveedorDao extends ProveedorDao {
         mapper: (Map<String, Object?> row) => Proveedor(
             cif: row['cif'] as String,
             nombreEmpresa: row['nombreEmpresa'] as String,
+            idFamilia: row['idFamilia'] as String,
+            idSubFamilia: row['idSubFamilia'] as String,
             numero: row['numero'] as String,
             email: row['email'] as String));
   }
@@ -636,6 +646,8 @@ class _$ProveedorDao extends ProveedorDao {
         mapper: (Map<String, Object?> row) => Proveedor(
             cif: row['cif'] as String,
             nombreEmpresa: row['nombreEmpresa'] as String,
+            idFamilia: row['idFamilia'] as String,
+            idSubFamilia: row['idSubFamilia'] as String,
             numero: row['numero'] as String,
             email: row['email'] as String),
         arguments: [id],

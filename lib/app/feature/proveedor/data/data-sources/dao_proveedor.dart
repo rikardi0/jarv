@@ -14,4 +14,19 @@ abstract class ProveedorDao {
 
   @insert
   Future<void> insertProveedor(Proveedor proveedor);
+
+  @update
+  Future<void> updateProveedor(Proveedor proveedor);
+}
+
+@dao
+abstract class FamiliaProveedorDao {
+  @insert
+  Future<void> insertFamiliaProveedor(FamiliaProveedor familia);
+}
+
+@dao
+abstract class SubFamiliaProveedorDao {
+  @insert
+  Future<void> insertFamiliaProveedor(SubFamiliaProveedor familia);
 }

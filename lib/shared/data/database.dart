@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:floor/floor.dart';
+import 'package:jarv/app/feature/proveedor/data/data-sources/dao_proveedor.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
-import '../../app/feature/proveedor/data/data-sources/dao_proveedor.dart';
 import '../../app/feature/proveedor/data/model/entity_proveedor.dart';
 import 'data-source/dao.dart';
 import 'model/entity.dart';
@@ -18,10 +18,13 @@ part 'database.g.dart';
 @Database(version: 1, entities: [
   Familia,
   SubFamilia,
+  Proveedor,
+  FamiliaProveedor,
+  SubFamiliaProveedor,
+  Familia,
   TipoVenta,
   Devolucion,
   Producto,
-  Proveedor,
   Pedido,
   Stock,
   Merma,
