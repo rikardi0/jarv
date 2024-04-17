@@ -69,6 +69,8 @@ class _$AppDatabase extends AppDatabase {
 
   ProveedorDao? _proveedorDaoInstance;
 
+  FamiliaProveedorDao? _familiaProveedorDaoInstance;
+
   DevolucionDao? _devolucionDaoInstance;
 
   PedidoDao? _pedidoDaoInstance;
@@ -133,11 +135,9 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `SubFamilia` (`idSubfamilia` TEXT NOT NULL, `nombreSub` TEXT NOT NULL, `idFamilia` TEXT NOT NULL, PRIMARY KEY (`idSubfamilia`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Proveedor` (`cif` TEXT NOT NULL, `nombreEmpresa` TEXT NOT NULL, `numero` TEXT NOT NULL, `email` TEXT NOT NULL, `idFamilia` TEXT NOT NULL, `idSubFamilia` TEXT NOT NULL, PRIMARY KEY (`cif`))');
+            'CREATE TABLE IF NOT EXISTS `Proveedor` (`cif` TEXT NOT NULL, `nombreEmpresa` TEXT NOT NULL, `numero` TEXT NOT NULL, `email` TEXT NOT NULL, PRIMARY KEY (`cif`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `FamiliaProveedor` (`familiaId` TEXT NOT NULL, `cif` TEXT NOT NULL, `nombreFamilia` TEXT NOT NULL, PRIMARY KEY (`familiaId`))');
-        await database.execute(
-            'CREATE TABLE IF NOT EXISTS `SubFamiliaProveedor` (`subFamiliaId` TEXT NOT NULL, `nombreSubFamilia` TEXT NOT NULL, `cif` TEXT NOT NULL, PRIMARY KEY (`subFamiliaId`))');
+            'CREATE TABLE IF NOT EXISTS `FamiliaProveedor` (`familiaId` TEXT NOT NULL, `cif` TEXT NOT NULL, `nombreFamilia` TEXT NOT NULL, `nombreSubFamilia` TEXT NOT NULL, PRIMARY KEY (`familiaId`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Familia` (`idFamilia` TEXT NOT NULL, `nombreFamilia` TEXT NOT NULL, `idUsuario` TEXT NOT NULL, PRIMARY KEY (`idFamilia`))');
         await database.execute(
@@ -205,6 +205,12 @@ class _$AppDatabase extends AppDatabase {
   @override
   ProveedorDao get proveedorDao {
     return _proveedorDaoInstance ??= _$ProveedorDao(database, changeListener);
+  }
+
+  @override
+  FamiliaProveedorDao get familiaProveedorDao {
+    return _familiaProveedorDaoInstance ??=
+        _$FamiliaProveedorDao(database, changeListener);
   }
 
   @override
@@ -591,9 +597,7 @@ class _$ProveedorDao extends ProveedorDao {
                   'cif': item.cif,
                   'nombreEmpresa': item.nombreEmpresa,
                   'numero': item.numero,
-                  'email': item.email,
-                  'idFamilia': item.idFamilia,
-                  'idSubFamilia': item.idSubFamilia
+                  'email': item.email
                 },
             changeListener),
         _proveedorUpdateAdapter = UpdateAdapter(
@@ -604,9 +608,7 @@ class _$ProveedorDao extends ProveedorDao {
                   'cif': item.cif,
                   'nombreEmpresa': item.nombreEmpresa,
                   'numero': item.numero,
-                  'email': item.email,
-                  'idFamilia': item.idFamilia,
-                  'idSubFamilia': item.idSubFamilia
+                  'email': item.email
                 },
             changeListener);
 
@@ -626,8 +628,6 @@ class _$ProveedorDao extends ProveedorDao {
         mapper: (Map<String, Object?> row) => Proveedor(
             cif: row['cif'] as String,
             nombreEmpresa: row['nombreEmpresa'] as String,
-            idFamilia: row['idFamilia'] as String,
-            idSubFamilia: row['idSubFamilia'] as String,
             numero: row['numero'] as String,
             email: row['email'] as String));
   }
@@ -646,8 +646,6 @@ class _$ProveedorDao extends ProveedorDao {
         mapper: (Map<String, Object?> row) => Proveedor(
             cif: row['cif'] as String,
             nombreEmpresa: row['nombreEmpresa'] as String,
-            idFamilia: row['idFamilia'] as String,
-            idSubFamilia: row['idSubFamilia'] as String,
             numero: row['numero'] as String,
             email: row['email'] as String),
         arguments: [id],
@@ -664,6 +662,51 @@ class _$ProveedorDao extends ProveedorDao {
   @override
   Future<void> updateProveedor(Proveedor proveedor) async {
     await _proveedorUpdateAdapter.update(proveedor, OnConflictStrategy.abort);
+  }
+}
+
+class _$FamiliaProveedorDao extends FamiliaProveedorDao {
+  _$FamiliaProveedorDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database, changeListener),
+        _familiaProveedorInsertionAdapter = InsertionAdapter(
+            database,
+            'FamiliaProveedor',
+            (FamiliaProveedor item) => <String, Object?>{
+                  'familiaId': item.familiaId,
+                  'cif': item.cif,
+                  'nombreFamilia': item.nombreFamilia,
+                  'nombreSubFamilia': item.nombreSubFamilia
+                },
+            changeListener);
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<FamiliaProveedor> _familiaProveedorInsertionAdapter;
+
+  @override
+  Stream<List<FamiliaProveedor>> findFamiliaByCif(String cif) {
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM FamiliaProveedor WHERE cif = ?1',
+        mapper: (Map<String, Object?> row) => FamiliaProveedor(
+            cif: row['cif'] as String,
+            nombreFamilia: row['nombreFamilia'] as String,
+            nombreSubFamilia: row['nombreSubFamilia'] as String,
+            familiaId: row['familiaId'] as String),
+        arguments: [cif],
+        queryableName: 'FamiliaProveedor',
+        isView: false);
+  }
+
+  @override
+  Future<void> insertFamiliaProveedor(FamiliaProveedor familia) async {
+    await _familiaProveedorInsertionAdapter.insert(
+        familia, OnConflictStrategy.abort);
   }
 }
 
