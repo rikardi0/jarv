@@ -1,3 +1,4 @@
+import 'package:jarv/app/feature/inventario/ui/view/inventario_view.dart';
 import 'package:jarv/app/feature/proveedor/ui/view/proveedor_view.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -211,7 +212,7 @@ class _MenuState extends State<Menu> {
         speedDialItems(
             'Estadistica', Icons.stacked_bar_chart, ProveedorView.routeName),
         speedDialItems(
-            'Inventario', Icons.inventory_rounded, ProveedorView.routeName),
+            'Inventario', Icons.inventory_rounded, InventarioView.routeName),
         speedDialItems('Horario', Icons.schedule, ProveedorView.routeName),
         speedDialItems(
             'Configuracion', Icons.settings, ProveedorView.routeName),

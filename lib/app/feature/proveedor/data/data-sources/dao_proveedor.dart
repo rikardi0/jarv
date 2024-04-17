@@ -22,7 +22,7 @@ abstract class ProveedorDao {
 @dao
 abstract class FamiliaProveedorDao {
   @Query('SELECT * FROM FamiliaProveedor WHERE cif = :cif')
-  Stream<List<FamiliaProveedor>> findFamiliaByCif(String cif);
+  Future<List<FamiliaProveedor>> findFamiliaByCif(String cif);
 
   @insert
   Future<void> insertFamiliaProveedor(FamiliaProveedor familia);

@@ -28,7 +28,7 @@ class ProveedorRepositoryImpl extends ProveedorRepository {
   }
 
   @override
-  Stream<List<FamiliaProveedor>> findFamiliaByCif(String cif) {
+  Future<List<FamiliaProveedor>> findFamiliaByCif(String cif) {
     return _appDatabase.familiaProveedorDao.findFamiliaByCif(cif);
   }
 }

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:jarv/app/feature/inventario/ui/view/inventario_view.dart';
 import 'package:jarv/app/feature/login/ui/view/login.dart';
+import 'package:jarv/app/feature/proveedor/ui/view/proveedor_field.dart';
 import 'package:jarv/app/feature/proveedor/ui/view/proveedor_view.dart';
 import 'package:jarv/app/feature/venta/ui/widgets/cliente_field.dart';
 import 'package:jarv/core/theme/custom_theme.dart';
@@ -88,15 +90,19 @@ class MyApp extends StatelessWidget {
           case ClienteMenu.routeName:
             return ClienteMenu();
           case ClienteField.routeName:
-            return ClienteField();
+            return const ClienteField();
+          case InventarioView.routeName:
+            return const InventarioView();
           case ConsumicionPropia.routeName:
-            return ConsumicionPropia();
+            return const ConsumicionPropia();
           case TicketDiario.routeName:
             return TicketDiario();
           case Devolucion.routeName:
             return const Devolucion();
           case ProveedorView.routeName:
-            return ProveedorView();
+            return const ProveedorView();
+          case CreateProveedor.routeName:
+            return const CreateProveedor();
           case CierreDiario.routeName:
             return const CierreDiario();
           case SettingsView.routeName:
