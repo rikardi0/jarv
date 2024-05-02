@@ -70,7 +70,8 @@ class SubFamiliaSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final fecthProductoRepository = localService<MenuRepository>();
     return StreamBuilder(
-      stream: fecthProductoRepository.findSubFamiliaByFamilia(familiaId),
+      stream:
+          fecthProductoRepository.findSubFamiliaByFamilia(familiaId).asStream(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return DropdownButtonFormField(
@@ -109,7 +110,7 @@ class FamiliaSelector extends StatelessWidget {
     final fecthProductoRepository = localService<MenuRepository>();
 
     return StreamBuilder(
-      stream: fecthProductoRepository.findAllFamilias(),
+      stream: fecthProductoRepository.findAllFamilias().asStream(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return DropdownButtonFormField(

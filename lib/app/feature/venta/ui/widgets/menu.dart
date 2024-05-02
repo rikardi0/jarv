@@ -53,8 +53,8 @@ class _MenuState extends State<Menu> {
   double totalVenta = 0;
   double totalVentaEspera = 0;
 
-  final selectedFamiliaIndex = ValueNotifier<int?>(null);
-  final selectedSubFamiliaIndex = ValueNotifier<int?>(null);
+  final selectedFamiliaIndex = ValueNotifier<int?>(0);
+  final selectedSubFamiliaIndex = ValueNotifier<int?>(0);
   final selectedProductoIndex = ValueNotifier<int?>(null);
   final selectedItemLista = ValueNotifier<int?>(null);
 
@@ -89,72 +89,94 @@ class _MenuState extends State<Menu> {
     final MenuRepository fecthMenuRepository =
         localService.get<MenuRepository>();
 
+    final Size size = MediaQuery.of(context).size;
     const borderColor = Color.fromARGB(59, 7, 7, 7);
 
     final String joinedCantidad =
         cantidad.map((value) => int.parse(value)).toList().join();
 
-    final listaFamilia = fecthMenuRepository.findAllFamilias();
-    final listaSubFamilia =
+    final Future<List<Familia>> listaFamilia =
+        fecthMenuRepository.findAllFamilias();
+
+    Future<List<SubFamilia?>> listaSubFamilia =
         fecthMenuRepository.findSubFamiliaByFamilia(familiaSeleccionada);
-    final listaProducto =
+
+    Future<List<Producto?>> listaProducto =
         fecthMenuRepository.findProductoById(subFamiliaSeleccionada);
 
-    final Size size = MediaQuery.of(context).size;
+    Future<void> inicializarDatos() async {
+      if (familiaSeleccionada.isEmpty) {
+        List<Familia> familias = await listaFamilia;
+        familiaSeleccionada = familias.first.idFamilia;
+        listaSubFamilia =
+            fecthMenuRepository.findSubFamiliaByFamilia(familiaSeleccionada);
+      }
+      if (subFamiliaSeleccionada.isEmpty) {
+        List<SubFamilia?> subFamilia = await listaSubFamilia;
+        subFamiliaSeleccionada = subFamilia.first!.idSubfamilia;
+        listaProducto =
+            fecthMenuRepository.findProductoById(subFamiliaSeleccionada);
+      }
+    }
 
-    return Scaffold(
-      appBar: AppBar(
-        actions: widget.menuPrincipal
-            ? mostrarUsuario
-                ? const [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15.0),
-                      child: AppBarItemButton(
-                          icon: Icons.supervised_user_circle_outlined,
-                          label: 'Usuario'),
-                    )
-                  ]
-                : null
-            : null,
-        backgroundColor: mostrarUsuario
-            ? null
-            : Theme.of(context).colorScheme.primaryContainer,
-        centerTitle: widget.menuPrincipal ? true : false,
-        title: widget.menuPrincipal
-            ? productosAgregados.isEmpty
-                ? null
-                : appBarCheckOut()
-            : Text(widget.titleSection),
-        toolbarHeight: 35,
-        leading: widget.menuPrincipal
-            ? productosAgregados.isEmpty
-                ? speedDial()
-                : const SizedBox.shrink()
-            : null,
-      ),
-      body: StreamBuilder3(
-        streams: StreamTuple3(listaFamilia, listaSubFamilia, listaProducto),
+    return FutureBuilder(
+        future: inicializarDatos(),
         builder: (context, snapshot) {
-          if (!snapshot.snapshot1.hasData &&
-              !snapshot.snapshot2.hasData &&
-              !snapshot.snapshot3.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            final itemFamilia = snapshot.snapshot1.data;
-            final itemSubFamilia = snapshot.snapshot2.data;
-            final itemProducto = snapshot.snapshot3.data;
-            return _buildMenuBody(
-              size,
-              itemFamilia,
-              itemSubFamilia,
-              itemProducto,
-              joinedCantidad,
-              borderColor,
-            );
-          }
-        },
-      ),
-    );
+          return Scaffold(
+            appBar: AppBar(
+              actions: widget.menuPrincipal
+                  ? mostrarUsuario
+                      ? const [
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 15.0),
+                            child: AppBarItemButton(
+                                icon: Icons.supervised_user_circle_outlined,
+                                label: 'Usuario'),
+                          )
+                        ]
+                      : null
+                  : null,
+              backgroundColor: mostrarUsuario
+                  ? null
+                  : Theme.of(context).colorScheme.primaryContainer,
+              centerTitle: widget.menuPrincipal ? true : false,
+              title: widget.menuPrincipal
+                  ? productosAgregados.isEmpty
+                      ? null
+                      : appBarCheckOut()
+                  : Text(widget.titleSection),
+              leading: widget.menuPrincipal
+                  ? productosAgregados.isEmpty
+                      ? speedDial()
+                      : const SizedBox.shrink()
+                  : null,
+            ),
+            body: StreamBuilder3(
+              streams: StreamTuple3(listaFamilia.asStream(),
+                  listaSubFamilia.asStream(), listaProducto.asStream()),
+              builder: (context, snapshot) {
+                if (!snapshot.snapshot1.hasData &&
+                    !snapshot.snapshot2.hasData &&
+                    !snapshot.snapshot3.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                } else {
+                  final itemFamilia = snapshot.snapshot1.data;
+                  final itemSubFamilia = snapshot.snapshot2.data;
+                  final itemProducto = snapshot.snapshot3.data;
+
+                  return _buildMenuBody(
+                    size,
+                    itemFamilia,
+                    itemSubFamilia,
+                    itemProducto,
+                    joinedCantidad,
+                    borderColor,
+                  );
+                }
+              },
+            ),
+          );
+        });
   }
 
 //AppBar buttons
@@ -240,6 +262,7 @@ class _MenuState extends State<Menu> {
       Color borderColor) {
     final PagoRepository fecthPagoRepository =
         localService.get<PagoRepository>();
+
     return Column(
       children: [
         Expanded(
@@ -449,7 +472,7 @@ class _MenuState extends State<Menu> {
 
   void onFamiliaTap(Familia familia, int index) {
     return setState(() {
-      selectedSubFamiliaIndex.value = null;
+      selectedSubFamiliaIndex.value = 0;
       selectedProductoIndex.value = null;
       subFamiliaSeleccionada = "";
       familiaSeleccionada = familia.idFamilia;
@@ -459,14 +482,8 @@ class _MenuState extends State<Menu> {
 
   void onSubFamiliaTap(SubFamilia subFamilia, int index) {
     return setState(() {
-      if (selectedSubFamiliaIndex.value == index) {
-        selectedSubFamiliaIndex.value = null;
-        selectedProductoIndex.value = null;
-        subFamiliaSeleccionada = '';
-      } else {
-        subFamiliaSeleccionada = subFamilia.idSubfamilia;
-        changeIndex(index, selectedSubFamiliaIndex);
-      }
+      subFamiliaSeleccionada = subFamilia.idSubfamilia;
+      changeIndex(index, selectedSubFamiliaIndex);
     });
   }
 
