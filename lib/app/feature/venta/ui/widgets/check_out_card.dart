@@ -42,23 +42,28 @@ class CheckOut extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(
-              color:
-                  Theme.of(context).colorScheme.onBackground.withOpacity(0.15)),
-          borderRadius:
-              const BorderRadius.vertical(bottom: Radius.circular(20))),
-      elevation: 0.5,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _listaProductoOrdenado(context),
-          _totalVenta(),
-          _displayCantidad(),
-          _teclado(context),
-        ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onBackground
+                    .withOpacity(0.15)),
+            borderRadius:
+                const BorderRadius.vertical(bottom: Radius.circular(20))),
+        elevation: 0.5,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _listaProductoOrdenado(context),
+            _totalVenta(),
+            _displayCantidad(),
+            _teclado(context),
+          ],
+        ),
       ),
     );
   }
@@ -199,7 +204,9 @@ class CheckOut extends StatelessWidget {
                   : const Radius.circular(20),
             ),
             child: Container(
-                color: const Color.fromARGB(50, 54, 54, 54),
+                color: cantidadProducto.isEmpty
+                    ? const Color.fromARGB(50, 54, 54, 54)
+                    : Theme.of(context).colorScheme.primaryContainer,
                 height: MediaQuery.of(context).size.height * 0.08,
                 width: MediaQuery.of(context).size.width * 0.4,
                 child: Padding(
@@ -225,10 +232,10 @@ class CheckOut extends StatelessWidget {
   }
 
   Widget _teclado(BuildContext context) {
-    final height = MediaQuery.of(context).size.height * 0.275;
+    final height = MediaQuery.of(context).size.height * 0.22;
     final width = MediaQuery.of(context).size.width * 0.15;
     final colorScheme = Theme.of(context).colorScheme;
-    var totalHeight = height + height / 3;
+    var totalHeight = height + height / 4;
     return Visibility(
       visible: mostrarTeclado,
       child: Padding(
@@ -248,9 +255,9 @@ class CheckOut extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
-                      mainAxisSpacing: 1,
+                      mainAxisSpacing: 0,
                       crossAxisSpacing: 0,
-                      mainAxisExtent: height / 3.1,
+                      mainAxisExtent: height / 3,
                     ),
                     clipBehavior: Clip.antiAlias,
                     children: [
@@ -272,7 +279,7 @@ class CheckOut extends StatelessWidget {
                       onTap: () => onTapNum('0'),
                       child: ClipRRect(
                         borderRadius:
-                            const BorderRadius.all(Radius.circular(20)),
+                            const BorderRadius.all(Radius.circular(25)),
                         child: Container(
                             color: Theme.of(context)
                                 .colorScheme
@@ -408,23 +415,26 @@ class CheckOut extends StatelessWidget {
             ))),
         height: height / 3.5,
         width: width / 1.25,
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: AlignmentDirectional.centerStart,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2.5),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  color: colorIcon,
-                ),
-                Text(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2.5),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: Theme.of(context).textTheme.headlineLarge!.fontSize,
+                color: colorIcon,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Text(
                   label,
-                  style: TextStyle(color: colorIcon),
+                  style: TextStyle(
+                    color: colorIcon,
+                    fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

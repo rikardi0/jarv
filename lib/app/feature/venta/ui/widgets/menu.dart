@@ -271,7 +271,7 @@ class _MenuState extends State<Menu> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SizedBox(
-                width: size.width * 0.205,
+                width: size.width * 0.175,
                 child: ListFamilia(
                     selectedFamiliaIndex: selectedFamiliaIndex,
                     itemFamilia: itemFamilia,
@@ -283,7 +283,7 @@ class _MenuState extends State<Menu> {
                   child: Column(
                     children: [
                       SizedBox(
-                        height: size.height * 0.15,
+                        height: size.height * 0.075,
                         child: RowSubFamilia(
                           selectedSubFamiliaIndex: selectedSubFamiliaIndex,
                           itemSubFamilia: itemSubFamilia,
@@ -303,40 +303,43 @@ class _MenuState extends State<Menu> {
                   ),
                 ),
               ),
-              Container(
-                decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.background,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onBackground
-                          .withOpacity(0.15),
-                    )),
-                width: size.width * 0.3,
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: CheckOut(
-                    mostrarTeclado: mostrarTeclado,
-                    mostrarIdentificador: mostrarIdentificador,
-                    productosAgregados: productosAgregados,
-                    totalVenta: totalVenta,
-                    selectedItemLista: selectedItemLista,
-                    isMenuPrincipal: widget.menuPrincipal,
-                    cantidadProducto: cantidadProducto,
-                    titleSection: widget.titleSection,
-                    hideKeyboard: dropDownIcon,
-                    actualizarCantidad: actualizarCantidad(joinedCantidad),
-                    onTextIdentificadorTap: onTextIdentificadorTap,
-                    onBackIdentificador: onBackIdentificador,
-                    onAceptarIdentificador: onAceptarIdentificador,
-                    clearButton: clearButton,
-                    onTapNum: onTapNum,
-                    sectionActionButton: () {
-                      productosAgregados.isNotEmpty
-                          ? _builAlertDialog(fecthPagoRepository)
-                          : null;
-                    },
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.background,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onBackground
+                            .withOpacity(0.15),
+                      )),
+                  width: size.width * 0.3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: CheckOut(
+                      mostrarTeclado: mostrarTeclado,
+                      mostrarIdentificador: mostrarIdentificador,
+                      productosAgregados: productosAgregados,
+                      totalVenta: totalVenta,
+                      selectedItemLista: selectedItemLista,
+                      isMenuPrincipal: widget.menuPrincipal,
+                      cantidadProducto: cantidadProducto,
+                      titleSection: widget.titleSection,
+                      hideKeyboard: dropDownIcon,
+                      actualizarCantidad: actualizarCantidad(joinedCantidad),
+                      onTextIdentificadorTap: onTextIdentificadorTap,
+                      onBackIdentificador: onBackIdentificador,
+                      onAceptarIdentificador: onAceptarIdentificador,
+                      clearButton: clearButton,
+                      onTapNum: onTapNum,
+                      sectionActionButton: () {
+                        productosAgregados.isNotEmpty
+                            ? _builAlertDialog(fecthPagoRepository)
+                            : null;
+                      },
+                    ),
                   ),
                 ),
               )
@@ -502,6 +505,18 @@ class _MenuState extends State<Menu> {
         cantidad.clear();
         mostrarTeclado = false;
 
+        setState(() {});
+      } else {
+        productosAgregados.add(ProductoOrdenado(
+            productoId: producto.productoId,
+            nombreProducto: producto.producto,
+            precio: producto.precio,
+            cantidad: '1',
+            iva: producto.iva,
+            fecha: DateTime.now()));
+
+        totalVenta += producto.precio * double.parse('1');
+        mostrarTeclado = false;
         setState(() {});
       }
     });
