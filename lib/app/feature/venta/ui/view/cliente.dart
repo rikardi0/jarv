@@ -45,7 +45,7 @@ class _ClienteMenuState extends State<ClienteMenu> {
               child: SizedBox(
                 height: MediaQuery.of(context).size.height,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: StreamBuilder(
                       stream: clientes,
                       builder: (context, snapshot) {
@@ -60,17 +60,21 @@ class _ClienteMenuState extends State<ClienteMenu> {
                           return ListView.builder(
                               itemCount: clienteLista.length,
                               itemBuilder: (context, index) {
-                                return CardCliente(
-                                  direccionCliente:
-                                      clienteLista[index].direccion,
-                                  nombreCliente:
-                                      clienteLista[index].nombreCliente,
-                                  nifCliente: clienteLista[index].nif,
-                                  onPressEditar: () {
-                                    Navigator.popAndPushNamed(
-                                        context, '/cliente_field',
-                                        arguments: setArgument(index));
-                                  },
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 5.0),
+                                  child: CardCliente(
+                                    direccionCliente:
+                                        clienteLista[index].direccion,
+                                    nombreCliente:
+                                        clienteLista[index].nombreCliente,
+                                    nifCliente: clienteLista[index].nif,
+                                    onPressEditar: () {
+                                      Navigator.popAndPushNamed(
+                                          context, '/cliente_field',
+                                          arguments: setArgument(index));
+                                    },
+                                  ),
                                 );
                               });
                         }
@@ -133,40 +137,37 @@ class _ClienteMenuState extends State<ClienteMenu> {
             child: Container(
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(10)),
-              width: size.width * 0.35,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.5),
-                child: ListView(
-                  children: [
-                    SearchField(
-                      label: 'Nombre',
-                      type: TextInputType.name,
-                      controller: _nameController,
-                      onChanged: (value) {
-                        nameSearchText = value;
-                        setState(() {});
-                      },
-                    ),
-                    SearchField(
-                      label: 'NIF',
-                      type: TextInputType.number,
-                      controller: _nifController,
-                      onChanged: (value) {
-                        nifSearchText = value;
-                        setState(() {});
-                      },
-                    ),
-                    SearchField(
-                      label: 'Direccion',
-                      type: TextInputType.streetAddress,
-                      controller: _direccionController,
-                      onChanged: (value) {
-                        direccionSearchText = value;
-                        setState(() {});
-                      },
-                    )
-                  ],
-                ),
+              width: size.width * 0.3,
+              child: ListView(
+                children: [
+                  SearchField(
+                    label: 'Nombre',
+                    type: TextInputType.name,
+                    controller: _nameController,
+                    onChanged: (value) {
+                      nameSearchText = value;
+                      setState(() {});
+                    },
+                  ),
+                  SearchField(
+                    label: 'NIF',
+                    type: TextInputType.number,
+                    controller: _nifController,
+                    onChanged: (value) {
+                      nifSearchText = value;
+                      setState(() {});
+                    },
+                  ),
+                  SearchField(
+                    label: 'Direccion',
+                    type: TextInputType.streetAddress,
+                    controller: _direccionController,
+                    onChanged: (value) {
+                      direccionSearchText = value;
+                      setState(() {});
+                    },
+                  )
+                ],
               ),
             ),
           ),

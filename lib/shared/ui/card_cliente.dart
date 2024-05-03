@@ -14,19 +14,22 @@ class CardCliente extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: ListTile(
-        title: Text(nombreCliente),
-        subtitle: Text(direccionCliente),
-        trailing: FittedBox(
-          child: Column(
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    onPressEditar();
-                  },
-                  child: const Text('Editar')),
-              Text(nifCliente)
-            ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListTile(
+          title: Text(nombreCliente),
+          subtitle: Text(direccionCliente),
+          trailing: FittedBox(
+            child: Column(
+              children: [
+                ElevatedButton(
+                    onPressed: () {
+                      onPressEditar();
+                    },
+                    child: const Text('Editar')),
+                Text(nifCliente)
+              ],
+            ),
           ),
         ),
       ),

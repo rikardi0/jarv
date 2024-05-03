@@ -50,14 +50,13 @@ class _ClienteFieldState extends State<ClienteField> {
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 35,
         title:
             Text(argument.clienteNuevo ? 'Nuevo Cliente' : 'Modificar Cliente'),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 40.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
               child: Row(
@@ -66,46 +65,50 @@ class _ClienteFieldState extends State<ClienteField> {
                   Expanded(
                     child: SafeArea(
                       child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Row(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.7,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 40.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                    child: CustomTextField(
-                                        label: 'Nombre Cliente',
-                                        value: argument.nombreCliente,
-                                        controller: _nameController,
-                                        keyboard: TextInputType.name)),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.15,
-                                    child: CustomTextField(
-                                        label: 'NIF',
-                                        value: argument.nif,
-                                        controller: _nifController,
-                                        keyboard: TextInputType.number))
-                              ],
-                            ),
-                            CustomTextField(
-                                label: 'Correo',
-                                value: argument.email,
-                                controller: _emailController,
-                                keyboard: TextInputType.emailAddress),
-                            Row(
-                              children: [
-                                _buildNacimientoPicker(
-                                    argument, context, fechaHint),
-                                Expanded(
-                                    child: CustomTextField(
-                                        label: 'Telefono',
-                                        value: argument.telefono,
-                                        controller: _telefonoController,
-                                        keyboard: TextInputType.phone)),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                        child: CustomTextField(
+                                            label: 'Nombre Cliente',
+                                            value: argument.nombreCliente,
+                                            controller: _nameController,
+                                            keyboard: TextInputType.name)),
+                                    SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.15,
+                                        child: CustomTextField(
+                                            label: 'NIF',
+                                            value: argument.nif,
+                                            controller: _nifController,
+                                            keyboard: TextInputType.number))
+                                  ],
+                                ),
+                                CustomTextField(
+                                    label: 'Correo',
+                                    value: argument.email,
+                                    controller: _emailController,
+                                    keyboard: TextInputType.emailAddress),
+                                Row(
+                                  children: [
+                                    _buildNacimientoPicker(
+                                        argument, context, fechaHint),
+                                    Expanded(
+                                        child: CustomTextField(
+                                            label: 'Telefono',
+                                            value: argument.telefono,
+                                            controller: _telefonoController,
+                                            keyboard: TextInputType.phone)),
+                                  ],
+                                ),
                                 SizedBox(
                                     width: MediaQuery.of(context).size.width *
                                         0.25,
@@ -124,7 +127,7 @@ class _ClienteFieldState extends State<ClienteField> {
                                         keyboard: TextInputType.number)),
                               ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
@@ -191,7 +194,11 @@ class _ClienteFieldState extends State<ClienteField> {
                 elevation: 15.0,
               ),
             ),
-            ElevatedButton(onPressed: () {}, child: const Text('Agregar Foto')),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: FilledButton.tonal(
+                  onPressed: () {}, child: const Text('Agregar Foto')),
+            ),
           ],
         ),
       ),
