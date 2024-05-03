@@ -187,6 +187,8 @@ class _MenuState extends State<Menu> {
         GestureDetector(
           onTap: () {
             mostrarIdentificador = true;
+            mostrarTeclado = false;
+            identificadorVenta = '';
             setState(() {});
           },
           child: const AppBarItemButton(
@@ -465,8 +467,10 @@ class _MenuState extends State<Menu> {
   }
 
   dropDownIcon() {
-    mostrarTeclado = !mostrarTeclado;
-    setState(() {});
+    if (!mostrarIdentificador) {
+      mostrarTeclado = !mostrarTeclado;
+      setState(() {});
+    }
   }
 
   void changeIndex(int index, ValueNotifier<int?> notifier) {

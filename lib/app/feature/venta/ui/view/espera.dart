@@ -24,7 +24,6 @@ class _EsperaState extends State<Espera> {
     final List<ProductoEspera> listaProductoEspera =
         context.watch<VentaEsperaProvider>().listaEspera;
 
-    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: selectedVenta.value != null || listaProductoEspera.isEmpty
@@ -38,19 +37,21 @@ class _EsperaState extends State<Espera> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    width: size.width * 0.4,
-                    child: ListView.builder(
-                        itemCount: listaProductoEspera.length,
-                        itemBuilder: (context, index) {
-                          return CardVenta(
-                            index: index,
-                            selected: selectedVenta,
-                            listaProductos: listaProductoEspera,
-                            color: Theme.of(context).primaryColor,
-                            action: actionItem,
-                          );
-                        }),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: ListView.builder(
+                          itemCount: listaProductoEspera.length,
+                          itemBuilder: (context, index) {
+                            return CardVenta(
+                              index: index,
+                              selected: selectedVenta,
+                              listaProductos: listaProductoEspera,
+                              color: Theme.of(context).primaryColor,
+                              action: actionItem,
+                            );
+                          }),
+                    ),
                   ),
                   selectedVenta.value != null
                       ? FacturaFiscal(

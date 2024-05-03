@@ -23,8 +23,9 @@ class FacturaFiscal extends StatelessWidget {
               double.parse(element.cantidad) *
               (1 + (element.iva)),
     );
+    final double sizeWidth = MediaQuery.of(context).size.width * 0.35;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
+      padding: const EdgeInsets.all(8.0),
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
@@ -34,9 +35,9 @@ class FacturaFiscal extends StatelessWidget {
                     .onBackground
                     .withOpacity(0.15))),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(15.0),
           child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.375,
+            width: sizeWidth,
             child: Container(
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.background,
@@ -47,19 +48,20 @@ class FacturaFiscal extends StatelessWidget {
                           .onBackground
                           .withOpacity(0.15))),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(15.0),
                 child: Column(
                   children: [
                     const Text('TITULO EMPRESA'),
                     const Text('RIF'),
                     const Text('UBICACION'),
                     const Divider(),
-                    Expanded(child: Builder(
+                    Builder(
                       builder: (context) {
                         final productoOrdenado = listaProducto.last;
                         final fecha = productoOrdenado!.fecha;
                         return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(tipoPago == ''
                                 ? 'Venta en Espera'
@@ -71,7 +73,7 @@ class FacturaFiscal extends StatelessWidget {
                           ],
                         );
                       },
-                    )),
+                    ),
                     Expanded(
                       child: ListView.builder(
                         itemCount: listaProducto.length,
@@ -97,9 +99,13 @@ class FacturaFiscal extends StatelessWidget {
                       ),
                     ),
                     const Divider(),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text('Impuesto'), Text('Base'), Text('Cuota')],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        containerColumna(sizeWidth, 'Impuesto'),
+                        containerColumna(sizeWidth, 'Base'),
+                        containerColumna(sizeWidth, 'Cuota'),
+                      ],
                     ),
                     Expanded(
                       child: ListView.builder(
@@ -113,11 +119,11 @@ class FacturaFiscal extends StatelessWidget {
                               (productoOrdenado.iva * 100).floor().toString();
 
                           return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text('$ivaPorcentaje%'),
-                              Text(base.toString()),
-                              Text('${precio + base}'),
+                              containerColumna(sizeWidth, '$ivaPorcentaje %'),
+                              containerColumna(sizeWidth, '$base'),
+                              containerColumna(sizeWidth, '${precio + base}'),
                             ],
                           );
                         },
@@ -155,5 +161,14 @@ class FacturaFiscal extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget containerColumna(double sizeWidth, String content) {
+    return SizedBox(
+        width: sizeWidth / 3.25,
+        child: Text(
+          content,
+          textAlign: TextAlign.center,
+        ));
   }
 }

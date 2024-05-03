@@ -72,13 +72,13 @@ class CheckOut extends StatelessWidget {
     return Expanded(
       child: mostrarIdentificador
           ? Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 5.0),
                   child: TextFormField(
-                    onFieldSubmitted: (value) {
+                    onChanged: (value) {
                       if (value.isNotEmpty) {
                         onTextIdentificadorTap(value);
                       }
