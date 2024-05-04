@@ -21,6 +21,7 @@ class CheckOut extends StatelessWidget {
     this.onTapNum,
     this.clearButton,
     this.hideKeyboard,
+    this.clearCantidad,
   });
 
   final String cantidadProducto;
@@ -36,6 +37,7 @@ class CheckOut extends StatelessWidget {
   final dynamic onBackIdentificador;
   final dynamic onAceptarIdentificador;
   final dynamic clearButton;
+  final dynamic clearCantidad;
   final dynamic onTapNum;
   final dynamic hideKeyboard;
   final dynamic sectionActionButton;
@@ -219,11 +221,18 @@ class CheckOut extends StatelessWidget {
                           : ''),
                       GestureDetector(
                           onTap: () {
-                            hideKeyboard();
+                            cantidadProducto.isEmpty
+                                ? hideKeyboard()
+                                : clearCantidad();
                           },
-                          child: Icon(mostrarTeclado
-                              ? Icons.arrow_drop_down
-                              : Icons.arrow_drop_up)),
+                          child: Visibility(
+                            visible: !mostrarIdentificador,
+                            child: Icon(cantidadProducto.isEmpty
+                                ? mostrarTeclado
+                                    ? Icons.arrow_drop_down
+                                    : Icons.arrow_drop_up
+                                : Icons.clear),
+                          )),
                     ],
                   ),
                 )),
@@ -299,7 +308,7 @@ class CheckOut extends StatelessWidget {
                     SizedBox(
                       height: height / 3,
                       width: width / 3,
-                      child: _itemNumeroTeclado(',', context),
+                      child: _itemNumeroTeclado('.', context),
                     ),
                   ],
                 ),

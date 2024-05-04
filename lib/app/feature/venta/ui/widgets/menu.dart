@@ -92,8 +92,7 @@ class _MenuState extends State<Menu> {
     final Size size = MediaQuery.of(context).size;
     const borderColor = Color.fromARGB(59, 7, 7, 7);
 
-    final String joinedCantidad =
-        cantidad.map((value) => int.parse(value)).toList().join();
+    final String joinedCantidad = cantidad.join();
 
     final Future<List<Familia>> listaFamilia =
         fecthMenuRepository.findAllFamilias();
@@ -336,6 +335,7 @@ class _MenuState extends State<Menu> {
                       onAceptarIdentificador: onAceptarIdentificador,
                       clearButton: clearButton,
                       onTapNum: onTapNum,
+                      clearCantidad: clearCantidad,
                       sectionActionButton: () {
                         productosAgregados.isNotEmpty
                             ? _builAlertDialog(fecthPagoRepository)
@@ -350,6 +350,12 @@ class _MenuState extends State<Menu> {
         ),
       ],
     );
+  }
+
+  clearCantidad() {
+    setState(() {
+      cantidad.clear();
+    });
   }
 
   Future<dynamic> _builAlertDialog(PagoRepository fecthPagoRepository) {
@@ -569,7 +575,11 @@ class _MenuState extends State<Menu> {
   }
 
   void onTapNum(String label) {
-    cantidad.add(label);
+    if (label == '.' && (cantidad.isEmpty || cantidad.contains('.'))) {
+      return;
+    } else {
+      cantidad.add(label);
+    }
     setState(() {});
   }
 
