@@ -5,35 +5,55 @@ import 'package:jarv/app/feature/venta/data/model/producto_ordenado.dart';
 class CheckOut extends StatelessWidget {
   const CheckOut({
     super.key,
-    required this.mostrarIdentificador,
-    required this.productosAgregados,
-    required this.totalVenta,
-    required this.cantidadProducto,
-    required this.actualizarCantidad,
-    required this.mostrarTeclado,
-    required this.selectedItemLista,
     required this.isMenuPrincipal,
     required this.titleSection,
-    this.onTextIdentificadorTap,
-    this.onBackIdentificador,
-    this.onAceptarIdentificador,
+    required this.productosAgregados,
+    required this.totalVenta,
+    required this.actualizarCantidad,
+    required this.cantidadProducto,
+    required this.selectedItemLista,
+    required this.mostrarTeclado,
+    required this.textInput,
+    required this.editarProducto,
+    required this.propiedadEditada,
+    this.onChangeIdentificador,
     this.sectionActionButton,
+    this.hideKeyboard,
     this.onTapNum,
     this.clearButton,
-    this.hideKeyboard,
     this.clearCantidad,
+    this.onAceptarIdentificador,
+    this.onBackIdentificador,
+    this.editarPrecioAction,
+    this.onAceptarPrecio,
+    this.onBackAction,
+    this.onChangedPrecio,
+    this.editarUnidadesAction,
+    this.eliminarProductoAction,
+    required this.precioNuevo,
+    required this.cantidadNueva,
+    this.onChangedUnidad,
+    this.onAceptarUnidad,
   });
 
+  final String titleSection;
   final String cantidadProducto;
-  final bool mostrarIdentificador;
+  final String precioNuevo;
+  final String cantidadNueva;
+
+  final double totalVenta;
+
+  final bool textInput;
   final bool mostrarTeclado;
   final bool isMenuPrincipal;
+  final bool editarProducto;
+  final bool propiedadEditada;
+
   final List<ProductoOrdenado?> productosAgregados;
-  final double totalVenta;
-  final Future<void> actualizarCantidad;
   final ValueNotifier<int?> selectedItemLista;
-  final String titleSection;
-  final dynamic onTextIdentificadorTap;
+  final Future<void> actualizarCantidad;
+
+  final dynamic onChangeIdentificador;
   final dynamic onBackIdentificador;
   final dynamic onAceptarIdentificador;
   final dynamic clearButton;
@@ -41,6 +61,18 @@ class CheckOut extends StatelessWidget {
   final dynamic onTapNum;
   final dynamic hideKeyboard;
   final dynamic sectionActionButton;
+  //slidables
+  final dynamic editarPrecioAction;
+  final dynamic onAceptarPrecio;
+  final dynamic onBackAction;
+  final dynamic onChangedPrecio;
+
+  final dynamic onChangedUnidad;
+  final dynamic onAceptarUnidad;
+
+  final dynamic editarUnidadesAction;
+
+  final dynamic eliminarProductoAction;
 
   @override
   Widget build(BuildContext context) {
@@ -72,43 +104,15 @@ class CheckOut extends StatelessWidget {
 
   Expanded _listaProductoOrdenado(context) {
     return Expanded(
-      child: mostrarIdentificador
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0, vertical: 5.0),
-                  child: TextFormField(
-                    onChanged: (value) {
-                      if (value.isNotEmpty) {
-                        onTextIdentificadorTap(value);
-                      }
-                    },
-                    decoration: const InputDecoration(
-                        labelText: 'Identificador de Venta'),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    ElevatedButton(
-                        onPressed: () {
-                          onBackIdentificador();
-                        },
-                        child: const Text('Volver')),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                            foregroundColor: Theme.of(context).canvasColor),
-                        onPressed: () {
-                          onAceptarIdentificador();
-                        },
-                        child: const Text('Aceptar'))
-                  ],
-                )
-              ],
-            )
+      child: textInput
+          ? !editarProducto
+              ? buildTextInput(
+                  context,
+                  'Identificador Venta',
+                  onChangeIdentificador,
+                  onAceptarIdentificador,
+                  TextInputType.name)
+              : buildEditarColumn(context)
           : ListView.builder(
               itemCount: productosAgregados.length,
               itemBuilder: (BuildContext context, int index) {
@@ -118,48 +122,21 @@ class CheckOut extends StatelessWidget {
 
                 return Slidable(
                   key: UniqueKey(),
-                  startActionPane: ActionPane(
-                      extentRatio: 0.85,
-                      motion: const ScrollMotion(),
-                      openThreshold: 0.25,
-                      children: [
-                        SlidableAction(
-                            onPressed: (context) {},
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .secondaryContainer,
-                            foregroundColor: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer,
-                            icon: Icons.movie_edit,
-                            label: 'Precio'),
-                        SlidableAction(
-                            onPressed: (context) {},
-                            backgroundColor:
-                                Theme.of(context).colorScheme.tertiaryContainer,
-                            foregroundColor: Theme.of(context)
-                                .colorScheme
-                                .onTertiaryContainer,
-                            icon: Icons.delete,
-                            label: 'Eliminar'),
-                        SlidableAction(
-                            onPressed: (context) {},
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            foregroundColor: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
-                            icon: Icons.onetwothree_rounded,
-                            label: 'Unidades'),
-                      ]),
+                  startActionPane: buildStartAction(index, context),
+                  endActionPane: buildEndAction(index, context),
                   child: Builder(builder: (context) {
                     return ListTile(
                       onTap: () {
                         final slide = Slidable.of(context);
-                        slide!.openStartActionPane();
+                        selectedItemLista.value = index;
+                        final isClosed =
+                            slide!.actionPaneType.value == ActionPaneType.none;
+                        if (isClosed) {
+                          slide.openStartActionPane();
+                        } else {
+                          slide.close();
+                        }
                       },
-                      selected: selectedItemLista.value == index ? true : false,
-                      selectedTileColor: ThemeData().focusColor,
                       visualDensity: VisualDensity.compact,
                       title: Text(producto.nombreProducto),
                       subtitle:
@@ -173,10 +150,139 @@ class CheckOut extends StatelessWidget {
     );
   }
 
+  Padding buildEditarColumn(context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              ListTile(
+                isThreeLine: true,
+                title: Text(
+                  productosAgregados[selectedItemLista.value!]!.nombreProducto,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                subtitle: Text(
+                  !propiedadEditada
+                      ? productosAgregados[selectedItemLista.value!]!.cantidad
+                      : productosAgregados[selectedItemLista.value!]!
+                          .precio
+                          .toString(),
+                ),
+                trailing: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Nuevo ${!propiedadEditada ? 'Precio' : 'Cantidad'}:',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    Text(
+                      !propiedadEditada ? '$precioNuevo €' : cantidadNueva,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
+              ),
+              !propiedadEditada
+                  ? buildTextInput(context, 'Editar Precio', onChangedPrecio,
+                      onAceptarPrecio, TextInputType.number)
+                  : buildTextInput(context, 'Editar Cantidad', onChangedUnidad,
+                      onAceptarUnidad, TextInputType.number)
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Column buildTextInput(context, String label, onChanged, aceptarAction,
+      TextInputType inputType) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+          child: TextFormField(
+            keyboardType: inputType,
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                onChanged(value);
+              }
+            },
+            decoration: InputDecoration(labelText: label),
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ElevatedButton(
+                onPressed: () {
+                  onBackAction();
+                },
+                child: const Text('Volver')),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    foregroundColor: Theme.of(context).canvasColor),
+                onPressed: () {
+                  aceptarAction();
+                },
+                child: const Text('Aceptar'))
+          ],
+        )
+      ],
+    );
+  }
+
+  ActionPane buildEndAction(int index, BuildContext context) {
+    return ActionPane(
+        motion: const ScrollMotion(),
+        dismissible: DismissiblePane(onDismissed: () {
+          eliminarProductoAction(index);
+        }),
+        children: [
+          SlidableAction(
+              onPressed: (context) {
+                eliminarProductoAction(index);
+              },
+              backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+              foregroundColor:
+                  Theme.of(context).colorScheme.onSecondaryContainer,
+              icon: Icons.delete,
+              label: 'Eliminar'),
+        ]);
+  }
+
+  ActionPane buildStartAction(int index, BuildContext context) {
+    return ActionPane(
+        extentRatio: 0.7,
+        motion: const ScrollMotion(),
+        openThreshold: 0.25,
+        children: [
+          SlidableAction(
+              onPressed: (context) {
+                editarPrecioAction(index);
+              },
+              backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+              foregroundColor:
+                  Theme.of(context).colorScheme.onTertiaryContainer,
+              icon: Icons.movie_edit,
+              label: 'Precio'),
+          SlidableAction(
+              onPressed: (context) {
+                editarUnidadesAction(index);
+              },
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+              icon: Icons.onetwothree_rounded,
+              label: 'Unidades'),
+        ]);
+  }
+
   Visibility _totalVenta() {
     return Visibility(
-      visible:
-          productosAgregados.isEmpty || mostrarIdentificador ? false : true,
+      visible: productosAgregados.isEmpty || textInput ? false : true,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
         child: Row(
@@ -226,7 +332,7 @@ class CheckOut extends StatelessWidget {
                                 : clearCantidad();
                           },
                           child: Visibility(
-                            visible: !mostrarIdentificador,
+                            visible: !textInput,
                             child: Icon(cantidadProducto.isEmpty
                                 ? mostrarTeclado
                                     ? Icons.arrow_drop_down

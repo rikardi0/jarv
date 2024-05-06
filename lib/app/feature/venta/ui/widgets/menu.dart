@@ -42,10 +42,15 @@ class _MenuState extends State<Menu> {
   String? tipoDevolucion;
 
   String? identificadorVenta;
+  String precioNuevo = '0';
+  String cantidadNueva = '0';
 
   bool mostrarUsuario = true;
   bool mostrarTeclado = true;
-  bool mostrarIdentificador = false;
+  bool mostrarTextInput = false;
+  bool editarProducto = false;
+  //false: editar precio,   true: editar cantidad
+  bool propiedadEditada = false;
 
   List<String> cantidad = [];
   List<ProductoOrdenado?> productosAgregados = [];
@@ -185,7 +190,7 @@ class _MenuState extends State<Menu> {
       children: [
         GestureDetector(
           onTap: () {
-            mostrarIdentificador = true;
+            mostrarTextInput = true;
             mostrarTeclado = false;
             identificadorVenta = '';
             setState(() {});
@@ -265,91 +270,193 @@ class _MenuState extends State<Menu> {
         localService.get<PagoRepository>();
 
     return Column(
-      children: [
-        Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: size.width * 0.175,
-                child: ListFamilia(
-                    selectedFamiliaIndex: selectedFamiliaIndex,
-                    itemFamilia: itemFamilia,
-                    onFamiliaTap: onFamiliaTap),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: size.height * 0.075,
-                        child: RowSubFamilia(
-                          selectedSubFamiliaIndex: selectedSubFamiliaIndex,
-                          itemSubFamilia: itemSubFamilia,
-                          onSubFamiliaTap: onSubFamiliaTap,
-                        ),
-                      ),
-                      Expanded(
-                        child: GridProducto(
-                          selectedProductoIndex: selectedProductoIndex,
-                          itemProducto: itemProducto,
-                          joinedCantidad: joinedCantidad,
-                          borderColor: borderColor,
-                          onProductTap: onProductTap,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.background,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onBackground
-                            .withOpacity(0.15),
-                      )),
-                  width: size.width * 0.3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: CheckOut(
-                      mostrarTeclado: mostrarTeclado,
-                      mostrarIdentificador: mostrarIdentificador,
-                      productosAgregados: productosAgregados,
-                      totalVenta: totalVenta,
-                      selectedItemLista: selectedItemLista,
-                      isMenuPrincipal: widget.menuPrincipal,
-                      cantidadProducto: cantidadProducto,
-                      titleSection: widget.titleSection,
-                      hideKeyboard: dropDownIcon,
-                      actualizarCantidad: actualizarCantidad(joinedCantidad),
-                      onTextIdentificadorTap: onTextIdentificadorTap,
-                      onBackIdentificador: onBackIdentificador,
-                      onAceptarIdentificador: onAceptarIdentificador,
-                      clearButton: clearButton,
-                      onTapNum: onTapNum,
-                      clearCantidad: clearCantidad,
-                      sectionActionButton: () {
-                        productosAgregados.isNotEmpty
-                            ? _builAlertDialog(fecthPagoRepository)
-                            : null;
-                      },
-                    ),
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-      ],
+      children: aceptarUnidad(size, itemFamilia, itemSubFamilia, itemProducto,
+          joinedCantidad, borderColor, fecthPagoRepository),
     );
+  }
+
+  List<Widget> aceptarUnidad(
+      Size size,
+      List<Familia>? itemFamilia,
+      List<SubFamilia?>? itemSubFamilia,
+      List<Producto?>? itemProducto,
+      String joinedCantidad,
+      Color borderColor,
+      PagoRepository fecthPagoRepository) {
+    return [
+      Expanded(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            SizedBox(
+              width: size.width * 0.175,
+              child: ListFamilia(
+                  selectedFamiliaIndex: selectedFamiliaIndex,
+                  itemFamilia: itemFamilia,
+                  onFamiliaTap: onFamiliaTap),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: size.height * 0.075,
+                      child: RowSubFamilia(
+                        selectedSubFamiliaIndex: selectedSubFamiliaIndex,
+                        itemSubFamilia: itemSubFamilia,
+                        onSubFamiliaTap: onSubFamiliaTap,
+                      ),
+                    ),
+                    Expanded(
+                      child: GridProducto(
+                        selectedProductoIndex: selectedProductoIndex,
+                        itemProducto: itemProducto,
+                        joinedCantidad: joinedCantidad,
+                        borderColor: borderColor,
+                        onProductTap: onProductTap,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.background,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onBackground
+                          .withOpacity(0.15),
+                    )),
+                width: size.width * 0.3,
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: CheckOut(
+                    isMenuPrincipal: widget.menuPrincipal,
+                    titleSection: widget.titleSection,
+                    productosAgregados: productosAgregados,
+                    cantidadProducto: cantidadProducto,
+                    selectedItemLista: selectedItemLista,
+                    totalVenta: totalVenta,
+                    mostrarTeclado: mostrarTeclado,
+
+                    hideKeyboard: dropDownIcon,
+                    actualizarCantidad: actualizarCantidad(joinedCantidad),
+                    onChangeIdentificador: onTextIdentificadorTap,
+                    onBackIdentificador: onBackIdentificador,
+                    onAceptarIdentificador: onAceptarIdentificador,
+                    clearButton: clearButton,
+                    onTapNum: onTapNum,
+                    clearCantidad: clearCantidad,
+                    sectionActionButton: () {
+                      productosAgregados.isNotEmpty
+                          ? _builAlertDialog(fecthPagoRepository)
+                          : null;
+                    },
+                    //slidables
+                    textInput: mostrarTextInput,
+                    editarProducto: editarProducto,
+                    propiedadEditada: propiedadEditada,
+                    cantidadNueva: cantidadNueva,
+                    precioNuevo: precioNuevo,
+                    editarPrecioAction: editarPrecioAction,
+                    onAceptarPrecio: onAceptarPrecio,
+                    onChangedPrecio: onChangedPrecio,
+                    editarUnidadesAction: editarUnidadesAction,
+                    onAceptarUnidad: onAceptarUnidad,
+                    onChangedUnidad: onChangeUnidad,
+                    eliminarProductoAction: deleteProducto,
+                    onBackAction: onBack,
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    ];
+  }
+
+//editar unidad slidable
+  editarUnidadesAction(index) {
+    setState(() {
+      mostrarTextInput = true;
+      editarProducto = true;
+      propiedadEditada = true;
+    });
+  }
+
+  onChangeUnidad(value) {
+    setState(() {
+      cantidadNueva = value;
+    });
+  }
+
+  onAceptarUnidad() {
+    setState(() {
+      productosAgregados[selectedItemLista.value!]!.cantidad = cantidadNueva;
+      propiedadEditada = false;
+      mostrarTeclado = false;
+      resetProductoContainer();
+    });
+  }
+
+  double resetProductoContainer() {
+    totalVenta = 0;
+    cantidadNueva = '0';
+    precioNuevo = '0';
+    mostrarTextInput = false;
+    editarProducto = false;
+    return totalVenta += productosAgregados[selectedItemLista.value!]!.precio *
+        int.parse(productosAgregados[selectedItemLista.value!]!.cantidad);
+  }
+
+  onBack() {
+    setState(() {
+      precioNuevo = '0';
+      cantidadNueva = '0';
+      propiedadEditada = false;
+      mostrarTeclado = false;
+      mostrarTextInput = false;
+    });
+  }
+
+  deleteProducto(index) {
+    setState(() {
+      final precio = productosAgregados[index]!.precio;
+      final cantidad = int.parse(productosAgregados[index]!.cantidad);
+      final precioVenta = precio * cantidad;
+      productosAgregados.removeAt(index);
+      totalVenta -= precioVenta;
+    });
+  }
+
+//editar precio slidable
+  editarPrecioAction(index) {
+    setState(() {
+      mostrarTextInput = true;
+      editarProducto = true;
+    });
+  }
+
+  onChangedPrecio(String value) {
+    setState(() {
+      precioNuevo = value;
+    });
+  }
+
+  onAceptarPrecio() {
+    setState(() {
+      final precio = double.parse(precioNuevo);
+      productosAgregados[selectedItemLista.value!]!.precio = precio;
+      resetProductoContainer();
+    });
   }
 
   clearCantidad() {
@@ -473,7 +580,7 @@ class _MenuState extends State<Menu> {
   }
 
   dropDownIcon() {
-    if (!mostrarIdentificador) {
+    if (!mostrarTextInput) {
       mostrarTeclado = !mostrarTeclado;
       setState(() {});
     }
@@ -548,7 +655,7 @@ class _MenuState extends State<Menu> {
           idVenta: identificadorVenta,
           totalVenta: totalVenta);
       totalVenta = 0;
-      mostrarIdentificador = false;
+      mostrarTextInput = false;
       selectedProductoIndex.value = null;
       productosAgregados.clear();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -565,7 +672,7 @@ class _MenuState extends State<Menu> {
   }
 
   void onBackIdentificador() {
-    mostrarIdentificador = false;
+    mostrarTextInput = false;
     setState(() {});
   }
 
