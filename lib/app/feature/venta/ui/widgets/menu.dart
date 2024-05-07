@@ -1,23 +1,26 @@
-import 'package:jarv/app/feature/inventario/ui/view/inventario_view.dart';
-import 'package:jarv/app/feature/proveedor/ui/view/proveedor_view.dart';
+// ignore: depend_on_referenced_packages
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_animated_icons/lottiefiles.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 
+import 'package:jarv/shared/data/model/entity.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:jarv/app/feature/venta/data/model/producto_ordenado.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/pago_repository.dart';
-import '../../../../../shared/data/model/entity.dart';
-import '../../data/repositories/interfaces/menu_repository.dart';
-import '../../data/model/entity_venta.dart';
-import 'package:jarv/core/di/locator.dart';
+import 'package:jarv/app/feature/venta/data/repositories/interfaces/menu_repository.dart';
+import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
 
 import 'package:jarv/app/feature/venta/ui/provider/venta_espera_provider.dart';
-import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
+import 'package:jarv/core/di/locator.dart';
 
+import 'package:jarv/app/feature/inventario/ui/view/inventario_view.dart';
+import 'package:jarv/app/feature/proveedor/ui/view/proveedor_view.dart';
 import 'package:jarv/shared/ui/widgets.dart';
+import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
 
 class Menu extends StatefulWidget {
   const Menu(
@@ -35,7 +38,7 @@ class Menu extends StatefulWidget {
   State<Menu> createState() => _MenuState();
 }
 
-class _MenuState extends State<Menu> {
+class _MenuState extends State<Menu> with TickerProviderStateMixin {
   String familiaSeleccionada = "";
   String subFamiliaSeleccionada = "";
   String cantidadProducto = '';
@@ -49,6 +52,7 @@ class _MenuState extends State<Menu> {
   bool mostrarTeclado = true;
   bool mostrarTextInput = false;
   bool editarProducto = false;
+
   //false: editar precio,   true: editar cantidad
   bool propiedadEditada = false;
 
@@ -93,21 +97,11 @@ class _MenuState extends State<Menu> {
   Widget build(BuildContext context) {
     final MenuRepository fecthMenuRepository =
         localService.get<MenuRepository>();
-
-    final Size size = MediaQuery.of(context).size;
-    const borderColor = Color.fromARGB(59, 7, 7, 7);
-
-    final String joinedCantidad = cantidad.join();
-
-    final Future<List<Familia>> listaFamilia =
-        fecthMenuRepository.findAllFamilias();
-
+    Future<List<Familia>> listaFamilia = fecthMenuRepository.findAllFamilias();
     Future<List<SubFamilia?>> listaSubFamilia =
         fecthMenuRepository.findSubFamiliaByFamilia(familiaSeleccionada);
-
     Future<List<Producto?>> listaProducto =
         fecthMenuRepository.findProductoById(subFamiliaSeleccionada);
-
     Future<void> inicializarDatos() async {
       if (familiaSeleccionada.isEmpty) {
         List<Familia> familias = await listaFamilia;
@@ -122,6 +116,11 @@ class _MenuState extends State<Menu> {
             fecthMenuRepository.findProductoById(subFamiliaSeleccionada);
       }
     }
+
+    final Size size = MediaQuery.of(context).size;
+    const borderColor = Color.fromARGB(59, 7, 7, 7);
+
+    final String joinedCantidad = cantidad.join();
 
     return FutureBuilder(
         future: inicializarDatos(),
@@ -658,15 +657,29 @@ class _MenuState extends State<Menu> {
       mostrarTextInput = false;
       selectedProductoIndex.value = null;
       productosAgregados.clear();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        content: Text(
-          'Venta agregada a lista de espera',
-          style: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimaryContainer),
-        ),
-        duration: Durations.extralong4,
-      ));
+      showDialog(
+          context: context,
+          builder: (_) {
+            return AlertDialog(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                      height: 60,
+                      width: 60,
+                      child: Lottie.asset(LottieFiles.$98924_check_icon)),
+                  const Text(
+                    'Atencion!',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+              content: const Text('Venta agregada a lista de espera'),
+            );
+          });
+      Future.delayed(const Duration(milliseconds: 5000), () {
+        Navigator.pop(context);
+      });
       setState(() {});
     }
   }
