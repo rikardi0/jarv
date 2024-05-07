@@ -11,6 +11,7 @@ class TicketDiario extends StatefulWidget {
   TicketDiario({
     super.key,
   });
+
   static const routeName = '/ticket_diario';
   final fecthRepository = localService<TicketDiarioRepository>();
 
@@ -35,8 +36,8 @@ class _TicketDiarioState extends State<TicketDiario> {
   DateTimeRange rangoFechaFiltro =
       DateTimeRange(start: DateTime.now(), end: DateTime.now());
   DateTime fechaActual = DateTime.now();
-
-  final selectedVenta = ValueNotifier<int?>(null);
+  late List<Map<String, Object?>> data;
+  final selectedVenta = ValueNotifier<int?>(0);
 
   @override
   void initState() {
@@ -46,7 +47,7 @@ class _TicketDiarioState extends State<TicketDiario> {
 
   Future<void> _loadDataFromDatabase() async {
     try {
-      final data = await widget.fecthRepository
+      List<Map<String, Object?>> data = await widget.fecthRepository
           .findProductoByVentaId([ventaSeleccionada]);
       setState(() {
         listaProducto = data;
@@ -62,76 +63,96 @@ class _TicketDiarioState extends State<TicketDiario> {
     final fechaFormateada = fechaFormatter(fechaActual);
 
     final ventaDiaria =
-        widget.fecthRepository.findVentaByFecha(fechaFormateada).asStream();
+        widget.fecthRepository.findVentaByFecha(fechaFormateada);
+    Future<void> inicializarDatos() async {
+      if (ventaSeleccionada == 0) {
+        List<Venta?> venta = await ventaDiaria;
+        ventaSeleccionada = venta.reversed.toList().first!.idVenta;
+        data = await widget.fecthRepository
+            .findProductoByVentaId([ventaSeleccionada]);
+      }
+    }
+
+    ;
     final List<String> clienteLista = [];
 
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Ticket Diario'),
-        ),
-        body: StreamBuilder2(
-          streams:
-              StreamTuple2(ventaDiaria, _loadDataFromDatabase().asStream()),
-          builder: (context, snapshot) {
-            if (!snapshot.snapshot1.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            } else {
-              listaVenta = snapshot.snapshot1.data;
-              final itemVenta = snapshot.snapshot1.data;
-              if (cliente != null) {
-                listaVenta = listaVenta!.where((element) {
-                  return element!.nombreCliente
-                      .toString()
-                      .toLowerCase()
-                      .contains(cliente!.toLowerCase());
-                }).toList();
-              } else if (metodoPago != null) {
-                listaVenta = listaVenta!.where((element) {
-                  return element!.metodoPago
-                      .toString()
-                      .toLowerCase()
-                      .contains(metodoPago!.toLowerCase());
-                }).toList();
-              }
-              for (var element in itemVenta!) {
-                if (!clienteLista.contains(element!.nombreCliente)) {
-                  clienteLista.add(element.nombreCliente);
-                }
-              }
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    listaVenta!.isEmpty
-                        ? const Expanded(
-                            child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.info_outline),
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text(
-                                      'Sin ventas Registradas',
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.black54),
+    return FutureBuilder(
+        future: inicializarDatos(),
+        builder: (context, snapshot) {
+          return Scaffold(
+              appBar: AppBar(
+                title: const Text('Ticket Diario'),
+              ),
+              body: StreamBuilder2(
+                streams: StreamTuple2(
+                    ventaDiaria.asStream(), _loadDataFromDatabase().asStream()),
+                builder: (context, snapshot) {
+                  if (!snapshot.snapshot1.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else {
+                    listaVenta = snapshot.snapshot1.data;
+                    final itemVenta = snapshot.snapshot1.data;
+                    _filterDropDown();
+                    for (var element in itemVenta!) {
+                      if (!clienteLista.contains(element!.nombreCliente)) {
+                        clienteLista.add(element.nombreCliente);
+                      }
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          listaVenta!.isEmpty
+                              ? const Expanded(
+                                  child: Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.info_outline),
+                                        Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Sin ventas Registradas',
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.black54),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : _tarjetaVenta(context, listaVenta),
-                    _containerFactura(context),
-                    _filtroVenta(context, clienteLista),
-                  ],
-                ),
-              );
-            }
-          },
-        ));
+                                )
+                              : _tarjetaVenta(context, listaVenta),
+                          _containerFactura(context),
+                          _filtroVenta(context, clienteLista),
+                        ],
+                      ),
+                    );
+                  }
+                },
+              ));
+        });
+  }
+
+  void _filterDropDown() {
+    if (cliente != null) {
+      listaVenta = listaVenta!.where((element) {
+        return element!.nombreCliente
+            .toString()
+            .toLowerCase()
+            .contains(cliente!.toLowerCase());
+      }).toList();
+    } else if (metodoPago != null) {
+      listaVenta = listaVenta!.where((element) {
+        return element!.metodoPago
+            .toString()
+            .toLowerCase()
+            .contains(metodoPago!.toLowerCase());
+      }).toList();
+    }
   }
 
   Padding _filtroVenta(BuildContext context, List<String> clienteLista) {
@@ -413,7 +434,7 @@ class _TicketDiarioState extends State<TicketDiario> {
           child: ListView.builder(
             itemCount: ventaItem!.length,
             itemBuilder: (context, index) {
-              final venta = ventaItem[index];
+              final venta = ventaItem.reversed.toList()[index];
               final dateTime =
                   DateTime.fromMillisecondsSinceEpoch(venta!.idVenta);
               final String hora = hourFormatter(dateTime);
