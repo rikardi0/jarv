@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:jarv/shared/ui/card_venta.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:jarv/app/feature/venta/data/model/producto_espera.dart';
 import 'package:jarv/app/feature/venta/ui/widgets/app_bar_item.dart';
 import 'package:jarv/app/feature/venta/ui/provider/venta_espera_provider.dart';
 import 'package:jarv/shared/ui/factura_fiscal.dart';
-import 'package:provider/provider.dart';
-
-import '../../../../../shared/ui/card_venta.dart';
 
 class Espera extends StatefulWidget {
   const Espera({super.key});
@@ -26,7 +26,7 @@ class _EsperaState extends State<Espera> {
 
     return Scaffold(
       appBar: AppBar(
-        title: selectedVenta.value != null || listaProductoEspera.isEmpty
+        title: selectedVenta.value != null && listaProductoEspera.isNotEmpty
             ? appBarActions(listaProductoEspera)
             : const Text('Ventas en Espera'),
       ),
