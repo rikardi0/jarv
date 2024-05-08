@@ -1,26 +1,21 @@
-// ignore: depend_on_referenced_packages
-import 'package:lottie/lottie.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_animated_icons/lottiefiles.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:multiple_stream_builder/multiple_stream_builder.dart';
-
-import 'package:jarv/shared/data/model/entity.dart';
-import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
-import 'package:jarv/app/feature/venta/data/model/producto_ordenado.dart';
-import 'package:jarv/app/feature/venta/data/repositories/interfaces/pago_repository.dart';
-import 'package:jarv/app/feature/venta/data/repositories/interfaces/menu_repository.dart';
-import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
-
-import 'package:jarv/app/feature/venta/ui/provider/venta_espera_provider.dart';
-import 'package:jarv/core/di/locator.dart';
-
 import 'package:jarv/app/feature/inventario/ui/view/inventario_view.dart';
 import 'package:jarv/app/feature/proveedor/ui/view/proveedor_view.dart';
-import 'package:jarv/shared/ui/widgets.dart';
+import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
+import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
+import 'package:jarv/app/feature/venta/data/model/producto_ordenado.dart';
+import 'package:jarv/app/feature/venta/data/repositories/interfaces/menu_repository.dart';
+import 'package:jarv/app/feature/venta/data/repositories/interfaces/pago_repository.dart';
+import 'package:jarv/app/feature/venta/ui/provider/venta_espera_provider.dart';
 import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
+import 'package:jarv/core/di/locator.dart';
+import 'package:jarv/shared/data/model/entity.dart';
+import 'package:jarv/shared/ui/custom_alert_dialog.dart';
+import 'package:jarv/shared/ui/widgets.dart';
+import 'package:multiple_stream_builder/multiple_stream_builder.dart';
+import 'package:provider/provider.dart';
 
 class Menu extends StatefulWidget {
   const Menu(
@@ -660,22 +655,8 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
       showDialog(
           context: context,
           builder: (_) {
-            return AlertDialog(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                      height: 60,
-                      width: 60,
-                      child: Lottie.asset(LottieFiles.$98924_check_icon)),
-                  const Text(
-                    'Atencion!',
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-              content: const Text('Venta agregada a lista de espera'),
-            );
+            return CustomAlertDialog(
+                context: context, content: 'Venta Agregada a lista de espera');
           });
       Future.delayed(const Duration(milliseconds: 5000), () {
         Navigator.pop(context);
