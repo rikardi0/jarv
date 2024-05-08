@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:flutter/services.dart';
+import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
+import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/pago_repository.dart';
+import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
 import 'package:jarv/core/di/locator.dart';
-
-import '../../../../../shared/ui/cliente_selector.dart';
-import '../../../../../shared/ui/factura_fiscal.dart';
-import '../../../../../shared/ui/metodo_pago_selector.dart';
-import '../../data/model/entity_venta.dart';
-import '../utils/date_format.dart';
+import 'package:jarv/shared/ui/cliente_selector.dart';
+import 'package:jarv/shared/ui/factura_fiscal.dart';
+import 'package:jarv/shared/ui/metodo_pago_selector.dart';
 
 class Pago extends StatefulWidget {
   Pago({
@@ -27,6 +26,7 @@ class _PagoState extends State<Pago> {
   String? cliente;
   double totalFactura = 0;
   int efectivoEntregado = 0;
+  double cambio = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +39,7 @@ class _PagoState extends State<Pago> {
       (previousValue, element) =>
           previousValue +
           (element!.precio) *
-              double.parse(element.cantidad) *
-              (1 + (element.iva)),
+              double.parse(element.cantidad) * (1),
     );
 
     return Scaffold(
@@ -49,54 +48,63 @@ class _PagoState extends State<Pago> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: size.width * 0.35,
-              child: Padding(
-                padding: const EdgeInsets.all(3.0),
-                child: _columnMetodoPago(context, argument),
+            SafeArea(
+              child: SingleChildScrollView(
+                child: SizedBox(
+                  width: size.width * 0.35,
+                  child: Padding(
+                    padding: const EdgeInsets.all(3.0),
+                    child: _columnMetodoPago(context, argument),
+                  ),
+                ),
               ),
             ),
             FacturaFiscal(
               listaProducto: argument.productoAgregado,
               tipoPago: metodoPago,
               precioVenta: argument.totalVenta,
+              efectivoEntregado: efectivoEntregado,
+              cambio: cambio,
             ),
           ],
         ));
   }
 
   Widget _columnMetodoPago(BuildContext context, CheckOutArgument argument) {
-    final cambio = efectivoEntregado - argument.totalVenta;
+    cambio = efectivoEntregado - argument.totalVenta;
     final clienteLista = widget.fecthRepository.findAllClienteNombre();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          'Venta',
-          style: Theme.of(context).textTheme.titleLarge,
-          textAlign: TextAlign.center,
-        ),
-        MetodoPagoSelector(
-            metodoPago: metodoPago,
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.75,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Venta',
+            style: Theme.of(context).textTheme.titleLarge,
+            textAlign: TextAlign.center,
+          ),
+          MetodoPagoSelector(
+              metodoPago: metodoPago,
+              onChanged: (value) {
+                metodoPago = value;
+                setState(() {});
+              }),
+          ClienteSelector(
+            cliente: cliente,
+            clienteLista: clienteLista,
             onChanged: (value) {
-              metodoPago = value;
+              cliente = value;
               setState(() {});
-            }),
-        ClienteSelector(
-          cliente: cliente,
-          clienteLista: clienteLista,
-          onChanged: (value) {
-            cliente = value;
-            setState(() {});
-          },
-        ),
-        _totalFactura(),
-        _efectivoEntregado(),
-        _cambioEntregar(cambio),
-        _registrarButton(argument),
-      ],
+            },
+          ),
+          _totalFactura(),
+          _efectivoEntregado(),
+          _cambioEntregar(cambio),
+          _registrarButton(argument),
+        ],
+      ),
     );
   }
 

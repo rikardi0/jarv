@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import 'package:jarv/shared/ui/card_venta.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:jarv/app/feature/venta/data/model/producto_espera.dart';
-import 'package:jarv/app/feature/venta/ui/widgets/app_bar_item.dart';
 import 'package:jarv/app/feature/venta/ui/provider/venta_espera_provider.dart';
+import 'package:jarv/app/feature/venta/ui/widgets/app_bar_item.dart';
+import 'package:jarv/shared/ui/card_venta.dart';
 import 'package:jarv/shared/ui/factura_fiscal.dart';
+import 'package:provider/provider.dart';
 
 class Espera extends StatefulWidget {
   const Espera({super.key});
@@ -18,11 +17,12 @@ class Espera extends StatefulWidget {
 }
 
 class _EsperaState extends State<Espera> {
-  final selectedVenta = ValueNotifier<int?>(null);
+  final selectedVenta = ValueNotifier<int?>(0);
+
   @override
   Widget build(BuildContext context) {
     final List<ProductoEspera> listaProductoEspera =
-        context.watch<VentaEsperaProvider>().listaEspera;
+        context.watch<VentaEsperaProvider>().listaEspera.reversed.toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -61,6 +61,8 @@ class _EsperaState extends State<Espera> {
                           tipoPago: '',
                           precioVenta: listaProductoEspera[selectedVenta.value!]
                               .totalVenta,
+                          efectivoEntregado: 0,
+                          cambio: 0,
                         )
                       : const SizedBox.shrink()
                 ],
