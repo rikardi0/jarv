@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/ticket_diario_repository.dart';
 import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
 import 'package:jarv/core/di/locator.dart';
+import 'package:jarv/shared/ui/empty_message.dart';
 import 'package:jarv/shared/ui/metodo_pago_selector.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
-
-import '../../data/model/entity_venta.dart';
 
 class TicketDiario extends StatefulWidget {
   TicketDiario({
@@ -13,7 +13,8 @@ class TicketDiario extends StatefulWidget {
   });
 
   static const routeName = '/ticket_diario';
-  final fecthRepository = localService<TicketDiarioRepository>();
+  final TicketDiarioRepository fetchRepository =
+      localService<TicketDiarioRepository>();
 
   @override
   State<TicketDiario> createState() => _TicketDiarioState();
@@ -27,8 +28,10 @@ class _TicketDiarioState extends State<TicketDiario> {
 
   String? cliente;
   String? metodoPago;
+  String? tipoVenta;
 
   List<Venta?>? listaVenta;
+  List<TipoVenta?>? tipoVentaLista;
   bool isRangeActive = false;
   int ventaSeleccionada = 0;
   double montoFactura = 0.0;
@@ -47,7 +50,7 @@ class _TicketDiarioState extends State<TicketDiario> {
 
   Future<void> _loadDataFromDatabase() async {
     try {
-      List<Map<String, Object?>> data = await widget.fecthRepository
+      List<Map<String, Object?>> data = await widget.fetchRepository
           .findProductoByVentaId([ventaSeleccionada]);
       setState(() {
         listaProducto = data;
@@ -63,17 +66,17 @@ class _TicketDiarioState extends State<TicketDiario> {
     final fechaFormateada = fechaFormatter(fechaActual);
 
     final ventaDiaria =
-        widget.fecthRepository.findVentaByFecha(fechaFormateada);
+        widget.fetchRepository.findVentaByFecha(fechaFormateada);
+
     Future<void> inicializarDatos() async {
       if (ventaSeleccionada == 0) {
         List<Venta?> venta = await ventaDiaria;
         ventaSeleccionada = venta.reversed.toList().first!.idVenta;
-        data = await widget.fecthRepository
+        data = await widget.fetchRepository
             .findProductoByVentaId([ventaSeleccionada]);
       }
     }
 
-    ;
     final List<String> clienteLista = [];
 
     return FutureBuilder(
@@ -83,16 +86,19 @@ class _TicketDiarioState extends State<TicketDiario> {
               appBar: AppBar(
                 title: const Text('Ticket Diario'),
               ),
-              body: StreamBuilder2(
-                streams: StreamTuple2(
-                    ventaDiaria.asStream(), _loadDataFromDatabase().asStream()),
+              body: StreamBuilder3(
+                streams: StreamTuple3(
+                    ventaDiaria.asStream(),
+                    _loadDataFromDatabase().asStream(),
+                    widget.fetchRepository.findAllTipoVenta().asStream()),
                 builder: (context, snapshot) {
                   if (!snapshot.snapshot1.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   } else {
-                    listaVenta = snapshot.snapshot1.data;
                     final itemVenta = snapshot.snapshot1.data;
-                    _filterDropDown();
+                    listaVenta = snapshot.snapshot1.data;
+                    tipoVentaLista = snapshot.snapshot3.data;
+                    _filtrarCriterios();
                     for (var element in itemVenta!) {
                       if (!clienteLista.contains(element!.nombreCliente)) {
                         clienteLista.add(element.nombreCliente);
@@ -105,29 +111,12 @@ class _TicketDiarioState extends State<TicketDiario> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           listaVenta!.isEmpty
-                              ? const Expanded(
-                                  child: Center(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.info_outline),
-                                        Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text(
-                                            'Sin ventas Registradas',
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.black54),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
+                              ? const EmptyMessage()
                               : _tarjetaVenta(context, listaVenta),
-                          _containerFactura(context),
-                          _filtroVenta(context, clienteLista),
+                          Visibility(
+                              visible: listaVenta!.isEmpty ? false : true,
+                              child: _containerFactura(context)),
+                          _filtroVenta(context, clienteLista, tipoVentaLista),
                         ],
                       ),
                     );
@@ -137,7 +126,7 @@ class _TicketDiarioState extends State<TicketDiario> {
         });
   }
 
-  void _filterDropDown() {
+  void _filtrarCriterios() {
     if (cliente != null) {
       listaVenta = listaVenta!.where((element) {
         return element!.nombreCliente
@@ -152,10 +141,24 @@ class _TicketDiarioState extends State<TicketDiario> {
             .toLowerCase()
             .contains(metodoPago!.toLowerCase());
       }).toList();
+    } else if (tipoVenta != null) {
+      listaVenta = listaVenta!.where((element) {
+        return element!.tipoVenta
+            .toString()
+            .toLowerCase()
+            .contains(tipoVenta!.toLowerCase());
+      }).toList();
     }
   }
 
-  Padding _filtroVenta(BuildContext context, List<String> clienteLista) {
+  Padding _filtroVenta(
+      BuildContext context, List<String> clienteLista, tipoVentaLista) {
+    final List<String> lista = [];
+    if (tipoVentaLista != null) {
+      for (var element in tipoVentaLista) {
+        lista.add(element!.tipoVenta);
+      }
+    }
     return Padding(
       padding: const EdgeInsets.only(left: 20.0, bottom: 5.0),
       child: SizedBox(
@@ -168,18 +171,22 @@ class _TicketDiarioState extends State<TicketDiario> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildDatePicker(context),
-              _buildCliente(clienteLista),
+              _buildClienteDropDown(clienteLista),
+              _buildTipoVentaDropDown(lista),
               MetodoPagoSelector(
                   metodoPago: metodoPago,
                   onCancel: () {
                     setState(() {
                       metodoPago = null;
+                      selectedVenta.value = null;
                     });
                   },
                   onChanged: (value) {
                     setState(() {
                       metodoPago = value;
                       cliente = null;
+                      tipoVenta = null;
+                      selectedVenta.value = null;
                     });
                   }),
               FilledButton(onPressed: () {}, child: const Text('Imprimir'))
@@ -190,7 +197,8 @@ class _TicketDiarioState extends State<TicketDiario> {
     );
   }
 
-  DropdownButtonFormField<String> _buildCliente(List<String> clienteLista) {
+  DropdownButtonFormField<String> _buildClienteDropDown(
+      List<String> clienteLista) {
     return DropdownButtonFormField<String>(
       value: cliente,
       hint: const Text('Cliente'),
@@ -199,6 +207,7 @@ class _TicketDiarioState extends State<TicketDiario> {
           ? GestureDetector(
               onTap: () {
                 cliente = null;
+                selectedVenta.value = null;
                 setState(() {});
               },
               child: const Icon(Icons.cancel_outlined),
@@ -212,8 +221,43 @@ class _TicketDiarioState extends State<TicketDiario> {
       }).toList(),
       onChanged: (value) {
         setState(() {
+          selectedVenta.value = null;
           metodoPago = null;
+          tipoVenta = null;
           cliente = value;
+        });
+      },
+    );
+  }
+
+  DropdownButtonFormField<String> _buildTipoVentaDropDown(
+      List<String> tipoVentaLista) {
+    return DropdownButtonFormField<String>(
+      value: tipoVenta,
+      hint: const Text('Tipo Venta'),
+      isExpanded: true,
+      icon: tipoVenta != null
+          ? GestureDetector(
+              onTap: () {
+                tipoVenta = null;
+                selectedVenta.value = null;
+                setState(() {});
+              },
+              child: const Icon(Icons.cancel_outlined),
+            )
+          : const Icon(Icons.arrow_drop_down),
+      items: tipoVentaLista.map((String value) {
+        return DropdownMenuItem(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          selectedVenta.value = null;
+          metodoPago = null;
+          cliente = null;
+          tipoVenta = value;
         });
       },
     );

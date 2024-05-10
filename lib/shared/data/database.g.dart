@@ -1315,6 +1315,14 @@ class _$TipoVentaDao extends TipoVentaDao {
   }
 
   @override
+  Future<List<TipoVenta>> findAllTipoVenta() async {
+    return _queryAdapter.queryList('SELECT * FROM TipoVenta',
+        mapper: (Map<String, Object?> row) => TipoVenta(
+            idTipoVenta: row['idTipoVenta'] as int,
+            tipoVenta: row['tipoVenta'] as String));
+  }
+
+  @override
   Future<void> insertTipoVenta(TipoVenta venta) async {
     await _tipoVentaInsertionAdapter.insert(venta, OnConflictStrategy.abort);
   }
