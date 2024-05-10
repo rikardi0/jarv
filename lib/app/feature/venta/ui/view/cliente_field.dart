@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_cliente.dart';
 import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/cliente_repository.dart';
+import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
+import 'package:jarv/app/feature/venta/ui/utils/validators.dart';
 import 'package:jarv/core/di/locator.dart';
-
-import '../../../../../shared/ui/custom_text_field.dart';
-import '../utils/date_format.dart';
+import 'package:jarv/shared/ui/custom_text_field.dart';
+import 'package:regexpattern/regexpattern.dart';
 
 class ClienteField extends StatefulWidget {
   const ClienteField({super.key});
+
   static const routeName = '/cliente_field';
 
   @override
@@ -32,6 +34,7 @@ class _ClienteFieldState extends State<ClienteField> {
   final TextEditingController _pedidosController = TextEditingController();
 
   final TextEditingController _fechaController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -69,63 +72,85 @@ class _ClienteFieldState extends State<ClienteField> {
                           height: MediaQuery.of(context).size.height * 0.7,
                           child: Padding(
                             padding: const EdgeInsets.only(right: 40.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        child: CustomTextField(
-                                            label: 'Nombre Cliente',
-                                            value: argument.nombreCliente,
-                                            controller: _nameController,
-                                            keyboard: TextInputType.name)),
-                                    SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.15,
-                                        child: CustomTextField(
-                                            label: 'NIF',
-                                            value: argument.nif,
-                                            controller: _nifController,
-                                            keyboard: TextInputType.number))
-                                  ],
-                                ),
-                                CustomTextField(
-                                    label: 'Correo',
-                                    value: argument.email,
-                                    controller: _emailController,
-                                    keyboard: TextInputType.emailAddress),
-                                Row(
-                                  children: [
-                                    _buildNacimientoPicker(
-                                        argument, context, fechaHint),
-                                    Expanded(
-                                        child: CustomTextField(
-                                            label: 'Telefono',
-                                            value: argument.telefono,
-                                            controller: _telefonoController,
-                                            keyboard: TextInputType.phone)),
-                                  ],
-                                ),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.25,
-                                    child: CustomTextField(
-                                        label: 'Pts Acumulados',
-                                        value: argument.puntos.toString(),
-                                        controller: _ptsController,
-                                        keyboard: TextInputType.number)),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.25,
-                                    child: CustomTextField(
-                                        label: 'Pedidos',
-                                        value: argument.pedidos.toString(),
-                                        controller: _pedidosController,
-                                        keyboard: TextInputType.number)),
-                              ],
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                          child: CustomTextField(
+                                              label: 'Nombre Cliente',
+                                              value: argument.nombreCliente,
+                                              controller: _nameController,
+                                              keyboard: TextInputType.name)),
+                                      SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.15,
+                                          child: CustomTextField(
+                                              validateAction: (String value) {
+                                                if (value.length != 5) {
+                                                  return shortMessage;
+                                                }
+                                                return null;
+                                              },
+                                              label: 'NIF',
+                                              value: argument.nif,
+                                              controller: _nifController,
+                                              keyboard: TextInputType.number))
+                                    ],
+                                  ),
+                                  CustomTextField(
+                                      validateAction: (String value) {
+                                        if (!value.isEmail()) {
+                                          return wrongEmailMessage;
+                                        }
+                                        return null;
+                                      },
+                                      label: 'Correo',
+                                      value: argument.email,
+                                      controller: _emailController,
+                                      keyboard: TextInputType.emailAddress),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _buildNacimientoPicker(
+                                          argument, context, fechaHint),
+                                      Expanded(
+                                          child: CustomTextField(
+                                              validateAction: (String value) {},
+                                              label: 'Telefono',
+                                              value: argument.telefono,
+                                              controller: _telefonoController,
+                                              keyboard: TextInputType.phone)),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.25,
+                                      child: CustomTextField(
+                                          label: 'Pts Acumulados',
+                                          value: argument.puntos.toString(),
+                                          controller: _ptsController,
+                                          keyboard: TextInputType.number)),
+                                  SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.25,
+                                      child: CustomTextField(
+                                          label: 'Pedidos',
+                                          value: argument.pedidos.toString(),
+                                          controller: _pedidosController,
+                                          keyboard: TextInputType.number)),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -153,12 +178,14 @@ class _ClienteFieldState extends State<ClienteField> {
             label: const Text('Generar Factura')),
         FilledButton.icon(
             onPressed: () {
-              if (!argument.clienteNuevo) {
-                fetchRepository.updateCliente(setCliente(argument));
-                Navigator.popAndPushNamed(context, '/cliente');
-              } else {
-                fetchRepository.insertCliente(setCliente(argument));
-                Navigator.popAndPushNamed(context, '/cliente');
+              if (_formKey.currentState!.validate()) {
+                if (!argument.clienteNuevo) {
+                  fetchRepository.updateCliente(setCliente(argument));
+                  Navigator.popAndPushNamed(context, '/cliente');
+                } else {
+                  fetchRepository.insertCliente(setCliente(argument));
+                  Navigator.popAndPushNamed(context, '/cliente');
+                }
               }
             },
             icon: const Icon(Icons.save),

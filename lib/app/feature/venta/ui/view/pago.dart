@@ -22,11 +22,15 @@ class Pago extends StatefulWidget {
 }
 
 class _PagoState extends State<Pago> {
-  String metodoPago = 'tarjeta';
+  String? metodoPago;
+
   String? cliente;
   double totalFactura = 0;
   int efectivoEntregado = 0;
   double cambio = 0;
+
+  final _metodoPagoField = GlobalKey<FormState>();
+  final _clienteField = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +42,7 @@ class _PagoState extends State<Pago> {
       0.0,
       (previousValue, element) =>
           previousValue +
-          (element!.precio) *
-              double.parse(element.cantidad) * (1),
+          (element!.precio) * double.parse(element.cantidad) * (1),
     );
 
     return Scaffold(
@@ -61,7 +64,7 @@ class _PagoState extends State<Pago> {
             ),
             FacturaFiscal(
               listaProducto: argument.productoAgregado,
-              tipoPago: metodoPago,
+              metodoPago: metodoPago,
               precioVenta: argument.totalVenta,
               efectivoEntregado: efectivoEntregado,
               cambio: cambio,
@@ -70,7 +73,10 @@ class _PagoState extends State<Pago> {
         ));
   }
 
-  Widget _columnMetodoPago(BuildContext context, CheckOutArgument argument) {
+  Widget _columnMetodoPago(
+    BuildContext context,
+    CheckOutArgument argument,
+  ) {
     cambio = efectivoEntregado - argument.totalVenta;
     final clienteLista = widget.fecthRepository.findAllClienteNombre();
 
@@ -85,19 +91,30 @@ class _PagoState extends State<Pago> {
             style: Theme.of(context).textTheme.titleLarge,
             textAlign: TextAlign.center,
           ),
-          MetodoPagoSelector(
-              metodoPago: metodoPago,
+          Form(
+            key: _metodoPagoField,
+            child: MetodoPagoSelector(
+                metodoPago: metodoPago,
+                onCancel: () {
+                  setState(() {
+                    metodoPago = null;
+                  });
+                },
+                onChanged: (value) {
+                  metodoPago = value;
+                  setState(() {});
+                }),
+          ),
+          Form(
+            key: _clienteField,
+            child: ClienteSelector(
+              cliente: cliente,
+              clienteLista: clienteLista,
               onChanged: (value) {
-                metodoPago = value;
+                cliente = value;
                 setState(() {});
-              }),
-          ClienteSelector(
-            cliente: cliente,
-            clienteLista: clienteLista,
-            onChanged: (value) {
-              cliente = value;
-              setState(() {});
-            },
+              },
+            ),
           ),
           _totalFactura(),
           _efectivoEntregado(),
@@ -156,7 +173,7 @@ class _PagoState extends State<Pago> {
 
   Widget rowColumn(String title, Widget content) {
     return Visibility(
-      visible: metodoPago == 'tarjeta' ? false : true,
+      visible: metodoPago == 'tarjeta' || metodoPago == null ? false : true,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Row(
@@ -177,21 +194,26 @@ class _PagoState extends State<Pago> {
       children: [
         ElevatedButton(
             onPressed: () {
-              _registrarVenta(argument);
-              Navigator.pushNamed(context, '/menu');
+              if (_metodoPagoField.currentState!.validate()) {
+                _registrarVenta(argument, false);
+                Navigator.pushNamed(context, '/menu');
+              }
             },
             child: const Text('No Imprimir')),
         FilledButton(
             onPressed: () {
-              _registrarVenta(argument);
-              Navigator.pushNamed(context, '/menu');
+              if (_clienteField.currentState!.validate() &&
+                  _metodoPagoField.currentState!.validate()) {
+                _registrarVenta(argument, true);
+                Navigator.pushNamed(context, '/menu');
+              }
             },
             child: const Text('Imprimir Ticket')),
       ],
     );
   }
 
-  void _registrarVenta(CheckOutArgument argument) async {
+  void _registrarVenta(CheckOutArgument argument, bool imprimirTicker) async {
     final idVenta = DateTime.now().millisecondsSinceEpoch;
     final fechaFormatoVenta = fechaFormatter(argument.fechaVenta);
     final tipoVenta = await widget.fecthRepository.findTipoVentaById(0);
@@ -213,8 +235,8 @@ class _PagoState extends State<Pago> {
         ingresoTotal: argument.totalVenta,
         fecha: fechaFormatoVenta,
         idUsuario: 01,
-        nombreCliente: cliente!,
-        metodoPago: metodoPago,
+        nombreCliente: imprimirTicker ? cliente! : 'Sin Nombre Cliente',
+        metodoPago: metodoPago!,
         tipoVenta: tipoVenta!));
   }
 }

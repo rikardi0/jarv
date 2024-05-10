@@ -6,14 +6,14 @@ class FacturaFiscal extends StatelessWidget {
   const FacturaFiscal({
     super.key,
     required this.listaProducto,
-    required this.tipoPago,
+    required this.metodoPago,
     required this.precioVenta,
     required this.efectivoEntregado,
     required this.cambio,
   });
 
   final List<ProductoOrdenado?> listaProducto;
-  final String tipoPago;
+  final String? metodoPago;
   final double? precioVenta;
   final int? efectivoEntregado;
   final double? cambio;
@@ -66,9 +66,11 @@ class FacturaFiscal extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(tipoPago == ''
-                                ? 'Venta en Espera'
-                                : 'Venta $tipoPago'),
+                            Text(metodoPago == null
+                                ? ''
+                                : metodoPago == ''
+                                    ? 'Venta en Espera'
+                                    : 'Venta $metodoPago'),
                             Text(fechaFormatter(fecha)),
                             Text(hourFormatter(fecha))
                           ],
@@ -142,7 +144,7 @@ class FacturaFiscal extends StatelessWidget {
                       ],
                     ),
                     Visibility(
-                      visible: tipoPago == 'tarjeta' || tipoPago == ''
+                      visible: metodoPago == 'tarjeta' || metodoPago == null
                           ? false
                           : true,
                       child: Padding(

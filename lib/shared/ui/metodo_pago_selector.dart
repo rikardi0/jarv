@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/venta/ui/utils/validators.dart';
 
 class MetodoPagoSelector extends StatelessWidget {
   const MetodoPagoSelector({
@@ -14,7 +15,13 @@ class MetodoPagoSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField(
+    return DropdownButtonFormField<String>(
+        validator: (value) {
+          if (value == null) {
+            return emptyMessage;
+          }
+          return null;
+        },
         hint: const Text('Metodo de Pago'),
         isExpanded: true,
         icon: metodoPago == null
@@ -26,7 +33,7 @@ class MetodoPagoSelector extends StatelessWidget {
                 child: const Icon(Icons.cancel_outlined),
               ),
         value: metodoPago,
-        items: const <DropdownMenuItem>[
+        items: const <DropdownMenuItem<String>>[
           DropdownMenuItem(value: 'efectivo', child: Text('Efectivo')),
           DropdownMenuItem(value: 'tarjeta', child: Text('Tarjeta')),
         ],
