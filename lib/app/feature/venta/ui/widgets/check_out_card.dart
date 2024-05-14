@@ -10,64 +10,59 @@ class CheckOut extends StatelessWidget {
     required this.productosAgregados,
     required this.totalVenta,
     required this.actualizarCantidad,
-    required this.cantidadProducto,
+    required this.inputTeclado,
     required this.selectedItemLista,
     required this.mostrarTeclado,
-    required this.textInput,
+    required this.mostrarTextInput,
     required this.editarProducto,
-    required this.propiedadEditada,
+    required this.isEditCantidad,
     this.onChangeIdentificador,
     this.sectionActionButton,
     this.hideKeyboard,
     this.onTapNum,
-    this.clearButton,
-    this.clearCantidad,
+    this.clearListaProducto,
+    this.clearInputTeclado,
     this.onAceptarIdentificador,
     this.onBackIdentificador,
     this.editarPrecioAction,
     this.onAceptarPrecio,
     this.onBackAction,
-    this.onChangedPrecio,
     this.editarUnidadesAction,
     this.eliminarProductoAction,
-    required this.precioNuevo,
-    required this.cantidadNueva,
-    this.onChangedUnidad,
     this.onAceptarUnidad,
+    this.backspace,
   });
 
   final String titleSection;
-  final String cantidadProducto;
-  final String precioNuevo;
-  final String cantidadNueva;
+  final String inputTeclado;
 
   final double totalVenta;
 
-  final bool textInput;
+  final bool mostrarTextInput;
   final bool mostrarTeclado;
   final bool isMenuPrincipal;
   final bool editarProducto;
-  final bool propiedadEditada;
+  final bool isEditCantidad;
 
   final List<ProductoOrdenado?> productosAgregados;
   final ValueNotifier<int?> selectedItemLista;
   final Future<void> actualizarCantidad;
 
   final dynamic onChangeIdentificador;
-  final dynamic onBackIdentificador;
   final dynamic onAceptarIdentificador;
-  final dynamic clearButton;
-  final dynamic clearCantidad;
+  final dynamic onBackIdentificador;
+  final dynamic clearListaProducto;
+  final dynamic clearInputTeclado;
   final dynamic onTapNum;
   final dynamic hideKeyboard;
   final dynamic sectionActionButton;
+
   //slidables
   final dynamic editarPrecioAction;
   final dynamic onAceptarPrecio;
   final dynamic onBackAction;
-  final dynamic onChangedPrecio;
+  final dynamic backspace;
 
-  final dynamic onChangedUnidad;
   final dynamic onAceptarUnidad;
 
   final dynamic editarUnidadesAction;
@@ -92,9 +87,22 @@ class CheckOut extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _listaProductoOrdenado(context),
-            _totalVenta(),
-            _displayCantidad(),
+            Expanded(
+              child: Container(
+                  color: Theme.of(context).colorScheme.background,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        _listaProductoOrdenado(context),
+                        _totalVenta(),
+                      ],
+                    ),
+                  )),
+            ),
+            Visibility(
+                visible: !mostrarTextInput ? true : false,
+                child: _displayCantidad()),
             _teclado(context),
           ],
         ),
@@ -104,15 +112,15 @@ class CheckOut extends StatelessWidget {
 
   Expanded _listaProductoOrdenado(context) {
     return Expanded(
-      child: textInput
+      child: mostrarTextInput
           ? !editarProducto
               ? buildTextInput(
                   context,
                   'Identificador Venta',
                   onChangeIdentificador,
                   onAceptarIdentificador,
-                  TextInputType.name)
-              : buildEditarColumn(context)
+                )
+              : _buildEditarColumn(context)
           : ListView.builder(
               itemCount: productosAgregados.length,
               itemBuilder: (BuildContext context, int index) {
@@ -141,7 +149,7 @@ class CheckOut extends StatelessWidget {
                       title: Text(producto.nombreProducto),
                       subtitle:
                           Text('${producto.cantidad} x ${producto.precio}€'),
-                      trailing: Text('${total.toString()}€'),
+                      trailing: Text('${total.toStringAsFixed(2)}€'),
                     );
                   }),
                 );
@@ -150,61 +158,91 @@ class CheckOut extends StatelessWidget {
     );
   }
 
-  Padding buildEditarColumn(context) {
+  Padding _buildEditarColumn(context) {
+    final String nombreProducto =
+        productosAgregados[selectedItemLista.value!]!.nombreProducto;
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ListTile(
-                isThreeLine: true,
-                title: Text(
-                  productosAgregados[selectedItemLista.value!]!.nombreProducto,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                subtitle: Text(
-                  !propiedadEditada
-                      ? productosAgregados[selectedItemLista.value!]!.cantidad
-                      : productosAgregados[selectedItemLista.value!]!
-                          .precio
-                          .toString(),
-                ),
-                trailing: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Nuevo ${!propiedadEditada ? 'Precio' : 'Cantidad'}:',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    Text(
-                      !propiedadEditada ? '$precioNuevo €' : cantidadNueva,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ],
-                ),
+              Text(
+                nombreProducto,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              !propiedadEditada
-                  ? buildTextInput(context, 'Editar Precio', onChangedPrecio,
-                      onAceptarPrecio, TextInputType.number)
-                  : buildTextInput(context, 'Editar Cantidad', onChangedUnidad,
-                      onAceptarUnidad, TextInputType.number)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Nuev${isEditCantidad ? 'a Cantidad' : 'o Precio'}:',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.only(left: 25.0),
+                    child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.black12,
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10.0, vertical: 5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(inputTeclado,
+                                  style: Theme.of(context).textTheme.bodyLarge),
+                              IconButton(
+                                  onPressed: () {
+                                    backspace();
+                                  },
+                                  icon: const Icon(Icons.backspace_sharp))
+                            ],
+                          ),
+                        )),
+                  ))
+                ],
+              ),
             ],
           ),
-        ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(
+                  onPressed: () {
+                    onBackAction();
+                  },
+                  child: const Text('Volver')),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Theme.of(context).canvasColor),
+                  onPressed: isEditCantidad ? onAceptarUnidad : onAceptarPrecio,
+                  child: const Text('Aceptar'))
+            ],
+          )
+        ],
       ),
     );
   }
 
-  Column buildTextInput(context, String label, onChanged, aceptarAction,
-      TextInputType inputType) {
+  Column buildTextInput(
+    context,
+    String label,
+    onChanged,
+    aceptarAction,
+  ) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
           child: TextFormField(
-            keyboardType: inputType,
             onChanged: (value) {
               if (value.isNotEmpty) {
                 onChanged(value);
@@ -282,7 +320,7 @@ class CheckOut extends StatelessWidget {
 
   Visibility _totalVenta() {
     return Visibility(
-      visible: productosAgregados.isEmpty || textInput ? false : true,
+      visible: productosAgregados.isEmpty || mostrarTextInput ? false : true,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
         child: Row(
@@ -291,10 +329,10 @@ class CheckOut extends StatelessWidget {
             ElevatedButton.icon(
                 icon: const Icon(Icons.clear_all_rounded),
                 onPressed: () {
-                  clearButton();
+                  clearListaProducto();
                 },
                 label: const Text('Limpiar Lista')),
-            Text(totalVenta != 0.0 ? '€ ${totalVenta.toString()}' : '')
+            Text(totalVenta != 0.0 ? '€ ${totalVenta.toStringAsFixed(2)}' : '')
           ],
         ),
       ),
@@ -312,7 +350,7 @@ class CheckOut extends StatelessWidget {
                   : const Radius.circular(20),
             ),
             child: Container(
-                color: cantidadProducto.isEmpty
+                color: inputTeclado.isEmpty
                     ? const Color.fromARGB(50, 54, 54, 54)
                     : Theme.of(context).colorScheme.primaryContainer,
                 height: MediaQuery.of(context).size.height * 0.08,
@@ -322,18 +360,17 @@ class CheckOut extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(cantidadProducto.isNotEmpty
-                          ? 'Cantidad: $cantidadProducto'
+                      Text(inputTeclado.isNotEmpty
+                          ? 'Cantidad: $inputTeclado'
                           : ''),
                       GestureDetector(
                           onTap: () {
-                            cantidadProducto.isEmpty
+                            inputTeclado.isEmpty
                                 ? hideKeyboard()
-                                : clearCantidad();
+                                : clearInputTeclado();
                           },
                           child: Visibility(
-                            visible: !textInput,
-                            child: Icon(cantidadProducto.isEmpty
+                            child: Icon(inputTeclado.isEmpty
                                 ? mostrarTeclado
                                     ? Icons.arrow_drop_down
                                     : Icons.arrow_drop_up

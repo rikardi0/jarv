@@ -36,20 +36,17 @@ class Menu extends StatefulWidget {
 class _MenuState extends State<Menu> with TickerProviderStateMixin {
   String familiaSeleccionada = "";
   String subFamiliaSeleccionada = "";
-  String cantidadProducto = '';
+  String inputTeclado = '';
   String? tipoDevolucion;
 
   String? identificadorVenta;
-  String precioNuevo = '0';
-  String cantidadNueva = '0';
 
   bool mostrarUsuario = true;
   bool mostrarTeclado = true;
   bool mostrarTextInput = false;
   bool editarProducto = false;
 
-  //false: editar precio,   true: editar cantidad
-  bool propiedadEditada = false;
+  bool isEditCantidad = false;
 
   List<String> cantidad = [];
   List<ProductoOrdenado?> productosAgregados = [];
@@ -112,9 +109,7 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
       }
     }
 
-    final Size size = MediaQuery.of(context).size;
     const borderColor = Color.fromARGB(59, 7, 7, 7);
-
     final String joinedCantidad = cantidad.join();
 
     return FutureBuilder(
@@ -163,7 +158,7 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
                   final itemProducto = snapshot.snapshot3.data;
 
                   return _buildMenuBody(
-                    size,
+                    MediaQuery.of(context).size,
                     itemFamilia,
                     itemSubFamilia,
                     itemProducto,
@@ -320,7 +315,10 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: Container(
                 decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.background,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onBackground
+                        .withOpacity(0.035),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: Theme.of(context)
@@ -332,41 +330,44 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
                 child: Padding(
                   padding: const EdgeInsets.all(5.0),
                   child: CheckOut(
+                    inputTeclado: inputTeclado,
                     isMenuPrincipal: widget.menuPrincipal,
                     titleSection: widget.titleSection,
-                    productosAgregados: productosAgregados,
-                    cantidadProducto: cantidadProducto,
-                    selectedItemLista: selectedItemLista,
-                    totalVenta: totalVenta,
-                    mostrarTeclado: mostrarTeclado,
 
-                    hideKeyboard: dropDownIcon,
+                    productosAgregados: productosAgregados,
+                    selectedItemLista: selectedItemLista,
+                    mostrarTeclado: mostrarTeclado,
+                    totalVenta: totalVenta,
+
                     actualizarCantidad: actualizarCantidad(joinedCantidad),
                     onChangeIdentificador: onTextIdentificadorTap,
-                    onBackIdentificador: onBackIdentificador,
                     onAceptarIdentificador: onAceptarIdentificador,
-                    clearButton: clearButton,
+                    onBackIdentificador: onBackIdentificador,
+
+                    clearInputTeclado: clearInputTeclado,
+                    hideKeyboard: hideTeclado,
+                    clearListaProducto: clearListaProducto,
                     onTapNum: onTapNum,
-                    clearCantidad: clearCantidad,
                     sectionActionButton: () {
                       productosAgregados.isNotEmpty
                           ? _builAlertDialog(fecthPagoRepository)
                           : null;
                     },
                     //slidables
-                    textInput: mostrarTextInput,
+                    mostrarTextInput: mostrarTextInput,
                     editarProducto: editarProducto,
-                    propiedadEditada: propiedadEditada,
-                    cantidadNueva: cantidadNueva,
-                    precioNuevo: precioNuevo,
+                    isEditCantidad: isEditCantidad,
+                    eliminarProductoAction: eliminarProductoAction,
                     editarPrecioAction: editarPrecioAction,
                     onAceptarPrecio: onAceptarPrecio,
-                    onChangedPrecio: onChangedPrecio,
                     editarUnidadesAction: editarUnidadesAction,
                     onAceptarUnidad: onAceptarUnidad,
-                    onChangedUnidad: onChangeUnidad,
-                    eliminarProductoAction: deleteProducto,
-                    onBackAction: onBack,
+                    onBackAction: onBackAction,
+                    backspace: () {
+                      setState(() {
+                        cantidad.removeLast();
+                      });
+                    },
                   ),
                 ),
               ),
@@ -375,88 +376,6 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
         ),
       ),
     ];
-  }
-
-//editar unidad slidable
-  editarUnidadesAction(index) {
-    setState(() {
-      mostrarTextInput = true;
-      editarProducto = true;
-      propiedadEditada = true;
-    });
-  }
-
-  onChangeUnidad(value) {
-    setState(() {
-      cantidadNueva = value;
-    });
-  }
-
-  onAceptarUnidad() {
-    setState(() {
-      productosAgregados[selectedItemLista.value!]!.cantidad = cantidadNueva;
-      propiedadEditada = false;
-      mostrarTeclado = false;
-      resetProductoContainer();
-    });
-  }
-
-  double resetProductoContainer() {
-    totalVenta = 0;
-    cantidadNueva = '0';
-    precioNuevo = '0';
-    mostrarTextInput = false;
-    editarProducto = false;
-    return totalVenta += productosAgregados[selectedItemLista.value!]!.precio *
-        int.parse(productosAgregados[selectedItemLista.value!]!.cantidad);
-  }
-
-  onBack() {
-    setState(() {
-      precioNuevo = '0';
-      cantidadNueva = '0';
-      propiedadEditada = false;
-      mostrarTeclado = false;
-      mostrarTextInput = false;
-    });
-  }
-
-  deleteProducto(index) {
-    setState(() {
-      final precio = productosAgregados[index]!.precio;
-      final cantidad = int.parse(productosAgregados[index]!.cantidad);
-      final precioVenta = precio * cantidad;
-      productosAgregados.removeAt(index);
-      totalVenta -= precioVenta;
-    });
-  }
-
-//editar precio slidable
-  editarPrecioAction(index) {
-    setState(() {
-      mostrarTextInput = true;
-      editarProducto = true;
-    });
-  }
-
-  onChangedPrecio(String value) {
-    setState(() {
-      precioNuevo = value;
-    });
-  }
-
-  onAceptarPrecio() {
-    setState(() {
-      final precio = double.parse(precioNuevo);
-      productosAgregados[selectedItemLista.value!]!.precio = precio;
-      resetProductoContainer();
-    });
-  }
-
-  clearCantidad() {
-    setState(() {
-      cantidad.clear();
-    });
   }
 
   Future<dynamic> _builAlertDialog(PagoRepository fecthPagoRepository) {
@@ -486,6 +405,8 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
                         ? _saveVenta(fecthPagoRepository, 2)
                         : _saveVenta(fecthPagoRepository, 1);
                     Navigator.pop(context);
+                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, '/menu');
                   },
                   child: const Text('Aceptar'))
             ],
@@ -542,44 +463,6 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
     });
   }
 
-  Future<void> _saveVenta(
-      PagoRepository fecthPagoRepository, int idTipoVenta) async {
-    final idVenta = DateTime.now().millisecondsSinceEpoch;
-    final tipoVenta = await fecthPagoRepository.findTipoVentaById(idTipoVenta);
-
-    fecthPagoRepository.insertVenta(Venta(
-        idVenta: idVenta,
-        metodoPago: 'Tarjeta',
-        costeTotal: 0,
-        ingresoTotal: 0,
-        fecha: fechaFormatter(DateTime.now()),
-        idUsuario: 0,
-        nombreCliente:
-            widget.devolucion ? tipoDevolucion! : widget.titleSection,
-        tipoVenta: tipoVenta!));
-
-    for (var element in productosAgregados) {
-      fecthPagoRepository.insertDetalleVenta(DetalleVenta(
-          idVenta: idVenta,
-          productoId: element!.productoId,
-          cantidad: int.parse(element.cantidad),
-          precioUnitario: element.precio,
-          descuento: 0,
-          entregado: true,
-          idDetalleVenta: UniqueKey().toString()));
-    }
-    cantidad.clear();
-    productosAgregados.clear();
-    setState(() {});
-  }
-
-  dropDownIcon() {
-    if (!mostrarTextInput) {
-      mostrarTeclado = !mostrarTeclado;
-      setState(() {});
-    }
-  }
-
   void changeIndex(int index, ValueNotifier<int?> notifier) {
     notifier.value = index;
   }
@@ -614,27 +497,66 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
 
         totalVenta += producto.precio * double.parse(joinedCantidad);
         cantidad.clear();
-        mostrarTeclado = false;
 
         setState(() {});
       } else {
-        productosAgregados.add(ProductoOrdenado(
-            productoId: producto.productoId,
-            nombreProducto: producto.producto,
-            precio: producto.precio,
-            cantidad: '1',
-            iva: producto.iva,
-            fecha: DateTime.now()));
+        if (productosAgregados
+            .any((element) => element!.productoId == producto.productoId)) {
+          final item = productosAgregados
+              .where((element) => element!.productoId == producto.productoId);
+          final int cantidad = int.parse(item.first!.cantidad) + 1;
+          item.first!.cantidad = cantidad.toString();
+          totalVenta += item.first!.precio;
+        } else {
+          productosAgregados.add(ProductoOrdenado(
+              productoId: producto.productoId,
+              nombreProducto: producto.producto,
+              precio: producto.precio,
+              cantidad: '1',
+              iva: producto.iva,
+              fecha: DateTime.now()));
 
-        totalVenta += producto.precio * double.parse('1');
-        mostrarTeclado = false;
-        setState(() {});
+          totalVenta += producto.precio * double.parse('1');
+
+          setState(() {});
+        }
       }
     });
   }
 
-//Metodos utilizados CardCheckOut
-  void clearButton() {
+  Future<void> _saveVenta(
+      PagoRepository fecthPagoRepository, int idTipoVenta) async {
+    final idVenta = DateTime.now().millisecondsSinceEpoch;
+    final tipoVenta = await fecthPagoRepository.findTipoVentaById(idTipoVenta);
+
+    fecthPagoRepository.insertVenta(Venta(
+        idVenta: idVenta,
+        metodoPago: 'Tarjeta',
+        costeTotal: 0,
+        ingresoTotal: 0,
+        fecha: fechaFormatter(DateTime.now()),
+        idUsuario: 0,
+        nombreCliente:
+            widget.devolucion ? tipoDevolucion! : widget.titleSection,
+        tipoVenta: tipoVenta!));
+
+    for (var element in productosAgregados) {
+      fecthPagoRepository.insertDetalleVenta(DetalleVenta(
+          idVenta: idVenta,
+          productoId: element!.productoId,
+          cantidad: int.parse(element.cantidad),
+          precioUnitario: element.precio,
+          descuento: 0,
+          entregado: true,
+          idDetalleVenta: UniqueKey().toString()));
+    }
+    cantidad.clear();
+    productosAgregados.clear();
+    setState(() {});
+  }
+
+//Metodos CardCheckOut
+  void clearListaProducto() {
     productosAgregados.clear();
     totalVenta = 0;
     setState(() {});
@@ -685,6 +607,89 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
   }
 
   Future<void> actualizarCantidad(String joinedCantidad) async {
-    cantidadProducto = joinedCantidad;
+    inputTeclado = joinedCantidad;
+  }
+
+  editarUnidadesAction(index) {
+    setState(() {
+      mostrarTeclado = true;
+      mostrarTextInput = true;
+      editarProducto = true;
+      isEditCantidad = true;
+    });
+  }
+
+  eliminarProductoAction(index) {
+    setState(() {
+      final precio = productosAgregados[index]!.precio;
+      final cantidad = int.parse(productosAgregados[index]!.cantidad);
+      final precioVenta = precio * cantidad;
+      productosAgregados.removeAt(index);
+      totalVenta -= precioVenta;
+    });
+  }
+
+  editarPrecioAction(index) {
+    setState(() {
+      mostrarTeclado = true;
+      mostrarTextInput = true;
+      editarProducto = true;
+    });
+  }
+
+  onAceptarUnidad() {
+    if (inputTeclado.isNotEmpty) {
+      setState(() {
+        totalVenta -= productosAgregados[selectedItemLista.value!]!.precio *
+            int.parse(productosAgregados[selectedItemLista.value!]!.cantidad);
+        productosAgregados[selectedItemLista.value!]!.cantidad = inputTeclado;
+        totalVenta += productosAgregados[selectedItemLista.value!]!.precio *
+            int.parse(productosAgregados[selectedItemLista.value!]!.cantidad);
+        isEditCantidad = false;
+        clearInputTeclado();
+        resetProductoContainer();
+      });
+    }
+  }
+
+  onAceptarPrecio() {
+    if (inputTeclado.isNotEmpty) {
+      setState(() {
+        final precio = double.parse(inputTeclado);
+        totalVenta -= productosAgregados[selectedItemLista.value!]!.precio *
+            int.parse(productosAgregados[selectedItemLista.value!]!.cantidad);
+        productosAgregados[selectedItemLista.value!]!.precio = precio;
+        totalVenta += productosAgregados[selectedItemLista.value!]!.precio *
+            int.parse(productosAgregados[selectedItemLista.value!]!.cantidad);
+        clearInputTeclado();
+        resetProductoContainer();
+      });
+    }
+  }
+
+  onBackAction() {
+    setState(() {
+      isEditCantidad = false;
+      mostrarTextInput = false;
+      clearInputTeclado();
+    });
+  }
+
+  hideTeclado() {
+    if (!mostrarTextInput) {
+      mostrarTeclado = !mostrarTeclado;
+      setState(() {});
+    }
+  }
+
+  clearInputTeclado() {
+    setState(() {
+      cantidad.clear();
+    });
+  }
+
+  void resetProductoContainer() {
+    mostrarTextInput = false;
+    editarProducto = false;
   }
 }
