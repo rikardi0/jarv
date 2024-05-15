@@ -153,29 +153,41 @@ class _SettingsViewState extends State<SettingsView> {
           clipBehavior: Clip.none,
           renderChildrenOutsideViewport: true,
           childDelegate: ListWheelChildLoopingListDelegate(children: [
-            _buildListTile('Empresa', Icons.store, context),
-            _buildListTile('Tienda', Icons.storefront_rounded, context),
-            _buildListTile('Personalizacion', Icons.edit, context),
-            _buildListTile('Dispositivos', Icons.devices, context),
-            _buildListTile('Ventas', Icons.sell, context),
-            _buildListTile('Time-Out', Icons.timelapse, context),
-            _buildListTile('Exportar', Icons.import_export, context),
+            _buildListTile(
+                'Empresa', Icons.store, context, '/empresa_settings'),
+            _buildListTile('Tienda', Icons.storefront_rounded, context,
+                '/tienda_settings'),
+            _buildListTile('Personalizacion', Icons.edit, context,
+                '/personalizacion_settings'),
+            _buildListTile('Dispositivos', Icons.devices, context,
+                '/dispositivos_settings'),
+            _buildListTile('Ventas', Icons.sell, context, '/ventas_settings'),
+            _buildListTile(
+                'Time-Out', Icons.timelapse, context, '/time_settings'),
+            _buildListTile(
+                'Exportar', Icons.import_export, context, '/exportar_settings'),
           ]),
         ),
       ),
     );
   }
 
-  Widget _buildListTile(String label, IconData icon, context) {
-    return Card(
-      color: Theme.of(context).colorScheme.surface,
-      child: ListTile(
-        title: Text(
-          label,
-        ),
-        trailing: Icon(
-          icon,
-          size: 30,
+  Widget _buildListTile(
+      String label, IconData icon, context, String routeName) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, routeName);
+      },
+      child: Card(
+        color: Theme.of(context).colorScheme.surface,
+        child: ListTile(
+          title: Text(
+            label,
+          ),
+          trailing: Icon(
+            icon,
+            size: 30,
+          ),
         ),
       ),
     );
