@@ -72,8 +72,10 @@ class _TicketDiarioState extends State<TicketDiario> {
       if (ventaSeleccionada == 0) {
         List<Venta?> venta = await ventaDiaria;
         ventaSeleccionada = venta.reversed.toList().first!.idVenta;
+
         data = await widget.fetchRepository
             .findProductoByVentaId([ventaSeleccionada]);
+        montoFactura = venta.reversed.toList().first!.costeTotal;
       }
     }
 
@@ -424,7 +426,7 @@ class _TicketDiarioState extends State<TicketDiario> {
         final cantidad = listaProducto[index]['cantidad'].toString();
         final precioTotal = double.parse(precioUnitario) * int.parse(cantidad);
         final base = precioTotal * impuesto;
-        final precio = precioTotal + base;
+        final precio = precioTotal - base;
 
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
