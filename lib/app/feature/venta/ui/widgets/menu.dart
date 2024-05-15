@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:jarv/app/feature/inventario/ui/view/inventario_view.dart';
 import 'package:jarv/app/feature/proveedor/ui/view/proveedor_view.dart';
+import 'package:jarv/app/feature/settings/ui/view/settings_view.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
 import 'package:jarv/app/feature/venta/data/model/producto_ordenado.dart';
@@ -231,8 +232,7 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
         speedDialItems(
             'Inventario', Icons.inventory_rounded, InventarioView.routeName),
         speedDialItems('Horario', Icons.schedule, ProveedorView.routeName),
-        speedDialItems(
-            'Configuracion', Icons.settings, ProveedorView.routeName),
+        speedDialItems('Configuracion', Icons.settings, SettingsView.routeName),
       ],
     );
   }

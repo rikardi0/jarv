@@ -6,14 +6,14 @@ import 'package:jarv/app/feature/inventario/ui/view/inventario_view.dart';
 import 'package:jarv/app/feature/login/ui/view/login.dart';
 import 'package:jarv/app/feature/proveedor/ui/view/proveedor_field.dart';
 import 'package:jarv/app/feature/proveedor/ui/view/proveedor_view.dart';
-import 'package:jarv/app/feature/venta/ui/widgets/cliente_field.dart';
+import 'package:jarv/app/feature/settings/ui/provider/settings_controller.dart';
+import 'package:jarv/app/feature/settings/ui/view/settings_view.dart';
+import 'package:jarv/app/feature/venta/ui/view/cliente_field.dart';
 import 'package:jarv/core/theme/custom_theme.dart';
 import 'package:provider/provider.dart';
 
-import '../core/settings/settings_controller.dart';
-import '../core/settings/settings_view.dart';
-import 'feature/venta/ui/view/view_venta.dart';
 import 'feature/venta/ui/provider/venta_espera_provider.dart';
+import 'feature/venta/ui/view/view_venta.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {

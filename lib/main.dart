@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jarv/app/feature/settings/ui/provider/settings_controller.dart';
+import 'package:jarv/app/feature/settings/ui/provider/settings_service.dart';
 import 'package:jarv/core/di/locator.dart';
 
-import 'core/settings/settings_controller.dart';
-import 'core/settings/settings_service.dart';
 import 'app/app.dart';
 
 Future<void> main() async {
