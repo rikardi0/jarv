@@ -7,17 +7,19 @@ class EmptyMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Expanded(
+    return Expanded(
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.info_outline),
+            const Icon(Icons.info_outline),
             Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Text(
                 'Sin ventas Registradas',
-                style: TextStyle(fontSize: 20, color: Colors.black54),
+                style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+                    color: Colors.black54),
               ),
             ),
           ],

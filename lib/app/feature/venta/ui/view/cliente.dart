@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_cliente.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/cliente_repository.dart';
 import 'package:jarv/core/di/locator.dart';
-import '../../../../../shared/ui/card_cliente.dart';
-import '../../../../../shared/ui/search_field.dart';
+import 'package:jarv/shared/ui/widget/search_field.dart';
+
+import '../../../../../shared/ui/widget/card_cliente.dart';
 import '../../data/model/entity_venta.dart';
 
 class ClienteMenu extends StatefulWidget {

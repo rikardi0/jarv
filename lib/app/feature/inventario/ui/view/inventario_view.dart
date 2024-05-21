@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/inventario/data/repositories/interface/inventario_repository.dart';
+import 'package:jarv/shared/ui/widget/filter_familia_subfamilia.dart';
 
 import '../../../../../core/di/locator.dart';
 
-import 'package:jarv/shared/ui/filter_familia_subfamilia.dart';
 
 class InventarioView extends StatefulWidget {
   const InventarioView({super.key});

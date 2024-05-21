@@ -3,9 +3,8 @@ import 'package:jarv/app/feature/proveedor/data/model/argument_proveedor.dart';
 import 'package:jarv/app/feature/proveedor/data/model/entity_proveedor.dart';
 import 'package:jarv/app/feature/proveedor/data/repositories/interfaces/proveedor_repository.dart';
 import 'package:jarv/core/di/locator.dart';
-import 'package:jarv/shared/ui/filter_familia_subfamilia.dart';
-
-import '../../../../../shared/ui/custom_text_field.dart';
+import 'package:jarv/shared/ui/widget/custom_text_field.dart';
+import 'package:jarv/shared/ui/widget/filter_familia_subfamilia.dart';
 
 class CreateProveedor extends StatefulWidget {
   const CreateProveedor({super.key});

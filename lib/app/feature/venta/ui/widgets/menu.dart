@@ -10,11 +10,15 @@ import 'package:jarv/app/feature/venta/data/model/producto_ordenado.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/menu_repository.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/pago_repository.dart';
 import 'package:jarv/app/feature/venta/ui/provider/venta_espera_provider.dart';
-import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
+import 'package:jarv/app/feature/venta/ui/widgets/app_bar_item.dart';
+import 'package:jarv/app/feature/venta/ui/widgets/check_out_card.dart';
 import 'package:jarv/core/di/locator.dart';
 import 'package:jarv/shared/data/model/entity.dart';
-import 'package:jarv/shared/ui/custom_alert_dialog.dart';
-import 'package:jarv/shared/ui/widgets.dart';
+import 'package:jarv/shared/ui/utils/date_format.dart';
+import 'package:jarv/shared/ui/widget/custom_alert_dialog.dart';
+import 'package:jarv/shared/ui/widget/grid_producto.dart';
+import 'package:jarv/shared/ui/widget/list_familia.dart';
+import 'package:jarv/shared/ui/widget/row_sub_familia.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 import 'package:provider/provider.dart';
 

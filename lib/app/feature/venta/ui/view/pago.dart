@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/pago_repository.dart';
-import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
 import 'package:jarv/core/di/locator.dart';
-import 'package:jarv/shared/ui/cliente_selector.dart';
-import 'package:jarv/shared/ui/factura_fiscal.dart';
-import 'package:jarv/shared/ui/metodo_pago_selector.dart';
+import 'package:jarv/shared/ui/utils/date_format.dart';
+import 'package:jarv/shared/ui/widget/cliente_selector.dart';
+import 'package:jarv/shared/ui/widget/factura_fiscal.dart';
+import 'package:jarv/shared/ui/widget/metodo_pago_selector.dart';
 
 class Pago extends StatefulWidget {
   Pago({
@@ -202,8 +202,8 @@ class _PagoState extends State<Pago> {
             child: const Text('No Imprimir')),
         FilledButton(
             onPressed: () {
-              if (_clienteField.currentState!.validate() &&
-                  _metodoPagoField.currentState!.validate()) {
+              if (_metodoPagoField.currentState!.validate() &&
+                  _clienteField.currentState!.validate()) {
                 _registrarVenta(argument, true);
                 Navigator.pushNamed(context, '/menu');
               }

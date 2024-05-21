@@ -3,8 +3,8 @@ import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:jarv/app/feature/venta/data/model/producto_espera.dart';
 import 'package:jarv/app/feature/venta/ui/provider/venta_espera_provider.dart';
 import 'package:jarv/app/feature/venta/ui/widgets/app_bar_item.dart';
-import 'package:jarv/shared/ui/card_venta.dart';
-import 'package:jarv/shared/ui/factura_fiscal.dart';
+import 'package:jarv/shared/ui/widget/card_venta.dart';
+import 'package:jarv/shared/ui/widget/factura_fiscal.dart';
 import 'package:provider/provider.dart';
 
 class Espera extends StatefulWidget {
@@ -58,7 +58,7 @@ class _EsperaState extends State<Espera> {
                           listaProducto:
                               listaProductoEspera[selectedVenta.value!]
                                   .listaProducto,
-                          tipoPago: '',
+                          metodoPago: '',
                           precioVenta: listaProductoEspera[selectedVenta.value!]
                               .totalVenta,
                           efectivoEntregado: 0,
@@ -81,16 +81,18 @@ class _EsperaState extends State<Espera> {
   }
 
   Center listaEsperaVacia() {
-    return const Center(
+    return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.info_outline),
+          const Icon(Icons.info_outline),
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Text(
               'Sin ventas en espera',
-              style: TextStyle(fontSize: 20, color: Colors.black54),
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+                  color: Colors.black54),
             ),
           ),
         ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../app/feature/venta/data/repositories/interfaces/menu_repository.dart';
-import '../../core/di/locator.dart';
+import '../../../app/feature/venta/data/repositories/interfaces/menu_repository.dart';
+import '../../../core/di/locator.dart';
 
 class MainFilter extends StatelessWidget {
   const MainFilter({

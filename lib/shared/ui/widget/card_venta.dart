@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
-
-import '../../../app/feature/venta/data/model/producto_espera.dart';
+import 'package:jarv/app/feature/venta/data/model/producto_espera.dart';
+import 'package:jarv/shared/ui/utils/date_format.dart';
 
 class CardVenta extends StatelessWidget {
   final int index;

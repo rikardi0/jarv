@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/proveedor/data/model/argument_proveedor.dart';
-
-import 'package:jarv/core/di/locator.dart';
-
 import 'package:jarv/app/feature/proveedor/data/model/entity_proveedor.dart';
 import 'package:jarv/app/feature/proveedor/data/repositories/interfaces/proveedor_repository.dart';
-
-import 'package:jarv/shared/ui/search_field.dart';
-
-import '../../../../../shared/ui/filter_familia_subfamilia.dart';
+import 'package:jarv/core/di/locator.dart';
+import 'package:jarv/shared/ui/widget/filter_familia_subfamilia.dart';
+import 'package:jarv/shared/ui/widget/search_field.dart';
 
 class ProveedorView extends StatefulWidget {
   const ProveedorView({super.key});

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/venta/data/model/entity_venta.dart';
 import 'package:jarv/app/feature/venta/data/repositories/interfaces/ticket_diario_repository.dart';
-import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
 import 'package:jarv/core/di/locator.dart';
-import 'package:jarv/shared/ui/empty_message.dart';
-import 'package:jarv/shared/ui/metodo_pago_selector.dart';
+import 'package:jarv/shared/ui/utils/date_format.dart';
+import 'package:jarv/shared/ui/widget/empty_message.dart';
+import 'package:jarv/shared/ui/widget/metodo_pago_selector.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
 
 class TicketDiario extends StatefulWidget {

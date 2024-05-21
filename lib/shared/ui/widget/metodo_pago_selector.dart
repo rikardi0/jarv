@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jarv/app/feature/venta/ui/utils/validators.dart';
+import 'package:jarv/shared/ui/utils/validators.dart';
 
 class MetodoPagoSelector extends StatelessWidget {
   const MetodoPagoSelector({
