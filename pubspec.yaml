@@ -17,6 +17,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  intl: ^0.18.1
   flutter_slidable: ^3.0.1
   flutter_speed_dial: ^7.0.0
   get_it: ^7.6.7
@@ -26,6 +27,8 @@ dependencies:
   sqflite: ^2.3.2
   regexpattern: ^2.6.0
   clickable_list_wheel_view: ^0.2.0
+  horizontal_stepper_step: ^0.0.5
+  slide_to_act: ^2.0.2
 
 
 dev_dependencies:

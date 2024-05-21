@@ -336,6 +336,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.1"
+  horizontal_stepper_step:
+    dependency: "direct main"
+    description:
+      name: horizontal_stepper_step
+      sha256: "66ca9574690b798ee1e3af50d5ae9123f67d9d8cbb7389e99445f1815c0c84cb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.5"
   http_multi_server:
     dependency: transitive
     description:
@@ -353,7 +361,7 @@ packages:
     source: hosted
     version: "4.0.2"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       sha256: "3bc132a9dbce73a7e4a21a17d06e1878839ffbf975568bc875c60537824b0c4d"
@@ -565,6 +573,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  slide_to_act:
+    dependency: "direct main"
+    description:
+      name: slide_to_act
+      sha256: cd4ea5019754347d5a2b0375e802ad948610a0e233adfe51a9cc5b3a1fc3a43b
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   source_gen:
     dependency: transitive
     description:
