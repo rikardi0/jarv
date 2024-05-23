@@ -18,7 +18,7 @@ class MetodoPagoSelector extends StatelessWidget {
     return DropdownButtonFormField<String>(
         validator: (value) {
           if (value == null) {
-            return emptyMessage;
+            return emptyValidator(value!);
           }
           return null;
         },
