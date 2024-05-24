@@ -5,6 +5,7 @@ class UsuarioRegistro extends StatelessWidget {
     super.key,
   });
 
+  static int positionStepper = 3;
   @override
   Widget build(BuildContext context) {
     return const Text('power usuario');

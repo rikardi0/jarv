@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/administrador_view.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/empresa_registro.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/producto_registro.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/proveedor_registro.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/tienda_registro.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/usuario_view.dart';
+import 'package:jarv/app/feature/login/ui/view/widget/step/administrador_view.dart';
+import 'package:jarv/app/feature/login/ui/view/widget/step/empresa_registro.dart';
+import 'package:jarv/app/feature/login/ui/view/widget/step/producto_registro.dart';
+import 'package:jarv/app/feature/login/ui/view/widget/step/proveedor_registro.dart';
+import 'package:jarv/app/feature/login/ui/view/widget/step/tienda_registro.dart';
+import 'package:jarv/app/feature/login/ui/view/widget/step/usuario_view.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 
 class PrimerRegistro extends StatefulWidget {
@@ -16,7 +16,28 @@ class PrimerRegistro extends StatefulWidget {
 }
 
 class _PrimerRegistroState extends State<PrimerRegistro> {
-  final adminForm = GlobalKey<FormState>();
+  final TextEditingController nombreEmpresa = TextEditingController();
+  final TextEditingController nifEmpresa = TextEditingController();
+  final TextEditingController correoEmpresa = TextEditingController();
+  final TextEditingController paisEmpresa = TextEditingController();
+  final TextEditingController provinciaEmpresa = TextEditingController();
+  final TextEditingController ciudadEmpresa = TextEditingController();
+  final TextEditingController zipCodeEmpresa = TextEditingController();
+  final TextEditingController phoneEmpresa = TextEditingController();
+  final empresaFormKey = GlobalKey<FormState>();
+  final TextEditingController nombreAdmin = TextEditingController();
+  final TextEditingController passwordAdmin = TextEditingController();
+
+  final adminFormKey = GlobalKey<FormState>();
+  final TextEditingController nombreTienda = TextEditingController();
+  final TextEditingController nifTienda = TextEditingController();
+  final TextEditingController correoTienda = TextEditingController();
+  final TextEditingController paisTienda = TextEditingController();
+  final TextEditingController provinciaTienda = TextEditingController();
+  final TextEditingController ciudadTienda = TextEditingController();
+  final TextEditingController zipTienda = TextEditingController();
+  final TextEditingController phoneTienda = TextEditingController();
+  final tiendaFormKey = GlobalKey<FormState>();
   int position = 0;
   bool showButton = true;
   bool showStepper = false;
@@ -27,9 +48,9 @@ class _PrimerRegistroState extends State<PrimerRegistro> {
       body: Center(
         child: SafeArea(
           child: SingleChildScrollView(
+            physics: showStepper ? null : const NeverScrollableScrollPhysics(),
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: SizedBox(
                 height: MediaQuery.of(context).size.height,
                 child: Column(
@@ -55,62 +76,119 @@ class _PrimerRegistroState extends State<PrimerRegistro> {
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Stepper(
+            physics: const ClampingScrollPhysics(),
             controlsBuilder: (context, details) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  FilledButton.tonal(
-                    onPressed: () {
-                      setState(() {
-                        if (position != 0) {
-                          position -= 1;
-                        }
-                      });
-                    },
-                    child: const Text('Cancelar'),
-                  ),
-                  FilledButton(
-                    onPressed: () {
-                      if (adminForm.currentState!.validate()) {
-                        setState(() {
-                          if (position <= 5) {
-                            position += 1;
-                          }
-                        });
-                      }
-                    },
-                    child: const Text('Continuar'),
-                  ),
-                ],
-              );
+              return position == ProductoRegistro.positionStepper
+                  ? const SizedBox()
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        FilledButton.tonal(
+                          onPressed: () {
+                            if (position != 0) {
+                              changeStep(false);
+                            }
+                          },
+                          child: const Text('Cancelar'),
+                        ),
+                        FilledButton(
+                          onPressed: () {
+                            if (position == EmpresaRegistro.positionStepper) {
+                              if (empresaFormKey.currentState!.validate()) {
+                                changeStep(true);
+                              }
+                            } else if (position ==
+                                TiendaRegistro.positionStepper) {
+                              if (tiendaFormKey.currentState!.validate()) {
+                                changeStep(true);
+                              }
+                            } else if (position ==
+                                AdminRegistro.positionStepper) {
+                              if (adminFormKey.currentState!.validate()) {
+                                changeStep(true);
+                              }
+                            }
+                          },
+                          child: const Text('Continuar'),
+                        ),
+                      ],
+                    );
             },
             type: StepperType.horizontal,
             currentStep: position,
             onStepTapped: (index) {
               setState(() {
-                if (position >= index) {
-                  position = index;
-                }
+                position = index;
               });
             },
             steps: [
               step(
+                  'Empresa',
+                  EmpresaRegistro(
+                    formKey: empresaFormKey,
+                    nombreController: nombreEmpresa,
+                    nifController: nifEmpresa,
+                    correoController: correoEmpresa,
+                    paisController: paisEmpresa,
+                    provinciaController: provinciaEmpresa,
+                    ciudadController: ciudadEmpresa,
+                    codigoPostalController: zipCodeEmpresa,
+                    telefonoController: phoneEmpresa,
+                  ),
+                  EmpresaRegistro.positionStepper),
+              step(
+                  'Tienda',
+                  TiendaRegistro(
+                    formKey: tiendaFormKey,
+                    nombreController: nombreTienda,
+                    nifController: nifTienda,
+                    correoController: correoTienda,
+                    paisController: paisTienda,
+                    provinciaController: provinciaTienda,
+                    ciudadController: ciudadTienda,
+                    codigoPostalController: zipTienda,
+                    telefonoController: phoneTienda,
+                  ),
+                  TiendaRegistro.positionStepper),
+              step(
                   'Administrador',
                   AdminRegistro(
-                    formKey: adminForm,
+                    formKey: adminFormKey,
+                    nombre: nombreAdmin,
+                    password: passwordAdmin,
                   ),
-                  0),
-              step('Usuario', const UsuarioRegistro(), 1),
-              step('Empresa', const EmpresaRegistro(), 2),
-              step('Tienda', const TiendaRegistro(), 3),
-              step('Producto', const ProductoRegistro(), 4),
-              step('Proveedor', const ProveedorRegistro(), 5),
+                  AdminRegistro.positionStepper),
+              step('Usuarios', const UsuarioRegistro(),
+                  UsuarioRegistro.positionStepper),
+              step('Producto', ProductoRegistro(
+                continueAction: () {
+                  setState(() {
+                    position += 1;
+                  });
+                },
+              ), ProductoRegistro.positionStepper),
+              step('Proveedor', const ProveedorRegistro(),
+                  ProveedorRegistro.positionStepper),
               step('Final', const Text('data'), 6),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void changeStep(bool isSum) {
+    setState(() {
+      if (isSum) {
+        if (position <= 5) {
+          position += 1;
+        }
+      } else {
+        if (position <= 5) {
+          position -= 1;
+        }
+      }
+    });
   }
 
   Step step(String title, Widget content, index) {

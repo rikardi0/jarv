@@ -5,6 +5,7 @@ class ProveedorRegistro extends StatelessWidget {
     super.key,
   });
 
+  static int positionStepper = 5;
   @override
   Widget build(BuildContext context) {
     return const Text('data');

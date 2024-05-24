@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:jarv/app/feature/venta/ui/utils/validators.dart';
-import 'package:jarv/shared/ui/custom_text_field.dart';
+import 'package:jarv/app/feature/login/ui/view/widget/image_picker.dart';
+import 'package:jarv/shared/ui/utils/validators.dart';
+import 'package:jarv/shared/ui/widget/custom_text_field.dart';
 
 class AdminRegistro extends StatefulWidget {
   const AdminRegistro({
     super.key,
     required this.formKey,
+    required this.nombre,
+    required this.password,
   });
 
   final GlobalKey<FormState> formKey;
+  static int positionStepper = 2;
+  final TextEditingController nombre;
+
+  final TextEditingController password;
 
   @override
   State<AdminRegistro> createState() => _AdminRegistroState();
 }
 
 class _AdminRegistroState extends State<AdminRegistro> {
-  final TextEditingController nombre = TextEditingController();
-  final TextEditingController password = TextEditingController();
   bool hideText = false;
 
   @override
@@ -55,14 +60,11 @@ class _AdminRegistroState extends State<AdminRegistro> {
                     width: MediaQuery.of(context).size.width * 0.4,
                     child: CustomTextField(
                         validateAction: (String value) {
-                          if (value.isEmpty) {
-                            return emptyMessage;
-                          }
-                          return null;
+                          return emptyValidator(value);
                         },
                         label: 'Nombre',
-                        value: nombre.text,
-                        controller: nombre,
+                        value: widget.nombre.text,
+                        controller: widget.nombre,
                         keyboard: TextInputType.name),
                   ),
                 ),
@@ -72,10 +74,7 @@ class _AdminRegistroState extends State<AdminRegistro> {
                     width: MediaQuery.of(context).size.width * 0.4,
                     child: CustomTextField(
                         validateAction: (String value) {
-                          if (value.isEmpty) {
-                            return emptyMessage;
-                          }
-                          return null;
+                          return emptyValidator(value);
                         },
                         trailing: GestureDetector(
                           onTap: () {
@@ -89,39 +88,16 @@ class _AdminRegistroState extends State<AdminRegistro> {
                         ),
                         obscureText: hideText ? true : null,
                         label: 'Contraseña',
-                        value: password.text,
-                        controller: password,
+                        value: widget.password.text,
+                        controller: widget.password,
                         keyboard: TextInputType.visiblePassword),
                   ),
                 ),
               ],
             ),
           ),
-          buildImageLoader(context)
+          const ImagePicker()
         ],
-      ),
-    );
-  }
-
-  SafeArea buildImageLoader(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.45,
-              width: MediaQuery.of(context).size.height * 0.45,
-              child: const Card(
-                elevation: 15.0,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: ElevatedButton(
-                  onPressed: () {}, child: const Text('Agregar Foto')),
-            ),
-          ],
-        ),
       ),
     );
   }
