@@ -19,7 +19,7 @@ class CustomThemeData {
     errorContainer: Color(0xFFFFDAD6),
     onError: Color(0xFFFFFFFF),
     onErrorContainer: Color(0xFF410002),
-    background: Color(0xFFFEFBFF),
+    background: Color(0xFFF3F3F3),
     onBackground: Color(0xFF1B1B1F),
     surface: Color(0xFFFEFBFF),
     onSurface: Color(0xFF1B1B1F),
@@ -71,6 +71,9 @@ class CustomThemeData {
   static ThemeData lightTheme(BuildContext context) {
     return ThemeData(
         useMaterial3: true,
+        appBarTheme: AppBarTheme(
+          backgroundColor: lightColorScheme.background,
+        ),
         colorScheme: lightColorScheme,
         datePickerTheme: DatePickerThemeData(
             rangePickerHeaderBackgroundColor: lightColorScheme.primary,
@@ -85,6 +88,9 @@ class CustomThemeData {
     return ThemeData(
         useMaterial3: true,
         colorScheme: darkColorScheme,
+        appBarTheme: AppBarTheme(
+          backgroundColor: darkColorScheme.background,
+        ),
         datePickerTheme: DatePickerThemeData(
             rangePickerHeaderBackgroundColor: darkColorScheme.primary,
             rangePickerHeaderForegroundColor: darkColorScheme.onPrimary),

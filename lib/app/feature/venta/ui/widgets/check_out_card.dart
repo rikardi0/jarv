@@ -220,8 +220,8 @@ class CheckOut extends StatelessWidget {
                   child: const Text('Volver')),
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Theme.of(context).canvasColor),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary),
                   onPressed: isEditCantidad ? onAceptarUnidad : onAceptarPrecio,
                   child: const Text('Aceptar'))
             ],
@@ -439,11 +439,14 @@ class CheckOut extends StatelessWidget {
                                 .withOpacity(0.75),
                             height: height / 3,
                             width: width / 1.5,
-                            child: const Center(
+                            child: Center(
                                 child: Text(
                               '0',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .fontSize,
                               ),
                             ))),
                       ),
@@ -600,7 +603,7 @@ class CheckOut extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 20,
+              fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
               color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
