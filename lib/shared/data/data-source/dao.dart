@@ -3,21 +3,6 @@ import 'package:floor/floor.dart';
 import '../model/entity.dart';
 
 @dao
-abstract class ProveedorDao {
-  @Query('SELECT * FROM Proveedor')
-  Future<List<Proveedor>> findAllProveedors();
-
-  @Query('SELECT nombreEmpresa FROM Proveedor')
-  Stream<List<String>> findAllProveedorNombre();
-
-  @Query('SELECT * FROM Proveedor WHERE cif = :id')
-  Stream<Proveedor?> findProveedorById(String id);
-
-  @insert
-  Future<void> insertProveedor(Proveedor proveedor);
-}
-
-@dao
 abstract class PedidoDao {
   @Query('SELECT * FROM Pedido')
   Future<List<Pedido>> findAllPedidos();
@@ -60,6 +45,66 @@ abstract class MermaDao {
 
   @insert
   Future<void> insertMerma(Merma merma);
+}
+
+@dao
+abstract class FamiliaDao {
+  @Query('SELECT * FROM Familia')
+  Future<List<Familia>> findAllFamilias();
+
+  @Query('SELECT nombreFamilia FROM Familia')
+  Stream<List<String>> findAllFamiliaNombre();
+
+  @Query('SELECT * FROM Familia WHERE idFamilia = :id')
+  Stream<Familia?> findFamiliaById(String id);
+
+  @insert
+  Future<void> insertFamilia(Familia familia);
+
+  @update
+  Future<void> updateFamilia(Familia familia);
+}
+
+@dao
+abstract class SubFamiliaDao {
+  @Query('SELECT * FROM SubFamilia')
+  Future<List<SubFamilia>> findAllSubFamilias();
+
+  @Query('SELECT nombreSub FROM SubFamilia')
+  Stream<List<String>> findAllSubFamiliaNombre();
+
+  @Query('SELECT * FROM SubFamilia WHERE idSubfamilia = :id')
+  Stream<SubFamilia?> findSubFamiliaById(String id);
+
+  @Query('SELECT * FROM SubFamilia WHERE idFamilia = :id')
+  Future<List<SubFamilia?>> findSubFamiliaByFamilia(String id);
+
+  @insert
+  Future<void> insertSubFamilia(SubFamilia subfamilia);
+
+  @update
+  Future<void> updateSubFamilia(SubFamilia subfamilia);
+}
+
+@dao
+abstract class ProductoDao {
+  @Query('SELECT * FROM Producto')
+  Future<List<Producto>> findAllProductos();
+
+  @Query('SELECT producto FROM Producto')
+  Stream<List<String>> findAllProductoNombre();
+
+  @Query('SELECT * FROM Producto WHERE productoId = :id')
+  Stream<Producto?> findProductoById(int id);
+
+  @Query('SELECT * FROM Producto WHERE idSubfamilia = :id')
+  Future<List<Producto?>> findProductoBySubFamiliaId(String id);
+
+  @insert
+  Future<void> insertProducto(Producto producto);
+
+  @update
+  Future<void> updateProducto(Producto producto);
 }
 
 @dao

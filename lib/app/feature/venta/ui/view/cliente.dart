@@ -1,32 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/venta/data/model/arguments_cliente.dart';
+import 'package:jarv/app/feature/venta/data/repositories/interfaces/cliente_repository.dart';
+import 'package:jarv/core/di/locator.dart';
 import '../../../../../shared/ui/card_cliente.dart';
-import '../../data/data-sources/dao_venta.dart';
+import '../../../../../shared/ui/search_field.dart';
 import '../../data/model/entity_venta.dart';
 
 class ClienteMenu extends StatefulWidget {
-  const ClienteMenu({super.key, required this.cliente});
+  ClienteMenu({super.key});
 
   static const routeName = '/cliente';
-  final ClienteDao cliente;
+  final fetchRepository = localService<ClienteRepository>();
 
   @override
   State<ClienteMenu> createState() => _ClienteMenuState();
 }
 
 class _ClienteMenuState extends State<ClienteMenu> {
-  List<Cliente> clienteLista = [];
-  final TextEditingController _nameSearchController = TextEditingController();
-  final TextEditingController _nifSearchController = TextEditingController();
-  final TextEditingController _direccionSearchController =
-      TextEditingController();
   String nameSearchText = '';
   String nifSearchText = '';
   String direccionSearchText = '';
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _nifController = TextEditingController();
+  final TextEditingController _direccionController = TextEditingController();
+  List<Cliente> clienteLista = [];
   @override
   Widget build(BuildContext context) {
-    final clientes = widget.cliente.findAllClientes().asStream();
-
+    final clientes = widget.fetchRepository.findAllClientes();
     final size = MediaQuery.of(context).size;
+
     return Scaffold(
         appBar: AppBar(
           title: const Text('Clientes'),
@@ -64,6 +66,11 @@ class _ClienteMenuState extends State<ClienteMenu> {
                                   nombreCliente:
                                       clienteLista[index].nombreCliente,
                                   nifCliente: clienteLista[index].nif,
+                                  onPressEditar: () {
+                                    Navigator.popAndPushNamed(
+                                        context, '/cliente_field',
+                                        arguments: setArgument(index));
+                                  },
                                 );
                               });
                         }
@@ -73,6 +80,22 @@ class _ClienteMenuState extends State<ClienteMenu> {
             ),
           ],
         ));
+  }
+
+  ClienteArgument setArgument(int index) {
+    return ClienteArgument(
+        fechaNacimiento: clienteLista[index].fechaNacimiento,
+        nif: clienteLista[index].nif,
+        direccion: clienteLista[index].direccion,
+        nombreCliente: clienteLista[index].nombreCliente,
+        telefono: clienteLista[index].telefono,
+        email: clienteLista[index].email,
+        puntos: clienteLista[index].puntos,
+        pedidos: clienteLista[index].pedidos,
+        nombreTienda: clienteLista[index].nombreTienda,
+        genero: clienteLista[index].genero,
+        idCliente: clienteLista[index].idCliente,
+        clienteNuevo: false);
   }
 
   void _searchFilter() {
@@ -115,22 +138,33 @@ class _ClienteMenuState extends State<ClienteMenu> {
                 padding: const EdgeInsets.symmetric(horizontal: 12.5),
                 child: ListView(
                   children: [
-                    textField(
-                        'Nombre', TextInputType.name, _nameSearchController,
-                        (value) {
-                      nameSearchText = value;
-                      setState(() {});
-                    }),
-                    textField('NIF', TextInputType.name, _nifSearchController,
-                        (value) {
-                      nifSearchText = value;
-                      setState(() {});
-                    }),
-                    textField('Direccion', TextInputType.streetAddress,
-                        _direccionSearchController, (value) {
-                      direccionSearchText = value;
-                      setState(() {});
-                    }),
+                    SearchField(
+                      label: 'Nombre',
+                      type: TextInputType.name,
+                      controller: _nameController,
+                      onChanged: (value) {
+                        nameSearchText = value;
+                        setState(() {});
+                      },
+                    ),
+                    SearchField(
+                      label: 'NIF',
+                      type: TextInputType.number,
+                      controller: _nifController,
+                      onChanged: (value) {
+                        nifSearchText = value;
+                        setState(() {});
+                      },
+                    ),
+                    SearchField(
+                      label: 'Direccion',
+                      type: TextInputType.streetAddress,
+                      controller: _direccionController,
+                      onChanged: (value) {
+                        direccionSearchText = value;
+                        setState(() {});
+                      },
+                    )
                   ],
                 ),
               ),
@@ -139,35 +173,14 @@ class _ClienteMenuState extends State<ClienteMenu> {
           Padding(
             padding: const EdgeInsets.all(2.0),
             child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.popAndPushNamed(context, '/cliente_field',
+                      arguments: ClienteArgument.empty());
+                },
                 icon: const Icon(Icons.add),
                 label: const Text('Nuevo Cliente')),
           )
         ],
-      ),
-    );
-  }
-
-  Widget textField(
-    String label,
-    TextInputType type,
-    TextEditingController controller,
-    dynamic onChanged,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextField(
-        controller: controller,
-        onChanged: (value) {
-          onChanged(value);
-        },
-        keyboardType: type,
-        decoration: InputDecoration(
-          border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(25.0))),
-          labelText: label,
-          suffixIcon: const Icon(Icons.search),
-        ),
       ),
     );
   }

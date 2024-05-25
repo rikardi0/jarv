@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jarv/core/di/locator.dart';
 
 import 'core/settings/settings_controller.dart';
 import 'core/settings/settings_service.dart';
 import 'app/app.dart';
 
-import 'shared/data/database.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDependencies();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
-
-  final AppDatabase databaseJARV =
-      await $FloorAppDatabase.databaseBuilder('JARV.db').build();
 
   // Set up the SettingsController, which will glue user settings to multiple
   // Flutter Widgets.
@@ -31,6 +28,5 @@ Future<void> main() async {
   // SettingsView.
   runApp(MyApp(
     settingsController: settingsController,
-    database: databaseJARV,
   ));
 }

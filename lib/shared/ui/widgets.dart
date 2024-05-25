@@ -7,6 +7,6 @@ export 'package:jarv/shared/ui/factura_fiscal.dart';
 //menu
 export 'package:jarv/app/feature/venta/ui/widgets/menu.dart';
 export 'package:jarv/app/feature/venta/ui/widgets/check_out_card.dart';
-export 'package:jarv/app/feature/venta/ui/widgets/grid_producto.dart';
-export 'package:jarv/app/feature/venta/ui/widgets/list_familia.dart';
-export 'package:jarv/app/feature/venta/ui/widgets/row_sub_familia.dart';
+export 'package:jarv/shared/ui/grid_producto.dart';
+export 'package:jarv/shared/ui/list_familia.dart';
+export 'package:jarv/shared/ui/row_sub_familia.dart';

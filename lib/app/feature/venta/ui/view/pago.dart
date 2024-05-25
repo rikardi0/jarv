@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:flutter/services.dart';
+import 'package:jarv/app/feature/venta/data/repositories/interfaces/pago_repository.dart';
+import 'package:jarv/core/di/locator.dart';
 
 import '../../../../../shared/ui/cliente_selector.dart';
 import '../../../../../shared/ui/factura_fiscal.dart';
 import '../../../../../shared/ui/metodo_pago_selector.dart';
-import '../../data/data-sources/dao_venta.dart';
 import '../../data/model/entity_venta.dart';
+import '../utils/date_format.dart';
 
 class Pago extends StatefulWidget {
-  const Pago(
-      {super.key,
-      required this.venta,
-      required this.cliente,
-      required this.detalleVenta});
+  Pago({
+    super.key,
+  });
 
   static const routeName = "/venta";
-  final VentaDao venta;
-  final DetalleVentaDao detalleVenta;
-  final ClienteDao cliente;
+  final fecthRepository = localService<PagoRepository>();
 
   @override
   State<Pago> createState() => _PagoState();
@@ -26,9 +24,9 @@ class Pago extends StatefulWidget {
 
 class _PagoState extends State<Pago> {
   String metodoPago = 'tarjeta';
-  String cliente = 'nombreCliente 1';
+  String? cliente;
   double totalFactura = 0;
-  int entregado = 0;
+  int efectivoEntregado = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -68,9 +66,9 @@ class _PagoState extends State<Pago> {
   }
 
   Widget _columnMetodoPago(BuildContext context, CheckOutArgument argument) {
-    final cambio = entregado - argument.totalVenta;
-    final Stream<List<String>> clienteLista =
-        widget.cliente.findAllClienteNombre();
+    final cambio = efectivoEntregado - argument.totalVenta;
+    final clienteLista = widget.fecthRepository.findAllClienteNombre();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -128,9 +126,9 @@ class _PagoState extends State<Pago> {
             keyboardType: TextInputType.number,
             onChanged: (value) {
               if (value.isNotEmpty) {
-                entregado = int.parse(value);
+                efectivoEntregado = int.parse(value);
               } else {
-                entregado = 0;
+                efectivoEntregado = 0;
               }
               setState(() {});
             },
@@ -141,7 +139,7 @@ class _PagoState extends State<Pago> {
   Widget _cambioEntregar(double cambio) {
     return rowColumn(
         'Cambio',
-        Text(entregado == 0
+        Text(efectivoEntregado == 0
             ? 'SIN CAMBIO'
             : cambio.isNegative
                 ? 'Faltan ${cambio.abs().toString()}'
@@ -172,43 +170,43 @@ class _PagoState extends State<Pago> {
         ElevatedButton(
             onPressed: () {
               _registrarVenta(argument);
+              Navigator.pushNamed(context, '/menu');
             },
             child: const Text('No Imprimir')),
         FilledButton(
             onPressed: () {
               _registrarVenta(argument);
+              Navigator.pushNamed(context, '/menu');
             },
             child: const Text('Imprimir Ticket')),
       ],
     );
   }
 
-  void _registrarVenta(CheckOutArgument argument) {
+  void _registrarVenta(CheckOutArgument argument) async {
     final idVenta = DateTime.now().millisecondsSinceEpoch;
+    final fechaFormatoVenta = fechaFormatter(argument.fechaVenta);
+    final tipoVenta = await widget.fecthRepository.findTipoVentaById(0);
 
     for (var element in argument.productoAgregado) {
-      widget.detalleVenta.insertDetalleVenta(DetalleVenta(
-          idVenta,
-          element!.productoId,
-          int.parse(element.cantidad),
-          element.precio,
-          0,
-          true,
-          UniqueKey().toString()));
+      widget.fecthRepository.insertDetalleVenta(DetalleVenta(
+          productoId: element!.productoId,
+          cantidad: int.parse(element.cantidad),
+          precioUnitario: element.precio,
+          descuento: 0,
+          idDetalleVenta: UniqueKey().toString(),
+          idVenta: idVenta,
+          entregado: true));
     }
-    final fechaMes =
-        '${argument.fechaVenta.day}/${argument.fechaVenta.month}/${argument.fechaVenta.year}';
 
-    widget.venta.insertVenta(Venta(
+    widget.fecthRepository.insertVenta(Venta(
         idVenta: idVenta,
         costeTotal: totalFactura,
         ingresoTotal: argument.totalVenta,
-        fecha: fechaMes,
+        fecha: fechaFormatoVenta,
         idUsuario: 01,
-        nombreCliente: cliente,
-        consumicionPropia: false,
-        metodoPago: metodoPago));
-
-    Navigator.pushNamed(context, '/menu');
+        nombreCliente: cliente!,
+        metodoPago: metodoPago,
+        tipoVenta: tipoVenta!));
   }
 }

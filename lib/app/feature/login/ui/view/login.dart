@@ -1,28 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/login/data/repository/interface/login_repository.dart';
+import 'package:jarv/app/feature/login/data/repository/interface/prueba_repository.dart';
+import 'package:jarv/core/di/locator.dart';
+import 'package:jarv/shared/data/model/entity.dart';
 import 'package:jarv/shared/ui/card_button.dart';
 
-import '../../../venta/data/data-sources/dao_venta.dart';
 import '../../../venta/data/model/entity_venta.dart';
-import '../../data/data-source/dao_login.dart';
 import '../../data/model/entity_login.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({
+  LoginScreen({
     super.key,
-    required this.usuarios,
-    required this.familia,
-    required this.subFamilia,
-    required this.producto,
-    required this.cliente,
   });
 
-  final UsuarioDao usuarios;
-  final FamiliaDao familia;
-  final SubFamiliaDao subFamilia;
-  final ProductoDao producto;
-  final ClienteDao cliente;
-
   static const routeName = "/login";
+  final fetchUsuario = localService<LoginRepository>();
+  final fetchPrueba = localService<PruebaRepository>();
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -34,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final Future<List<Usuario>> listUsuarios =
-        widget.usuarios.findAllUsuarios();
+        widget.fetchUsuario.findAllUsuarios();
 
     return Scaffold(
       appBar: AppBar(
@@ -118,8 +111,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text("Ingresar")),
                   ElevatedButton(
                       onPressed: () {
+                        widget.fetchPrueba.insertarTipoVenta(
+                            TipoVenta(idTipoVenta: 0, tipoVenta: 'regular'));
+                        widget.fetchPrueba.insertarTipoVenta(TipoVenta(
+                            idTipoVenta: 1, tipoVenta: 'consumicion propia'));
+                        widget.fetchPrueba.insertarTipoVenta(
+                            TipoVenta(idTipoVenta: 2, tipoVenta: 'devolucion'));
+                        widget.fetchPrueba.insertarTipoDevolucion(Devolucion(
+                            idDevolucion: 0,
+                            devolucion: 'producto incorrecto'));
+                        widget.fetchPrueba.insertarTipoDevolucion(Devolucion(
+                            idDevolucion: 1,
+                            devolucion: 'producto en mal estado'));
                         for (var i = 0; i < 12; i++) {
-                          widget.producto.insertProducto(Producto(
+                          widget.fetchPrueba.insertarProducto(Producto(
                               i,
                               'producto $i',
                               10.0,
@@ -127,13 +132,16 @@ class _LoginScreenState extends State<LoginScreen> {
                               0.1,
                               'idSubfamilia $i',
                               5));
-                          widget.familia.insertFamilia(Familia('idFamilia $i',
-                              'nombreFamilia $i', 'idUsuario $i'));
-                          widget.subFamilia.insertSubFamilia(SubFamilia(
+                          widget.fetchPrueba.insertarFamilia(Familia(
+                              'idFamilia $i',
+                              'nombreFamilia $i',
+                              'idUsuario $i'));
+                          widget.fetchPrueba.insertarSubFamilia(SubFamilia(
                               'idSubfamilia $i',
                               'nombreSub $i',
                               'idFamilia $i'));
-                          widget.cliente.insertCliente(Cliente(
+                          widget.fetchPrueba.insertarCliente(Cliente(
+                              idCliente: i,
                               nombreCliente: 'nombreCliente $i',
                               telefono: 'telefono $i',
                               email: 'email $i',
@@ -141,7 +149,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               nombreTienda: 'nombreTienda $i',
                               nif: 'NIF $i',
                               direccion: 'direccion $i',
-                              fechaNacimiento: 'fechaNacimiento $i'));
+                              fechaNacimiento: 'fechaNacimiento $i',
+                              genero: true,
+                              pedidos: 0));
                         }
                       },
                       child: const Text("Agregar Datos")),

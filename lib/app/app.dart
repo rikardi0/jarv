@@ -3,12 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:jarv/app/feature/login/ui/view/login.dart';
+import 'package:jarv/app/feature/proveedor/ui/view/proveedor_view.dart';
+import 'package:jarv/app/feature/venta/ui/widgets/cliente_field.dart';
 import 'package:jarv/core/theme/custom_theme.dart';
 import 'package:provider/provider.dart';
 
 import '../core/settings/settings_controller.dart';
 import '../core/settings/settings_view.dart';
-import '../shared/data/database.dart';
 import 'feature/venta/ui/view/view_venta.dart';
 import 'feature/venta/ui/provider/venta_espera_provider.dart';
 
@@ -17,9 +18,7 @@ class MyApp extends StatelessWidget {
   const MyApp({
     super.key,
     required this.settingsController,
-    required this.database,
   });
-  final AppDatabase database;
   final SettingsController settingsController;
 
   @override
@@ -79,55 +78,31 @@ class MyApp extends StatelessWidget {
       builder: (BuildContext context) {
         switch (routeSettings.name) {
           case LoginScreen.routeName:
-            return LoginScreen(
-              usuarios: database.usuarioDao,
-              familia: database.familiaDao,
-              subFamilia: database.subFamiliaDao,
-              producto: database.productoDao,
-              cliente: database.clienteDao,
-            );
+            return LoginScreen();
           case MenuScreen.routeName:
-            return MenuScreen(
-              database: database,
-            );
+            return const MenuScreen();
           case Pago.routeName:
-            return Pago(
-              venta: database.ventaDao,
-              cliente: database.clienteDao,
-              detalleVenta: database.detalleVentaDao,
-            );
+            return Pago();
           case Espera.routeName:
             return const Espera();
           case ClienteMenu.routeName:
-            return ClienteMenu(
-              cliente: database.clienteDao,
-            );
+            return ClienteMenu();
+          case ClienteField.routeName:
+            return ClienteField();
           case ConsumicionPropia.routeName:
-            return ConsumicionPropia(
-              database: database,
-            );
+            return ConsumicionPropia();
           case TicketDiario.routeName:
-            return TicketDiario(
-              cliente: database.clienteDao,
-              ventas: database.ventaDao,
-              ventaDetalle: database.detalleVentaDao,
-              producto: database.productoDao,
-              databaseExecutor: database.database,
-            );
+            return TicketDiario();
           case Devolucion.routeName:
             return const Devolucion();
+          case ProveedorView.routeName:
+            return ProveedorView();
           case CierreDiario.routeName:
             return const CierreDiario();
           case SettingsView.routeName:
             return SettingsView(controller: settingsController);
           default:
-            return LoginScreen(
-              usuarios: database.usuarioDao,
-              familia: database.familiaDao,
-              subFamilia: database.subFamiliaDao,
-              producto: database.productoDao,
-              cliente: database.clienteDao,
-            );
+            return LoginScreen();
         }
       },
     );

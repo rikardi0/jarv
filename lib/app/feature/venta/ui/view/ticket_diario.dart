@@ -1,27 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:jarv/shared/ui/cliente_selector.dart';
+import 'package:jarv/app/feature/venta/data/repositories/interfaces/ticket_diario_repository.dart';
+import 'package:jarv/app/feature/venta/ui/utils/date_format.dart';
+import 'package:jarv/core/di/locator.dart';
 import 'package:jarv/shared/ui/metodo_pago_selector.dart';
 import 'package:multiple_stream_builder/multiple_stream_builder.dart';
-import 'package:sqflite/sqflite.dart';
 
-import '../../data/data-sources/dao_venta.dart';
 import '../../data/model/entity_venta.dart';
 
 class TicketDiario extends StatefulWidget {
-  const TicketDiario({
+  TicketDiario({
     super.key,
-    required this.ventas,
-    required this.ventaDetalle,
-    required this.cliente,
-    required this.producto,
-    required this.databaseExecutor,
   });
   static const routeName = '/ticket_diario';
-  final VentaDao ventas;
-  final DetalleVentaDao ventaDetalle;
-  final ClienteDao cliente;
-  final ProductoDao producto;
-  final DatabaseExecutor databaseExecutor;
+  final fecthRepository = localService<TicketDiarioRepository>();
 
   @override
   State<TicketDiario> createState() => _TicketDiarioState();
@@ -29,12 +20,23 @@ class TicketDiario extends StatefulWidget {
 
 class _TicketDiarioState extends State<TicketDiario> {
   List<Map<String, Object?>> listaProducto = [];
+  TextEditingController fechaTextController = TextEditingController();
   String fechaFactura = '';
   String horaFactura = '';
+
+  String? cliente;
+  String? metodoPago;
+
+  List<Venta?>? listaVenta;
+  bool isRangeActive = false;
+  int ventaSeleccionada = 0;
   double montoFactura = 0.0;
-  bool intervalo = false;
-  String cliente = 'nombreCliente 1';
-  String metodoPago = 'tarjeta';
+
+  DateTimeRange rangoFechaFiltro =
+      DateTimeRange(start: DateTime.now(), end: DateTime.now());
+  DateTime fechaActual = DateTime.now();
+
+  final selectedVenta = ValueNotifier<int?>(null);
 
   @override
   void initState() {
@@ -44,12 +46,8 @@ class _TicketDiarioState extends State<TicketDiario> {
 
   Future<void> _loadDataFromDatabase() async {
     try {
-      final data = await widget.databaseExecutor.rawQuery('''
-SELECT Producto.*, Producto.iva, DetalleVenta.cantidad
-FROM DetalleVenta
-INNER JOIN Producto ON Producto.productoId = DetalleVenta.productoId
-WHERE DetalleVenta.idVenta = ?
-''', [ventaSeleccionada]);
+      final data = await widget.fecthRepository
+          .findProductoByVentaId([ventaSeleccionada]);
       setState(() {
         listaProducto = data;
       });
@@ -59,20 +57,18 @@ WHERE DetalleVenta.idVenta = ?
     }
   }
 
-  final selectedVenta = ValueNotifier<int?>(null);
-  int ventaSeleccionada = 0;
-  List<int> idProductosVenta = [];
-
   @override
   Widget build(BuildContext context) {
-    final dateTime = DateTime.now();
-    final fechaHoy = '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+    final fechaFormateada = fechaFormatter(fechaActual);
 
-    final ventaDiaria = widget.ventas.findVentaByFecha(fechaHoy).asStream();
-    final clienteLista = widget.cliente.findAllClienteNombre();
+    final ventaDiaria =
+        widget.fecthRepository.findVentaByFecha(fechaFormateada).asStream();
+    final List<String> clienteLista = [];
 
     return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          title: const Text('Ticket Diario'),
+        ),
         body: StreamBuilder2(
           streams:
               StreamTuple2(ventaDiaria, _loadDataFromDatabase().asStream()),
@@ -80,11 +76,50 @@ WHERE DetalleVenta.idVenta = ?
             if (!snapshot.snapshot1.hasData) {
               return const Center(child: CircularProgressIndicator());
             } else {
-              final ventaItem = snapshot.snapshot1.data;
-
+              listaVenta = snapshot.snapshot1.data;
+              final itemVenta = snapshot.snapshot1.data;
+              if (cliente != null) {
+                listaVenta = listaVenta!.where((element) {
+                  return element!.nombreCliente
+                      .toString()
+                      .toLowerCase()
+                      .contains(cliente!.toLowerCase());
+                }).toList();
+              } else if (metodoPago != null) {
+                listaVenta = listaVenta!.where((element) {
+                  return element!.metodoPago
+                      .toString()
+                      .toLowerCase()
+                      .contains(metodoPago!.toLowerCase());
+                }).toList();
+              }
+              for (var element in itemVenta!) {
+                if (!clienteLista.contains(element!.nombreCliente)) {
+                  clienteLista.add(element.nombreCliente);
+                }
+              }
               return Row(
                 children: [
-                  _tarjetaVenta(context, ventaItem),
+                  listaVenta!.isEmpty
+                      ? const Expanded(
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.info_outline),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Sin ventas Registradas',
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.black54),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : _tarjetaVenta(context, listaVenta),
                   _containerFactura(context),
                   _filtroVenta(context, clienteLista),
                 ],
@@ -94,52 +129,138 @@ WHERE DetalleVenta.idVenta = ?
         ));
   }
 
-  Padding _filtroVenta(
-      BuildContext context, Stream<List<String>> clienteLista) {
+  Padding _filtroVenta(BuildContext context, List<String> clienteLista) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
-      child: Expanded(
-        child: Container(
-          decoration: BoxDecoration(
-              color: Theme.of(context)
-                  .colorScheme
-                  .surfaceVariant
-                  .withOpacity(0.25),
-              borderRadius: BorderRadius.circular(10)),
-          width: MediaQuery.of(context).size.width * 0.3,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.5),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                DatePicker(
-                  intervalo: intervalo,
-                  onChanged: (value) {
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.3,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.5),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildDatePciker(context),
+              _buildCliente(clienteLista),
+              MetodoPagoSelector(
+                  metodoPago: metodoPago,
+                  onCancel: () {
                     setState(() {
-                      intervalo = value;
+                      metodoPago = null;
                     });
                   },
-                ),
-                ClienteSelector(
-                    cliente: cliente,
-                    clienteLista: clienteLista,
-                    onChanged: (value) {
-                      setState(() {
-                        cliente = value;
-                      });
-                    }),
-                MetodoPagoSelector(
-                    metodoPago: metodoPago,
-                    onChanged: (value) {
-                      setState(() {
-                        metodoPago = value;
-                      });
-                    })
-              ],
-            ),
+                  onChanged: (value) {
+                    setState(() {
+                      metodoPago = value;
+                      cliente = null;
+                    });
+                  }),
+              FilledButton(onPressed: () {}, child: const Text('Imprimir'))
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  DropdownButtonFormField<String> _buildCliente(List<String> clienteLista) {
+    return DropdownButtonFormField<String>(
+      value: cliente,
+      hint: const Text('Cliente'),
+      isExpanded: true,
+      icon: cliente != null
+          ? GestureDetector(
+              onTap: () {
+                cliente = null;
+                setState(() {});
+              },
+              child: const Icon(Icons.cancel_outlined),
+            )
+          : const Icon(Icons.arrow_drop_down),
+      items: clienteLista.map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          metodoPago = null;
+          cliente = value;
+        });
+      },
+    );
+  }
+
+  Column _buildDatePciker(BuildContext context) {
+    String fechaValue = fechaFormatter(fechaActual);
+    String fechaRangeHint =
+        '${fechaFormatter(rangoFechaFiltro.start)} - ${fechaFormatter(rangoFechaFiltro.end)}';
+
+    return Column(
+      children: [
+        TextFormField(
+          readOnly: true,
+          controller: fechaTextController,
+          onTap: () async {
+            setState(() {
+              metodoPago = null;
+              cliente = null;
+            });
+            if (isRangeActive) {
+              final rangoSeleccionado = await showDateRangePicker(
+                  context: context,
+                  initialEntryMode: DatePickerEntryMode.calendarOnly,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now());
+              fechaTextController.text = fechaRangeHint;
+              fechaTextController.text = fechaRangeHint;
+              if (rangoSeleccionado != null) {
+                setState(() {
+                  rangoFechaFiltro = rangoSeleccionado;
+                });
+              }
+            } else {
+              final fechaSeleccionada = await showDatePicker(
+                  context: context,
+                  initialEntryMode: DatePickerEntryMode.calendarOnly,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now());
+              fechaTextController.text = fechaValue;
+              if (fechaSeleccionada != null) {
+                setState(() {
+                  fechaActual = fechaSeleccionada;
+                });
+              }
+            }
+          },
+          decoration: InputDecoration(
+            helperText:
+                isRangeActive ? 'dd/mm/aaaa - dd/mm/aaaa' : 'dd/mm/aaaa',
+            labelText: 'Fecha',
+            suffixIcon: const Icon(Icons.calendar_month),
+          ),
+        ),
+        Row(
+          children: [
+            Switch(
+                value: isRangeActive,
+                onChanged: (value) {
+                  setState(() {
+                    fechaTextController.text = '';
+                    isRangeActive = value;
+                    fechaActual = DateTime.now();
+                    rangoFechaFiltro = DateTimeRange(
+                        start: DateTime.now(), end: DateTime.now());
+                  });
+                }),
+            Text(
+              'Intervalo',
+              style: Theme.of(context).textTheme.bodyLarge,
+            )
+          ],
+        )
+      ],
     );
   }
 
@@ -286,8 +407,8 @@ WHERE DetalleVenta.idVenta = ?
             final venta = ventaItem[index];
             final dateTime =
                 DateTime.fromMillisecondsSinceEpoch(venta!.idVenta);
-            final String hora =
-                '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+            final String hora = hourFormatter(dateTime);
+
             return Card(
               color: selectedVenta.value != index
                   ? Theme.of(context).cardTheme.color
@@ -317,12 +438,12 @@ WHERE DetalleVenta.idVenta = ?
                     }
                     ventaSeleccionada = venta.idVenta;
                     fechaFactura = venta.fecha;
-                    montoFactura = venta.costeTotal;
+                    montoFactura = venta.costeTotal.floorToDouble();
                     horaFactura = hora;
                     _loadDataFromDatabase();
                   });
                 },
-                title: const Text('Total'),
+                title: Text(venta.nombreCliente),
                 subtitle: Text(venta.costeTotal.floorToDouble().toString()),
                 trailing: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -336,61 +457,6 @@ WHERE DetalleVenta.idVenta = ?
           },
         ),
       ),
-    );
-  }
-}
-
-class DatePicker extends StatelessWidget {
-  const DatePicker({
-    super.key,
-    required this.intervalo,
-    required this.onChanged,
-  });
-
-  final bool intervalo;
-  final dynamic onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextFormField(
-          readOnly: true,
-          onTap: () {
-            if (intervalo) {
-              showDateRangePicker(
-                  context: context,
-                  initialEntryMode: DatePickerEntryMode.calendarOnly,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime.now());
-            } else {
-              showDatePicker(
-                  context: context,
-                  initialEntryMode: DatePickerEntryMode.calendarOnly,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime.now());
-            }
-          },
-          decoration: InputDecoration(
-            helperText: intervalo ? 'dd/mm/aaaa - dd/mm/aaaa' : 'dd/mm/aaaa',
-            labelText: 'Fecha',
-            suffixIcon: const Icon(Icons.calendar_month),
-          ),
-        ),
-        Row(
-          children: [
-            Switch(
-                value: intervalo,
-                onChanged: (value) {
-                  onChanged(value);
-                }),
-            Text(
-              'Intervalo',
-              style: Theme.of(context).textTheme.bodyLarge,
-            )
-          ],
-        )
-      ],
     );
   }
 }

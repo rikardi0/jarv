@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:jarv/shared/data/database.dart';
 
 import '../widgets/menu.dart';
 
 class ConsumicionPropia extends StatelessWidget {
-  ConsumicionPropia({super.key, required this.database});
-  final AppDatabase database;
+  const ConsumicionPropia({super.key});
   static const routeName = '/consumicion';
 
-  final selectedFamiliaIndex = ValueNotifier<int?>(null);
-  final selectedSubFamiliaIndex = ValueNotifier<int?>(null);
-  final selectedProductoIndex = ValueNotifier<int?>(null);
-  final selectedItemLista = ValueNotifier<int?>(null);
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
         body: Menu(
+      false,
       menuPrincipal: false,
-      db: database,
+      titleSection: 'Consumicion Propia',
     ));
   }
 }

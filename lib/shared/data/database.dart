@@ -1,21 +1,29 @@
 import 'dart:async';
+import 'package:floor/floor.dart';
+import 'package:jarv/app/feature/proveedor/data/data-sources/dao_proveedor.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
-import 'package:floor/floor.dart';
+import '../../app/feature/proveedor/data/model/entity_proveedor.dart';
 import 'data-source/dao.dart';
 import 'model/entity.dart';
+
 import '../../app/feature/login/data/data-source/dao_login.dart';
 import '../../app/feature/login/data/model/entity_login.dart';
+
 import '../../app/feature/venta/data/data-sources/dao_venta.dart';
 import '../../app/feature/venta/data/model/entity_venta.dart';
 
 part 'database.g.dart';
 
-@Database(version: 2, entities: [
+@Database(version: 1, entities: [
   Familia,
   SubFamilia,
-  Producto,
   Proveedor,
+  FamiliaProveedor,
+  Familia,
+  TipoVenta,
+  Devolucion,
+  Producto,
   Pedido,
   Stock,
   Merma,
@@ -39,6 +47,8 @@ abstract class AppDatabase extends FloorDatabase {
   SubFamiliaDao get subFamiliaDao;
   ProductoDao get productoDao;
   ProveedorDao get proveedorDao;
+  FamiliaProveedorDao get familiaProveedorDao;
+  DevolucionDao get devolucionDao;
   PedidoDao get pedidoDao;
   StockDao get stockDao;
   MermaDao get mermaDao;
@@ -47,6 +57,7 @@ abstract class AppDatabase extends FloorDatabase {
   SeguridadSocialDao get seguridadSocialDao;
   DetalleVentaDao get detalleVentaDao;
   VentaDao get ventaDao;
+  TipoVentaDao get tipoVentaDao;
   CosteFijoDao get costeFijoDao;
   ClienteDao get clienteDao;
   TiendaDao get tiendaDao;

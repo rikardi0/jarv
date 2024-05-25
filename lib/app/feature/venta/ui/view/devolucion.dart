@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/venta/ui/widgets/menu.dart';
 
 class Devolucion extends StatelessWidget {
   const Devolucion({super.key});
@@ -6,8 +7,12 @@ class Devolucion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(),
+    return const Scaffold(
+      body: Menu(
+        true,
+        menuPrincipal: false,
+        titleSection: 'Devolucion',
+      ),
     );
   }
 }

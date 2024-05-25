@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/venta/ui/widgets/menu.dart';
-import 'package:jarv/shared/data/database.dart';
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({
     super.key,
-    required this.database,
   });
-  final AppDatabase database;
   static const routeName = "/menu";
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Column(
         children: [
           Expanded(
-            child: Menu(db: database, menuPrincipal: true),
+            child: Menu(
+              false,
+              menuPrincipal: true,
+              titleSection: 'Menu Principal',
+            ),
           ),
-          const BottomActions()
+          BottomActions()
         ],
       ),
     );
