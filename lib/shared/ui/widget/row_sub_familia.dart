@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../data/model/entity.dart';
+import '../../data/model/entity.dart';
 
 class RowSubFamilia extends StatelessWidget {
   const RowSubFamilia({
@@ -36,11 +36,16 @@ class RowSubFamilia extends StatelessWidget {
                         color: selectedSubFamiliaIndex.value == index
                             ? Theme.of(context).colorScheme.primary
                             : Colors.black,
+                        fontWeight: selectedSubFamiliaIndex.value == index
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                         fontSize:
                             Theme.of(context).textTheme.titleMedium!.fontSize,
                       ),
                     ),
                     Divider(
+                      thickness:
+                          selectedSubFamiliaIndex.value == index ? 2.5 : null,
                       color: selectedSubFamiliaIndex.value == index
                           ? Theme.of(context).colorScheme.primary
                           : Colors.black,

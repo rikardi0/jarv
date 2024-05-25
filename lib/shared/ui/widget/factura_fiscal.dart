@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/venta/data/model/producto_ordenado.dart';
+import 'package:jarv/shared/ui/utils/date_format.dart';
 
 class FacturaFiscal extends StatelessWidget {
   const FacturaFiscal({
     super.key,
     required this.listaProducto,
-    required this.tipoPago,
+    required this.metodoPago,
     required this.precioVenta,
+    required this.efectivoEntregado,
+    required this.cambio,
   });
 
   final List<ProductoOrdenado?> listaProducto;
-  final String tipoPago;
+  final String? metodoPago;
   final double? precioVenta;
+  final int? efectivoEntregado;
+  final double? cambio;
 
   @override
   Widget build(BuildContext context) {
@@ -19,12 +24,11 @@ class FacturaFiscal extends StatelessWidget {
       0.0,
       (previousValue, element) =>
           previousValue +
-          (element!.precio) *
-              double.parse(element.cantidad) *
-              (1 + (element.iva)),
+          (element!.precio) * double.parse(element.cantidad) * (1),
     );
+    final double sizeWidth = MediaQuery.of(context).size.width * 0.35;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20.0),
+      padding: const EdgeInsets.all(8.0),
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
@@ -34,9 +38,9 @@ class FacturaFiscal extends StatelessWidget {
                     .onBackground
                     .withOpacity(0.15))),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(15.0),
           child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.375,
+            width: sizeWidth,
             child: Container(
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.background,
@@ -47,40 +51,40 @@ class FacturaFiscal extends StatelessWidget {
                           .onBackground
                           .withOpacity(0.15))),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(15.0),
                 child: Column(
                   children: [
                     const Text('TITULO EMPRESA'),
                     const Text('RIF'),
                     const Text('UBICACION'),
                     const Divider(),
-                    Expanded(child: Builder(
+                    Builder(
                       builder: (context) {
                         final productoOrdenado = listaProducto.last;
                         final fecha = productoOrdenado!.fecha;
                         return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(tipoPago == ''
-                                ? 'Venta en Espera'
-                                : 'Venta $tipoPago'),
-                            Text(
-                                '${fecha.day.toString()}/${fecha.month.toString()}/${fecha.year.toString()}'),
-                            Text(
-                                '${fecha.hour.toString()}: ${fecha.minute.toString()}')
+                            Text(metodoPago == null
+                                ? ''
+                                : metodoPago == ''
+                                    ? 'Venta en Espera'
+                                    : 'Venta $metodoPago'),
+                            Text(fechaFormatter(fecha)),
+                            Text(hourFormatter(fecha))
                           ],
                         );
                       },
-                    )),
+                    ),
                     Expanded(
                       child: ListView.builder(
                         itemCount: listaProducto.length,
                         itemBuilder: (BuildContext context, int index) {
                           final productoOrdenado = listaProducto[index];
-
-                          final precio =
-                              double.parse(productoOrdenado!.cantidad) *
-                                  productoOrdenado.precio;
+                          final cantidad =
+                              double.parse(productoOrdenado!.cantidad);
+                          final precio = cantidad * productoOrdenado.precio;
 
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -97,27 +101,35 @@ class FacturaFiscal extends StatelessWidget {
                       ),
                     ),
                     const Divider(),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text('Impuesto'), Text('Base'), Text('Cuota')],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        containerColumna(sizeWidth, 'Impuesto'),
+                        containerColumna(sizeWidth, 'Base'),
+                        containerColumna(sizeWidth, 'Cuota'),
+                      ],
                     ),
                     Expanded(
                       child: ListView.builder(
                         itemCount: listaProducto.length,
                         itemBuilder: (context, index) {
                           final productoOrdenado = listaProducto[index];
-                          final precio = productoOrdenado!.precio *
-                              double.parse(productoOrdenado.cantidad);
+                          final cantidad =
+                              double.parse(productoOrdenado!.cantidad);
+                          final precio = productoOrdenado.precio * cantidad;
                           final base = precio * productoOrdenado.iva;
+
                           final ivaPorcentaje =
                               (productoOrdenado.iva * 100).floor().toString();
 
                           return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text('$ivaPorcentaje%'),
-                              Text(base.toString()),
-                              Text('${precio + base}'),
+                              containerColumna(sizeWidth, '$ivaPorcentaje %'),
+                              containerColumna(
+                                  sizeWidth, base.toStringAsFixed(1)),
+                              containerColumna(sizeWidth,
+                                  (precio - base).toStringAsFixed(1)),
                             ],
                           );
                         },
@@ -132,17 +144,18 @@ class FacturaFiscal extends StatelessWidget {
                       ],
                     ),
                     Visibility(
-                      visible: tipoPago == 'tarjeta' || tipoPago == ''
+                      visible: metodoPago == 'tarjeta' || metodoPago == null
                           ? false
                           : true,
-                      child: const Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 0, vertical: 8.0),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Entregado 10 €'),
-                            Text('Cambio 1.50 €')
+                            Text('Entregado ${efectivoEntregado.toString()} €'),
+                            Text(cambio!.isNegative
+                                ? 'Faltan ${cambio!.abs().toString()} €'
+                                : 'Cambio ${cambio.toString()} €')
                           ],
                         ),
                       ),
@@ -155,5 +168,14 @@ class FacturaFiscal extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget containerColumna(double sizeWidth, String content) {
+    return SizedBox(
+        width: sizeWidth / 3.25,
+        child: Text(
+          content,
+          textAlign: TextAlign.center,
+        ));
   }
 }

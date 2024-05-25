@@ -17,12 +17,21 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  intl: ^0.18.1
   flutter_slidable: ^3.0.1
   flutter_speed_dial: ^7.0.0
   get_it: ^7.6.7
   multiple_stream_builder: ^3.0.2
   provider: ^6.1.2
+  flutter_animated_icons: ^1.0.1
   sqflite: ^2.3.2
+  regexpattern: ^2.6.0
+  clickable_list_wheel_view: ^0.2.0
+  horizontal_stepper_step: ^0.0.5
+  slide_to_act: ^2.0.2
+  file_picker: ^8.0.3
+  csv: ^6.0.0
+
 
 dev_dependencies:
   flutter_lints: ^2.0.0
@@ -38,3 +47,4 @@ flutter:
   assets:
     # Add assets from the images directory to the application.
     - assets/images/
+    - assets/animation/

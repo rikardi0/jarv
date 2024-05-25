@@ -4,7 +4,9 @@ import 'package:jarv/shared/data/database.dart';
 
 class TicketDiarioRepositoryImpl extends TicketDiarioRepository {
   final AppDatabase _appDatabase;
+
   TicketDiarioRepositoryImpl(this._appDatabase);
+
   @override
   Stream<List<String>> findAllClienteNombre() {
     return _appDatabase.clienteDao.findAllClienteNombre();
@@ -23,5 +25,10 @@ class TicketDiarioRepositoryImpl extends TicketDiarioRepository {
   @override
   Future<List<Venta?>> findVentaByFecha(String fechaActual) {
     return _appDatabase.ventaDao.findVentaByFecha(fechaActual);
+  }
+
+  @override
+  Future<List<TipoVenta>> findAllTipoVenta() {
+    return _appDatabase.tipoVentaDao.findAllTipoVenta();
   }
 }

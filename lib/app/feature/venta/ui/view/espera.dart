@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/venta/data/model/arguments_check_out.dart';
 import 'package:jarv/app/feature/venta/data/model/producto_espera.dart';
-import 'package:jarv/app/feature/venta/ui/widgets/app_bar_item.dart';
 import 'package:jarv/app/feature/venta/ui/provider/venta_espera_provider.dart';
-import 'package:jarv/shared/ui/factura_fiscal.dart';
+import 'package:jarv/app/feature/venta/ui/widgets/app_bar_item.dart';
+import 'package:jarv/shared/ui/widget/card_venta.dart';
+import 'package:jarv/shared/ui/widget/factura_fiscal.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../../shared/ui/card_venta.dart';
 
 class Espera extends StatefulWidget {
   const Espera({super.key});
@@ -18,16 +17,16 @@ class Espera extends StatefulWidget {
 }
 
 class _EsperaState extends State<Espera> {
-  final selectedVenta = ValueNotifier<int?>(null);
+  final selectedVenta = ValueNotifier<int?>(0);
+
   @override
   Widget build(BuildContext context) {
     final List<ProductoEspera> listaProductoEspera =
-        context.watch<VentaEsperaProvider>().listaEspera;
+        context.watch<VentaEsperaProvider>().listaEspera.reversed.toList();
 
-    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: selectedVenta.value != null || listaProductoEspera.isEmpty
+        title: selectedVenta.value != null && listaProductoEspera.isNotEmpty
             ? appBarActions(listaProductoEspera)
             : const Text('Ventas en Espera'),
       ),
@@ -38,28 +37,32 @@ class _EsperaState extends State<Espera> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    width: size.width * 0.4,
-                    child: ListView.builder(
-                        itemCount: listaProductoEspera.length,
-                        itemBuilder: (context, index) {
-                          return CardVenta(
-                            index: index,
-                            selected: selectedVenta,
-                            listaProductos: listaProductoEspera,
-                            color: Theme.of(context).primaryColor,
-                            action: actionItem,
-                          );
-                        }),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: ListView.builder(
+                          itemCount: listaProductoEspera.length,
+                          itemBuilder: (context, index) {
+                            return CardVenta(
+                              index: index,
+                              selected: selectedVenta,
+                              listaProductos: listaProductoEspera,
+                              color: Theme.of(context).primaryColor,
+                              action: actionItem,
+                            );
+                          }),
+                    ),
                   ),
                   selectedVenta.value != null
                       ? FacturaFiscal(
                           listaProducto:
                               listaProductoEspera[selectedVenta.value!]
                                   .listaProducto,
-                          tipoPago: '',
+                          metodoPago: '',
                           precioVenta: listaProductoEspera[selectedVenta.value!]
                               .totalVenta,
+                          efectivoEntregado: 0,
+                          cambio: 0,
                         )
                       : const SizedBox.shrink()
                 ],
@@ -78,16 +81,18 @@ class _EsperaState extends State<Espera> {
   }
 
   Center listaEsperaVacia() {
-    return const Center(
+    return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.info_outline),
+          const Icon(Icons.info_outline),
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Text(
               'Sin ventas en espera',
-              style: TextStyle(fontSize: 20, color: Colors.black54),
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+                  color: Colors.black54),
             ),
           ),
         ],

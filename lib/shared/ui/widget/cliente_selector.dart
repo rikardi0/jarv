@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/shared/ui/utils/validators.dart';
 
 class ClienteSelector extends StatelessWidget {
   const ClienteSelector({
@@ -18,7 +19,13 @@ class ClienteSelector extends StatelessWidget {
       stream: clienteLista,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return DropdownButton<String>(
+          return DropdownButtonFormField<String>(
+            validator: (value) {
+              if (value == null) {
+                return emptyValidator(value!);
+              }
+              return null;
+            },
             isExpanded: true,
             hint: const Text('Nombre Cliente'),
             value: cliente,

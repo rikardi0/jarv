@@ -30,6 +30,7 @@ class CardButton extends StatelessWidget {
           selected: valueNotifier.value == posicion ? true : false,
           title: Text(
             content,
+            textAlign: TextAlign.center,
           )),
     );
   }

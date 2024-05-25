@@ -3,7 +3,7 @@ import 'package:jarv/app/feature/login/data/repository/interface/login_repositor
 import 'package:jarv/app/feature/login/data/repository/interface/prueba_repository.dart';
 import 'package:jarv/core/di/locator.dart';
 import 'package:jarv/shared/data/model/entity.dart';
-import 'package:jarv/shared/ui/card_button.dart';
+import 'package:jarv/shared/ui/widget/card_button.dart';
 
 import '../../../venta/data/model/entity_venta.dart';
 import '../../data/model/entity_login.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../data/model/entity.dart';
+import '../../data/model/entity.dart';
 
 class GridProducto extends StatelessWidget {
   const GridProducto({
@@ -23,10 +23,10 @@ class GridProducto extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final SliverGridDelegateWithFixedCrossAxisCount grid =
         SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
+      crossAxisCount: 3,
       mainAxisSpacing: 0,
-      crossAxisSpacing: 10,
-      mainAxisExtent: size.height * 0.4,
+      crossAxisSpacing: 5,
+      mainAxisExtent: size.height * 0.25,
     );
     return GridView.builder(
       itemCount: itemProducto?.length ?? 0,
@@ -37,43 +37,37 @@ class GridProducto extends StatelessWidget {
         return GestureDetector(
           onTap: () => onProductTap(index, producto, joinedCantidad),
           child: Card(
-            shadowColor: const Color.fromARGB(255, 1, 24, 63),
-            elevation: selectedProductoIndex.value == index ? 15 : 0,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                side: BorderSide(
-                    width: 1,
-                    color: selectedProductoIndex.value == index
-                        ? const Color.fromARGB(255, 1, 27, 39)
-                        : borderColor)),
+                side: BorderSide(color: borderColor)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(
-                  height: size.height * 0.25,
-                  width: size.height * 0.2,
-                  child: const ClipRRect(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)),
-                    child: FadeInImage(
-                        fit: BoxFit.fill,
-                        placeholder: AssetImage('assets/images/load.gif'),
-                        image: NetworkImage(
-                            "https://s1.eestatic.com/2021/07/12/actualidad/595952167_195030066_1706x960.jpg")),
-                  ),
-                ),
+                    height: size.height * 0.165,
+                    child: const ClipRRect(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20)),
+                      child: FadeInImage(
+                          fit: BoxFit.fill,
+                          placeholder: AssetImage('assets/images/load.gif'),
+                          image: NetworkImage(
+                              "https://s1.eestatic.com/2021/07/12/actualidad/595952167_195030066_1706x960.jpg")),
+                    )),
                 Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Text(
                         producto!.producto,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(
                         '${producto.precio} €',
+                        style: Theme.of(context).textTheme.labelLarge,
                       ),
                     ],
                   ),

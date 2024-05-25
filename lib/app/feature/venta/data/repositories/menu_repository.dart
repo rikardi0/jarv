@@ -8,21 +8,17 @@ class MenuRepositoryImpl implements MenuRepository {
   final AppDatabase _database;
 
   @override
-  Stream<List<Familia>> findAllFamilias() {
-    return _database.familiaDao.findAllFamilias().asStream();
+  Future<List<Familia>> findAllFamilias() {
+    return _database.familiaDao.findAllFamilias();
   }
 
   @override
-  Stream<List<SubFamilia?>> findSubFamiliaByFamilia(String idFamilia) {
-    return _database.subFamiliaDao
-        .findSubFamiliaByFamilia(idFamilia)
-        .asStream();
+  Future<List<SubFamilia?>> findSubFamiliaByFamilia(String idFamilia) {
+    return _database.subFamiliaDao.findSubFamiliaByFamilia(idFamilia);
   }
 
   @override
-  Stream<List<Producto?>> findProductoById(String idSubFamilia) {
-    return _database.productoDao
-        .findProductoBySubFamiliaId(idSubFamilia)
-        .asStream();
+  Future<List<Producto?>> findProductoById(String idSubFamilia) {
+    return _database.productoDao.findProductoBySubFamiliaId(idSubFamilia);
   }
 }

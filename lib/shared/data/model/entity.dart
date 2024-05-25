@@ -191,7 +191,6 @@ class Familia {
   final String idFamilia;
 
   final String nombreFamilia;
-  @primaryKey
   final String idUsuario;
 
   Familia(this.idFamilia, this.nombreFamilia, this.idUsuario);

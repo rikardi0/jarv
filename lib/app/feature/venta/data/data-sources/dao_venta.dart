@@ -1,4 +1,5 @@
 import 'package:floor/floor.dart';
+
 import '../model/entity_venta.dart';
 
 @dao
@@ -60,6 +61,8 @@ abstract class TipoVentaDao {
   @Query('SELECT tipoVenta FROM TipoVenta WHERE idTipoVenta = :id')
   Future<String?> findTipoVentaByID(int id);
 
+  @Query('SELECT * FROM TipoVenta')
+  Future<List<TipoVenta>> findAllTipoVenta();
   @insert
   Future<void> insertTipoVenta(TipoVenta venta);
 }

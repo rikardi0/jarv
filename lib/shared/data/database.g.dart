@@ -669,7 +669,7 @@ class _$FamiliaProveedorDao extends FamiliaProveedorDao {
   _$FamiliaProveedorDao(
     this.database,
     this.changeListener,
-  )   : _queryAdapter = QueryAdapter(database, changeListener),
+  )   : _queryAdapter = QueryAdapter(database),
         _familiaProveedorInsertionAdapter = InsertionAdapter(
             database,
             'FamiliaProveedor',
@@ -678,8 +678,7 @@ class _$FamiliaProveedorDao extends FamiliaProveedorDao {
                   'cif': item.cif,
                   'nombreFamilia': item.nombreFamilia,
                   'nombreSubFamilia': item.nombreSubFamilia
-                },
-            changeListener);
+                });
 
   final sqflite.DatabaseExecutor database;
 
@@ -690,17 +689,15 @@ class _$FamiliaProveedorDao extends FamiliaProveedorDao {
   final InsertionAdapter<FamiliaProveedor> _familiaProveedorInsertionAdapter;
 
   @override
-  Stream<List<FamiliaProveedor>> findFamiliaByCif(String cif) {
-    return _queryAdapter.queryListStream(
+  Future<List<FamiliaProveedor>> findFamiliaByCif(String cif) async {
+    return _queryAdapter.queryList(
         'SELECT * FROM FamiliaProveedor WHERE cif = ?1',
         mapper: (Map<String, Object?> row) => FamiliaProveedor(
             cif: row['cif'] as String,
             nombreFamilia: row['nombreFamilia'] as String,
             nombreSubFamilia: row['nombreSubFamilia'] as String,
             familiaId: row['familiaId'] as String),
-        arguments: [cif],
-        queryableName: 'FamiliaProveedor',
-        isView: false);
+        arguments: [cif]);
   }
 
   @override
@@ -1315,6 +1312,14 @@ class _$TipoVentaDao extends TipoVentaDao {
         'SELECT tipoVenta FROM TipoVenta WHERE idTipoVenta = ?1',
         mapper: (Map<String, Object?> row) => row.values.first as String,
         arguments: [id]);
+  }
+
+  @override
+  Future<List<TipoVenta>> findAllTipoVenta() async {
+    return _queryAdapter.queryList('SELECT * FROM TipoVenta',
+        mapper: (Map<String, Object?> row) => TipoVenta(
+            idTipoVenta: row['idTipoVenta'] as int,
+            tipoVenta: row['tipoVenta'] as String));
   }
 
   @override
