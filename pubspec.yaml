@@ -29,6 +29,8 @@ dependencies:
   clickable_list_wheel_view: ^0.2.0
   horizontal_stepper_step: ^0.0.5
   slide_to_act: ^2.0.2
+  file_picker: ^8.0.3
+  csv: ^6.0.0
 
 
 dev_dependencies:
