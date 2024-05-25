@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/login/ui/widget/image_picker.dart';
+import 'package:jarv/app/feature/login/ui/widget/step/recetas_view.dart';
 import 'package:jarv/shared/data/model/entity.dart';
 import 'package:jarv/shared/ui/widget/custom_text_field.dart';
 
@@ -642,7 +643,10 @@ class _CrearProductoState extends State<CrearProducto> {
                                         backgroundColor: Theme.of(context)
                                             .colorScheme
                                             .tertiaryContainer),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                          context, RecetasView.routeName);
+                                    },
                                     icon: const Icon(Icons.receipt_long),
                                     label: const Text('Recetas')),
                               ),
