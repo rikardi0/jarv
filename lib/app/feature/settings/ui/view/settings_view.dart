@@ -1,34 +1,25 @@
 import 'package:clickable_list_wheel_view/clickable_list_wheel_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:jarv/app/feature/settings/ui/provider/settings_controller.dart';
+import 'package:jarv/app/feature/settings/ui/view/dispositivos_settings_view.dart';
+import 'package:jarv/app/feature/settings/ui/view/exportar_settings_view.dart';
+import 'package:jarv/app/feature/settings/ui/view/institucion_settings_view.dart';
+import 'package:jarv/app/feature/settings/ui/view/personalizacion_settings_view.dart';
+import 'package:jarv/app/feature/settings/ui/view/time_settings_view.dart';
+import 'package:jarv/app/feature/settings/ui/view/ventas_settings_view.dart';
 
 class SettingsView extends StatefulWidget {
-  const SettingsView({super.key, required this.controller});
+  const SettingsView({super.key});
 
   static const routeName = '/settings';
-  final SettingsController controller;
 
   @override
   State<SettingsView> createState() => _SettingsViewState();
 }
 
 class _SettingsViewState extends State<SettingsView> {
-  bool isSwitchActive = false;
-
-  final Map<String, IconData> settingsMap = {
-    'Empresa': Icons.store,
-    'Tienda': Icons.storefront_rounded,
-    'Personalización': Icons.edit,
-    'Dispositivos': Icons.devices,
-    'Ventas': Icons.sell,
-    'Time-Out': Icons.access_time, // Corrected icon for Time-Out
-    'Exportar': Icons.import_export,
-  };
 
   @override
   Widget build(BuildContext context) {
-    isSwitchActive =
-        widget.controller.themeMode == ThemeMode.light ? false : true;
     return Scaffold(
         appBar: AppBar(
           title: const Text('Configuracion'),
@@ -44,7 +35,6 @@ class _SettingsViewState extends State<SettingsView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildInfoTienda(context, 'Nombre Tienda'),
-                  buildContainer(context),
                 ],
               ),
             ),
@@ -78,94 +68,36 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 
-  Widget buildContainer(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Container(
-        decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-                width: 1.25,
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.5))),
-        child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Configuracion',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Modo oscuro',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ),
-                      Text(
-                        isSwitchActive ? 'Activado' : 'Desactivado',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      Switch(
-                          value: isSwitchActive,
-                          onChanged: (value) {
-                            if (widget.controller.themeMode ==
-                                ThemeMode.light) {
-                              widget.controller.updateThemeMode(ThemeMode.dark);
-                              isSwitchActive = true;
-                            } else {
-                              widget.controller
-                                  .updateThemeMode(ThemeMode.light);
-                              isSwitchActive = false;
-                            }
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )
-              ],
-            )),
-      ),
-    );
-  }
-
   Widget _buildListSettings(BuildContext context) {
-    final FixedExtentScrollController _scrollController =
+    final FixedExtentScrollController scrollController =
         FixedExtentScrollController();
     return Container(
       color: Colors.black26.withOpacity(0.05),
       width: MediaQuery.of(context).size.width * 0.25,
       child: ClickableListWheelScrollView(
-        scrollController: _scrollController,
+        scrollController: scrollController,
         itemHeight: 100,
         itemCount: 100,
         child: ListWheelScrollView.useDelegate(
-          controller: _scrollController,
+          controller: scrollController,
           physics: const FixedExtentScrollPhysics(),
           itemExtent: 100,
           overAndUnderCenterOpacity: 0.5,
           clipBehavior: Clip.none,
           renderChildrenOutsideViewport: true,
           childDelegate: ListWheelChildLoopingListDelegate(children: [
-            _buildListTile(
-                'Empresa', Icons.store, context, '/empresa_settings'),
-            _buildListTile('Tienda', Icons.storefront_rounded, context,
-                '/tienda_settings'),
+            _buildListTile('Institucion', Icons.store, context,
+                InstitucionSettingsView.routeName),
             _buildListTile('Personalizacion', Icons.edit, context,
-                '/personalizacion_settings'),
+                PersonalizacionSettingsView.routeName),
             _buildListTile('Dispositivos', Icons.devices, context,
-                '/dispositivos_settings'),
-            _buildListTile('Ventas', Icons.sell, context, '/ventas_settings'),
+                DispositivosSettingsView.routeName),
             _buildListTile(
-                'Time-Out', Icons.timelapse, context, '/time_settings'),
-            _buildListTile(
-                'Exportar', Icons.import_export, context, '/exportar_settings'),
+                'Ventas', Icons.sell, context, VentasSettingsView.routeName),
+            _buildListTile('Time-Out', Icons.timelapse, context,
+                TimeSettingsView.routeName),
+            _buildListTile('Exportar', Icons.import_export, context,
+                ExportarSettingsView.routeName),
           ]),
         ),
       ),
