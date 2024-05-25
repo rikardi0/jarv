@@ -105,7 +105,9 @@ class _RegistroInstitucionState extends State<RegistroInstitucion> {
             ),
           ),
         ),
-        const ImagePicker()
+        const ImagePicker(
+          ratio: 0.5,
+        )
       ],
     );
   }

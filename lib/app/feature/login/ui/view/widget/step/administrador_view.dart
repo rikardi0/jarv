@@ -96,7 +96,9 @@ class _AdminRegistroState extends State<AdminRegistro> {
               ],
             ),
           ),
-          const ImagePicker()
+          const ImagePicker(
+            ratio: 0.5,
+          )
         ],
       ),
     );
