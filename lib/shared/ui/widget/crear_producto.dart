@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/image_picker.dart';
+import 'package:jarv/app/feature/login/ui/widget/image_picker.dart';
 import 'package:jarv/shared/data/model/entity.dart';
 import 'package:jarv/shared/ui/widget/custom_text_field.dart';
 

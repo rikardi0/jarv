@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/step/administrador_view.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/step/empresa_registro.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/step/producto_registro.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/step/proveedor_registro.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/step/tienda_registro.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/step/usuario_view.dart';
+import 'package:jarv/app/feature/login/ui/widget/step/administrador_view.dart';
+import 'package:jarv/app/feature/login/ui/widget/step/empresa_registro.dart';
+import 'package:jarv/app/feature/login/ui/widget/step/producto_registro.dart';
+import 'package:jarv/app/feature/login/ui/widget/step/proveedor_registro.dart';
+import 'package:jarv/app/feature/login/ui/widget/step/tienda_registro.dart';
+import 'package:jarv/app/feature/login/ui/widget/step/usuario_view.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 
 class PrimerRegistro extends StatefulWidget {

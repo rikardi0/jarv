@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:jarv/app/feature/login/ui/view/widget/registro_institucion.dart';
+import 'package:jarv/app/feature/login/ui/widget/registro_institucion.dart';
 
-class EmpresaRegistro extends StatelessWidget {
-  const EmpresaRegistro({
+class TiendaRegistro extends StatelessWidget {
+  const TiendaRegistro({
     super.key,
     required this.formKey,
     required this.nombreController,
@@ -15,7 +15,6 @@ class EmpresaRegistro extends StatelessWidget {
     required this.telefonoController,
   });
 
-  final GlobalKey<FormState> formKey;
   final TextEditingController nombreController;
   final TextEditingController nifController;
   final TextEditingController correoController;
@@ -24,7 +23,8 @@ class EmpresaRegistro extends StatelessWidget {
   final TextEditingController ciudadController;
   final TextEditingController codigoPostalController;
   final TextEditingController telefonoController;
-  static int positionStepper = 0;
+  static int positionStepper = 1;
+  final GlobalKey<FormState> formKey;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class EmpresaRegistro extends StatelessWidget {
       ciudadController: ciudadController,
       codigoPostalController: codigoPostalController,
       telefonoController: telefonoController,
-      title: 'Empresa',
+      title: 'Tienda',
       content:
           'Le denominamos Empresa a nivel jurídico, para poder crear facturas...',
     );
