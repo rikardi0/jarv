@@ -263,3 +263,37 @@ class ProductoOferta {
     required this.unidades,
   });
 }
+
+@entity
+class Ingrediente {
+  @primaryKey
+  final String idIngrediente;
+  final String nombreIngrediente;
+  final String medida;
+  final int precio;
+  final int unidadesCompradas;
+
+  Ingrediente({
+    required this.idIngrediente,
+    required this.nombreIngrediente,
+    required this.medida,
+    required this.precio,
+    required this.unidadesCompradas,
+  });
+}
+
+@entity
+class Receta {
+  @primaryKey
+  final String idReceta;
+  final String idIngrediente;
+  final String medida;
+  final int cantidad;
+
+  Receta({
+    required this.idReceta,
+    required this.idIngrediente,
+    required this.medida,
+    required this.cantidad,
+  });
+}

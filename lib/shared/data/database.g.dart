@@ -109,6 +109,10 @@ class _$AppDatabase extends AppDatabase {
 
   ProductoOfertaDao? _productoOfertaDaoInstance;
 
+  IngredienteDao? _ingredienteDaoInstance;
+
+  RecetasDao? _recetaDaoInstance;
+
   Future<sqflite.Database> open(
     String path,
     List<Migration> migrations, [
@@ -180,6 +184,10 @@ class _$AppDatabase extends AppDatabase {
             'CREATE TABLE IF NOT EXISTS `Oferta` (`idOferta` INTEGER NOT NULL, `nombre` TEXT NOT NULL, `precio` REAL NOT NULL, `coste` REAL NOT NULL, PRIMARY KEY (`idOferta`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `ProductoOferta` (`idOferta` INTEGER NOT NULL, `idProducto` INTEGER NOT NULL, `cantidad` INTEGER NOT NULL, `unidades` INTEGER NOT NULL, PRIMARY KEY (`idOferta`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `Receta` (`idReceta` TEXT NOT NULL, `idIngrediente` TEXT NOT NULL, `medida` TEXT NOT NULL, `cantidad` INTEGER NOT NULL, PRIMARY KEY (`idReceta`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `Ingrediente` (`idIngrediente` TEXT NOT NULL, `nombreIngrediente` TEXT NOT NULL, `medida` TEXT NOT NULL, `precio` INTEGER NOT NULL, `unidadesCompradas` INTEGER NOT NULL, PRIMARY KEY (`idIngrediente`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -311,6 +319,17 @@ class _$AppDatabase extends AppDatabase {
   ProductoOfertaDao get productoOfertaDao {
     return _productoOfertaDaoInstance ??=
         _$ProductoOfertaDao(database, changeListener);
+  }
+
+  @override
+  IngredienteDao get ingredienteDao {
+    return _ingredienteDaoInstance ??=
+        _$IngredienteDao(database, changeListener);
+  }
+
+  @override
+  RecetasDao get recetaDao {
+    return _recetaDaoInstance ??= _$RecetasDao(database, changeListener);
   }
 }
 
@@ -1962,5 +1981,162 @@ class _$ProductoOfertaDao extends ProductoOfertaDao {
   Future<void> insertProductoOferta(ProductoOferta productoOferta) async {
     await _productoOfertaInsertionAdapter.insert(
         productoOferta, OnConflictStrategy.abort);
+  }
+}
+
+class _$IngredienteDao extends IngredienteDao {
+  _$IngredienteDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database, changeListener),
+        _ingredienteInsertionAdapter = InsertionAdapter(
+            database,
+            'Ingrediente',
+            (Ingrediente item) => <String, Object?>{
+                  'idIngrediente': item.idIngrediente,
+                  'nombreIngrediente': item.nombreIngrediente,
+                  'medida': item.medida,
+                  'precio': item.precio,
+                  'unidadesCompradas': item.unidadesCompradas
+                },
+            changeListener),
+        _ingredienteUpdateAdapter = UpdateAdapter(
+            database,
+            'Ingrediente',
+            ['idIngrediente'],
+            (Ingrediente item) => <String, Object?>{
+                  'idIngrediente': item.idIngrediente,
+                  'nombreIngrediente': item.nombreIngrediente,
+                  'medida': item.medida,
+                  'precio': item.precio,
+                  'unidadesCompradas': item.unidadesCompradas
+                },
+            changeListener);
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<Ingrediente> _ingredienteInsertionAdapter;
+
+  final UpdateAdapter<Ingrediente> _ingredienteUpdateAdapter;
+
+  @override
+  Future<List<Ingrediente>> findAllIngredientes() async {
+    return _queryAdapter.queryList('SELECT * FROM Ingrediente',
+        mapper: (Map<String, Object?> row) => Ingrediente(
+            idIngrediente: row['idIngrediente'] as String,
+            nombreIngrediente: row['nombreIngrediente'] as String,
+            medida: row['medida'] as String,
+            precio: row['precio'] as int,
+            unidadesCompradas: row['unidadesCompradas'] as int));
+  }
+
+  @override
+  Stream<List<String>> findAllNombreIngrediente() {
+    return _queryAdapter.queryListStream(
+        'SELECT nombreIngrediente FROM Ingrediente',
+        mapper: (Map<String, Object?> row) => row.values.first as String,
+        queryableName: 'Ingrediente',
+        isView: false);
+  }
+
+  @override
+  Stream<Ingrediente?> findIngredientById(int id) {
+    return _queryAdapter.queryStream(
+        'SELECT * FROM Ingrediente WHERE idIngrediente = ?1',
+        mapper: (Map<String, Object?> row) => Ingrediente(
+            idIngrediente: row['idIngrediente'] as String,
+            nombreIngrediente: row['nombreIngrediente'] as String,
+            medida: row['medida'] as String,
+            precio: row['precio'] as int,
+            unidadesCompradas: row['unidadesCompradas'] as int),
+        arguments: [id],
+        queryableName: 'Ingrediente',
+        isView: false);
+  }
+
+  @override
+  Future<void> insertIngrediente(Ingrediente ingrediente) async {
+    await _ingredienteInsertionAdapter.insert(
+        ingrediente, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateIngrediente(Ingrediente ingrediente) async {
+    await _ingredienteUpdateAdapter.update(
+        ingrediente, OnConflictStrategy.abort);
+  }
+}
+
+class _$RecetasDao extends RecetasDao {
+  _$RecetasDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database, changeListener),
+        _recetaInsertionAdapter = InsertionAdapter(
+            database,
+            'Receta',
+            (Receta item) => <String, Object?>{
+                  'idReceta': item.idReceta,
+                  'idIngrediente': item.idIngrediente,
+                  'medida': item.medida,
+                  'cantidad': item.cantidad
+                }),
+        _recetaUpdateAdapter = UpdateAdapter(
+            database,
+            'Receta',
+            ['idReceta'],
+            (Receta item) => <String, Object?>{
+                  'idReceta': item.idReceta,
+                  'idIngrediente': item.idIngrediente,
+                  'medida': item.medida,
+                  'cantidad': item.cantidad
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<Receta> _recetaInsertionAdapter;
+
+  final UpdateAdapter<Receta> _recetaUpdateAdapter;
+
+  @override
+  Future<List<Receta>> findAllRecetas() async {
+    return _queryAdapter.queryList('SELECT * FROM Receta',
+        mapper: (Map<String, Object?> row) => Receta(
+            idReceta: row['idReceta'] as String,
+            idIngrediente: row['idIngrediente'] as String,
+            medida: row['medida'] as String,
+            cantidad: row['cantidad'] as int));
+  }
+
+  @override
+  Stream<Ingrediente?> findRecetaById(int id) {
+    return _queryAdapter.queryStream('SELECT * FROM Receta WHERE idReceta = ?1',
+        mapper: (Map<String, Object?> row) => Ingrediente(
+            idIngrediente: row['idIngrediente'] as String,
+            nombreIngrediente: row['nombreIngrediente'] as String,
+            medida: row['medida'] as String,
+            precio: row['precio'] as int,
+            unidadesCompradas: row['unidadesCompradas'] as int),
+        arguments: [id],
+        queryableName: 'Receta',
+        isView: false);
+  }
+
+  @override
+  Future<void> insertReceta(Receta receta) async {
+    await _recetaInsertionAdapter.insert(receta, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateReceta(Receta receta) async {
+    await _recetaUpdateAdapter.update(receta, OnConflictStrategy.abort);
   }
 }
