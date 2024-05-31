@@ -35,6 +35,8 @@ class _CrearProductoState extends State<CrearProducto> {
   final TextEditingController ganancia = TextEditingController();
   final TextEditingController idSubfamiliaProducto = TextEditingController();
 
+  bool isCerveza = false;
+
   @override
   Widget build(BuildContext context) {
     if (listFamilia.length == 1) {
@@ -44,7 +46,7 @@ class _CrearProductoState extends State<CrearProducto> {
       selectedSubFamilia.value = 0;
     }
 
-    return Container(
+    return SizedBox(
         height: MediaQuery.of(context).size.height * 0.75,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -510,182 +512,208 @@ class _CrearProductoState extends State<CrearProducto> {
     );
   }
 
-  Dialog dialogProducto(BuildContext context, isEdit) {
+  Widget dialogProducto(BuildContext context, isEdit) {
     if (precio.text.isNotEmpty && coste.text.isNotEmpty) {
       ganancia.text =
           (double.parse(precio.text) - double.parse(coste.text)).toString();
     }
-    return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.5,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.25,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${isEdit ? 'Editar' : 'Agregar'} Articulo',
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall,
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: CustomTextField(
-                                    label: 'Nombre Producto',
-                                    value: productoNombre.text,
-                                    controller: productoNombre,
-                                    keyboard: TextInputType.text),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: CustomTextField(
-                                          label: 'Precio',
-                                          value: precio.text,
-                                          controller: precio,
-                                          keyboard: TextInputType.number),
-                                    ),
-                                    Expanded(
-                                      child: CustomTextField(
-                                          label: 'Coste',
-                                          value: coste.text,
-                                          controller: coste,
-                                          keyboard: TextInputType.number),
-                                    ),
-                                    Expanded(
-                                        child: TextFormField(
-                                      readOnly: true,
-                                      controller: ganancia,
-                                      decoration: const InputDecoration(
-                                        label: Text('Ganancia'),
-                                        border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10.0))),
+    return StatefulBuilder(builder: (context, state) {
+      return Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.25,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${isEdit ? 'Editar' : 'Agregar'} Articulo',
+                                  style:
+                                      Theme.of(context).textTheme.headlineSmall,
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: CustomTextField(
+                                      label: 'Nombre Producto',
+                                      value: productoNombre.text,
+                                      controller: productoNombre,
+                                      keyboard: TextInputType.text),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: CustomTextField(
+                                            label: 'Precio',
+                                            value: precio.text,
+                                            controller: precio,
+                                            keyboard: TextInputType.number),
                                       ),
-                                    )),
-                                  ],
+                                      Expanded(
+                                        child: CustomTextField(
+                                            label: 'Coste',
+                                            value: coste.text,
+                                            controller: coste,
+                                            keyboard: TextInputType.number),
+                                      ),
+                                      Expanded(
+                                          child: TextFormField(
+                                        readOnly: true,
+                                        controller: ganancia,
+                                        decoration: const InputDecoration(
+                                          label: Text('Ganancia'),
+                                          border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10.0))),
+                                        ),
+                                      )),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: CustomTextField(
-                                          label: 'IVA',
-                                          value: iva.text,
-                                          controller: iva,
-                                          keyboard: TextInputType.number),
-                                    ),
-                                    Expanded(
-                                      child: CustomTextField(
-                                          label: 'Medida',
-                                          value: medida.text,
-                                          controller: medida,
-                                          keyboard: TextInputType.text),
-                                    ),
-                                  ],
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: CustomTextField(
+                                            label: 'IVA',
+                                            value: iva.text,
+                                            controller: iva,
+                                            keyboard: TextInputType.number),
+                                      ),
+                                      Expanded(
+                                        child: CustomTextField(
+                                            label: 'Medida',
+                                            value: medida.text,
+                                            controller: medida,
+                                            keyboard: TextInputType.text),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.15,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              isEdit
-                                  ? FilledButton.icon(
-                                      style: FilledButton.styleFrom(
-                                          backgroundColor: Colors.transparent,
-                                          foregroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .onSecondaryContainer),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.15,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                isEdit
+                                    ? FilledButton.icon(
+                                        style: FilledButton.styleFrom(
+                                            backgroundColor: Colors.transparent,
+                                            foregroundColor: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondaryContainer),
+                                        onPressed: () {
+                                          setState(() {
+                                            listProducto.removeAt(
+                                                selectedProducto.value);
+                                            Navigator.pop(context);
+                                          });
+                                        },
+                                        icon: const Icon(Icons.delete),
+                                        label: const Text('Eliminar'))
+                                    : Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Cerveza',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge,
+                                          ),
+                                          Switch(
+                                              value: isCerveza,
+                                              onChanged: (value) {
+                                                state(() {
+                                                  isCerveza = value;
+                                                });
+                                              })
+                                        ],
+                                      ),
+                                const ImagePicker(
+                                  ratio: 0.25,
+                                ),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.15,
+                                  child: ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        foregroundColor: isCerveza
+                                            ? Colors.green
+                                            : Colors.orange,
+                                        backgroundColor: isCerveza
+                                            ? Colors.white
+                                            : Colors.white,
+                                      ),
                                       onPressed: () {
-                                        setState(() {
-                                          listProducto
-                                              .removeAt(selectedProducto.value);
-                                          Navigator.pop(context);
-                                        });
+                                        Navigator.pushNamed(
+                                            context, RecetasView.routeName);
                                       },
-                                      icon: const Icon(Icons.delete),
-                                      label: const Text('Eliminar'))
-                                  : const SizedBox.shrink(),
-                              const ImagePicker(
-                                ratio: 0.25,
-                              ),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.15,
-                                child: ElevatedButton.icon(
-                                    style: ElevatedButton.styleFrom(
-                                        foregroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .onTertiaryContainer,
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .tertiaryContainer),
-                                    onPressed: () {
-                                      Navigator.pushNamed(
-                                          context, RecetasView.routeName);
-                                    },
-                                    icon: const Icon(Icons.receipt_long),
-                                    label: const Text('Recetas')),
-                              ),
-                            ],
+                                      icon: Icon(isCerveza
+                                          ? Icons.oil_barrel
+                                          : Icons.receipt_long),
+                                      label: Text(isCerveza
+                                          ? 'Barril de Cerveza'
+                                          : 'Receta')),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text('Cancelar')),
-                        FilledButton(
-                            onPressed: () {
-                              setState(() {
-                                if (isEdit) {
-                                  editProducto();
-                                } else {
-                                  loadProducto();
-                                }
-
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                              onPressed: () {
                                 Navigator.pop(context);
-                              });
-                            },
-                            child: const Text('Aceptar')),
-                      ],
-                    ),
-                  ],
+                              },
+                              child: const Text('Cancelar')),
+                          FilledButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (isEdit) {
+                                    editProducto();
+                                  } else {
+                                    loadProducto();
+                                  }
+
+                                  Navigator.pop(context);
+                                });
+                              },
+                              child: const Text('Aceptar')),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   void editProducto() {

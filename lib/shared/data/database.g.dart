@@ -187,7 +187,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Receta` (`idReceta` TEXT NOT NULL, `idIngrediente` TEXT NOT NULL, `medida` TEXT NOT NULL, `cantidad` INTEGER NOT NULL, PRIMARY KEY (`idReceta`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Ingrediente` (`idIngrediente` TEXT NOT NULL, `nombreIngrediente` TEXT NOT NULL, `medida` TEXT NOT NULL, `precio` INTEGER NOT NULL, `unidadesCompradas` INTEGER NOT NULL, PRIMARY KEY (`idIngrediente`))');
+            'CREATE TABLE IF NOT EXISTS `Ingrediente` (`idIngrediente` TEXT NOT NULL, `nombreIngrediente` TEXT NOT NULL, `medida` TEXT NOT NULL, `precio` REAL NOT NULL, `unidadesCompradas` REAL NOT NULL, PRIMARY KEY (`idIngrediente`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -2030,8 +2030,8 @@ class _$IngredienteDao extends IngredienteDao {
             idIngrediente: row['idIngrediente'] as String,
             nombreIngrediente: row['nombreIngrediente'] as String,
             medida: row['medida'] as String,
-            precio: row['precio'] as int,
-            unidadesCompradas: row['unidadesCompradas'] as int));
+            precio: row['precio'] as double,
+            unidadesCompradas: row['unidadesCompradas'] as double));
   }
 
   @override
@@ -2051,11 +2051,18 @@ class _$IngredienteDao extends IngredienteDao {
             idIngrediente: row['idIngrediente'] as String,
             nombreIngrediente: row['nombreIngrediente'] as String,
             medida: row['medida'] as String,
-            precio: row['precio'] as int,
-            unidadesCompradas: row['unidadesCompradas'] as int),
+            precio: row['precio'] as double,
+            unidadesCompradas: row['unidadesCompradas'] as double),
         arguments: [id],
         queryableName: 'Ingrediente',
         isView: false);
+  }
+
+  @override
+  Future<void> deleteIngrediente(String id) async {
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM Ingrediente WHERE idIngrediente = ?1',
+        arguments: [id]);
   }
 
   @override
@@ -2123,11 +2130,17 @@ class _$RecetasDao extends RecetasDao {
             idIngrediente: row['idIngrediente'] as String,
             nombreIngrediente: row['nombreIngrediente'] as String,
             medida: row['medida'] as String,
-            precio: row['precio'] as int,
-            unidadesCompradas: row['unidadesCompradas'] as int),
+            precio: row['precio'] as double,
+            unidadesCompradas: row['unidadesCompradas'] as double),
         arguments: [id],
         queryableName: 'Receta',
         isView: false);
+  }
+
+  @override
+  Future<void> deleteReceta(String id) async {
+    await _queryAdapter.queryNoReturn('DELETE FROM Receta WHERE idReceta = ?1',
+        arguments: [id]);
   }
 
   @override

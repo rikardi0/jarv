@@ -273,6 +273,9 @@ abstract class IngredienteDao {
 
   @update
   Future<void> updateIngrediente(Ingrediente ingrediente);
+
+  @Query('DELETE FROM Ingrediente WHERE idIngrediente = :id')
+  Future<void> deleteIngrediente(String id);
 }
 
 @dao
@@ -288,4 +291,7 @@ abstract class RecetasDao {
 
   @update
   Future<void> updateReceta(Receta receta);
+
+  @Query('DELETE FROM Receta WHERE idReceta = :id')
+  Future<void> deleteReceta(String id);
 }

@@ -270,8 +270,8 @@ class Ingrediente {
   final String idIngrediente;
   final String nombreIngrediente;
   final String medida;
-  final int precio;
-  final int unidadesCompradas;
+  final double precio;
+  final double unidadesCompradas;
 
   Ingrediente({
     required this.idIngrediente,
