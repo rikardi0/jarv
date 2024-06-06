@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/login/data/model/recetas_argument.dart';
 import 'package:jarv/app/feature/login/data/repository/interface/login_repository.dart';
 import 'package:jarv/core/di/locator.dart';
 import 'package:jarv/shared/data/model/entity.dart';
 import 'package:jarv/shared/ui/widget/custom_text_field.dart';
+import 'package:jarv/shared/ui/widget/search_field.dart';
 
 class RecetasView extends StatefulWidget {
   const RecetasView({Key? key}) : super(key: key);
@@ -18,6 +20,7 @@ class _RecetasViewState extends State<RecetasView> {
   String? medidaSeleccionada;
 
   final fetchRepository = localService<LoginRepository>();
+  String searchText = '';
   final TextEditingController searchField = TextEditingController();
   final TextEditingController nombreIngrediente = TextEditingController();
   final TextEditingController cantidadIngrediente = TextEditingController();
@@ -34,20 +37,22 @@ class _RecetasViewState extends State<RecetasView> {
 
   @override
   Widget build(BuildContext context) {
+    final RecetaArgument argument =
+        ModalRoute.of(context)?.settings.arguments as RecetaArgument;
     return Scaffold(
       appBar: AppBar(),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          buildColumnIngredientes(context),
+          buildColumnIngredientes(context, argument.isCerveza),
           const VerticalDivider(),
-          buildTableReceta(context),
+          buildTableReceta(context, argument),
         ],
       ),
     );
   }
 
-  Padding buildTableReceta(BuildContext context) {
+  Padding buildTableReceta(BuildContext context, RecetaArgument argument) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: SizedBox(
@@ -59,7 +64,7 @@ class _RecetasViewState extends State<RecetasView> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Text(
-                  'Nombre de Producto',
+                  argument.nombreProducto!,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ),
@@ -189,7 +194,7 @@ class _RecetasViewState extends State<RecetasView> {
     ));
   }
 
-  Widget buildColumnIngredientes(BuildContext context) {
+  Widget buildColumnIngredientes(BuildContext context, bool isCerveza) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.25,
       child: Padding(
@@ -201,18 +206,21 @@ class _RecetasViewState extends State<RecetasView> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Text(
-                'Ingredientes',
+                isCerveza ? 'Barriles' : 'Ingredientes',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: CustomTextField(
-                  label: 'Buscar',
-                  trailing: const Icon(Icons.search),
-                  value: searchField.text,
-                  controller: searchField,
-                  keyboard: TextInputType.text),
+              child: SearchField(
+                label: 'Buscar Ingrediente',
+                type: TextInputType.name,
+                controller: searchField,
+                onChanged: (value) {
+                  searchText = value;
+                  setState(() {});
+                },
+              ),
             ),
             Expanded(
               child: FutureBuilder(
@@ -220,15 +228,23 @@ class _RecetasViewState extends State<RecetasView> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       listIngrediente = snapshot.data!;
-                      if (searchField.text.isNotEmpty) {
+                      if (isCerveza) {
                         listIngrediente = listIngrediente.where((element) {
                           return element!.nombreIngrediente
                               .toString()
                               .toLowerCase()
-                              .contains(
-                                  searchField.text.toString().toLowerCase());
+                              .contains('barril'.toLowerCase());
+                        }).toList();
+                      } else {
+                        listIngrediente = listIngrediente.where((element) {
+                          return !element!.nombreIngrediente
+                              .toString()
+                              .toLowerCase()
+                              .contains('barril'.toLowerCase());
                         }).toList();
                       }
+                      searchFilter();
+
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         child: ListView.builder(
@@ -259,7 +275,7 @@ class _RecetasViewState extends State<RecetasView> {
                                         context: context,
                                         builder: (context) {
                                           return dialogCrearIngrediente(
-                                              context, true);
+                                              context, true, isCerveza);
                                         },
                                       );
                                     },
@@ -334,7 +350,7 @@ class _RecetasViewState extends State<RecetasView> {
                   showDialog(
                     context: context,
                     builder: (context) {
-                      return dialogCrearIngrediente(context, false);
+                      return dialogCrearIngrediente(context, false, isCerveza);
                     },
                   );
                 } else if (double.parse(cantidadIngredienteReceta.text) >
@@ -346,12 +362,24 @@ class _RecetasViewState extends State<RecetasView> {
                 }
               },
               icon: Icon(!boolBtn() ? Icons.fastfood_rounded : Icons.add),
-              label: Text('${!boolBtn() ? 'Añadir' : 'Nuevo'} Ingrediente'),
+              label: Text(
+                  '${!boolBtn() ? 'Añadir' : 'Nuevo'} ${isCerveza ? 'Barril' : 'Ingrediente'} '),
             )
           ],
         ),
       ),
     );
+  }
+
+  void searchFilter() {
+    if (searchText.isNotEmpty) {
+      listIngrediente = listIngrediente.where((element) {
+        return element!.nombreIngrediente
+            .toString()
+            .toLowerCase()
+            .contains(searchText.toString().toLowerCase());
+      }).toList();
+    }
   }
 
   bool boolBtn() {
@@ -389,7 +417,8 @@ class _RecetasViewState extends State<RecetasView> {
     setState(() {});
   }
 
-  Dialog dialogCrearIngrediente(BuildContext context, bool isEdit) {
+  Dialog dialogCrearIngrediente(
+      BuildContext context, bool isEdit, bool isCerveza) {
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(26.0),
@@ -406,7 +435,8 @@ class _RecetasViewState extends State<RecetasView> {
                     children: [
                       Expanded(
                         child: CustomTextField(
-                            label: 'Nombre del Ingrediente',
+                            label:
+                                'Nombre del ${isCerveza ? 'Barril' : 'Ingrediente'}',
                             value: nombreIngrediente.text,
                             controller: nombreIngrediente,
                             keyboard: TextInputType.text),
@@ -475,7 +505,7 @@ class _RecetasViewState extends State<RecetasView> {
                               if (isEdit) {
                                 updateIngrediente();
                               } else {
-                                insertIngrediente();
+                                insertIngrediente(isCerveza);
                               }
                             });
                           },
@@ -506,10 +536,12 @@ class _RecetasViewState extends State<RecetasView> {
     Navigator.pop(context);
   }
 
-  void insertIngrediente() {
+  void insertIngrediente(bool isCerveza) {
     fetchRepository.insertIngrediente(Ingrediente(
         idIngrediente: UniqueKey().toString(),
-        nombreIngrediente: nombreIngrediente.text,
+        nombreIngrediente: isCerveza
+            ? 'Barril ${nombreIngrediente.text}'
+            : nombreIngrediente.text,
         medida: medidaIngrediente.text,
         precio: double.parse(costeIngrediente.text),
         unidadesCompradas: double.parse(cantidadIngrediente.text)));
