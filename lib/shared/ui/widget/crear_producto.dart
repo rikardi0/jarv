@@ -3,6 +3,7 @@ import 'package:jarv/app/feature/login/data/model/recetas_argument.dart';
 import 'package:jarv/app/feature/login/ui/widget/image_picker.dart';
 import 'package:jarv/app/feature/login/ui/widget/step/recetas_view.dart';
 import 'package:jarv/shared/data/model/entity.dart';
+import 'package:jarv/shared/ui/utils/validators.dart';
 import 'package:jarv/shared/ui/widget/custom_text_field.dart';
 
 class CrearProducto extends StatefulWidget {
@@ -38,13 +39,13 @@ class _CrearProductoState extends State<CrearProducto> {
 
   bool isCerveza = false;
 
+  GlobalKey<FormState> familiaFormKey = GlobalKey<FormState>();
+  GlobalKey<FormState> subFamiliaFormKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     if (listFamilia.length == 1) {
       selectedFamilia.value = 0;
-    }
-    if (listSubFamilia.length == 1) {
-      selectedSubFamilia.value = 0;
     }
 
     return SizedBox(
@@ -58,7 +59,9 @@ class _CrearProductoState extends State<CrearProducto> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 listFamilia.isEmpty ? const SizedBox() : rowSubFamilia(context),
-                listFamilia.isEmpty ? const SizedBox() : gridProducto(context),
+                listFamilia.isEmpty
+                    ? const SizedBox.shrink()
+                    : gridProducto(context),
               ],
             ),
           ],
@@ -68,22 +71,25 @@ class _CrearProductoState extends State<CrearProducto> {
   Widget columnFamilia(BuildContext context) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.15,
-      height: MediaQuery.of(context).size.height * 0.7,
+      height: MediaQuery.of(context).size.height * 0.725,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Text(
-              'Familia',
+              selectedFamilia.value == null
+                  ? ''
+                  : listFamilia[selectedFamilia.value].nombreFamilia,
               style: Theme.of(context).textTheme.headlineSmall,
+              textAlign: TextAlign.center,
             ),
           ),
           Expanded(
             child: Column(
               children: [
                 listFamilia.isEmpty
-                    ? const SizedBox()
+                    ? const SizedBox.shrink()
                     : Flexible(
                         child: ListView.builder(
                           shrinkWrap: true,
@@ -104,14 +110,17 @@ class _CrearProductoState extends State<CrearProducto> {
                           },
                         ),
                       ),
-                addCard(() {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return dialogFamilia(context, false);
-                    },
-                  );
-                }),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: addCard(() {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return dialogFamilia(context, false);
+                      },
+                    );
+                  }),
+                ),
               ],
             ),
           )
@@ -149,11 +158,17 @@ class _CrearProductoState extends State<CrearProducto> {
                         : const SizedBox.shrink()
                   ],
                 ),
-                CustomTextField(
-                    label: 'Nombre Familia',
-                    value: nombreFamilia.text,
-                    controller: nombreFamilia,
-                    keyboard: TextInputType.text),
+                Form(
+                  key: familiaFormKey,
+                  child: CustomTextField(
+                      label: 'Nombre Familia',
+                      value: nombreFamilia.text,
+                      controller: nombreFamilia,
+                      validateAction: (String value) {
+                        return emptyValidator(value);
+                      },
+                      keyboard: TextInputType.text),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -166,18 +181,21 @@ class _CrearProductoState extends State<CrearProducto> {
                     FilledButton(
                         onPressed: () {
                           setState(() {
-                            if (isEdit) {
-                              final keyProducto =
-                                  listFamilia[selectedFamilia.value].idFamilia;
-                              listFamilia[selectedFamilia.value] =
-                                  Familia(keyProducto, nombreFamilia.text, '0');
-                            } else {
-                              listFamilia.add(Familia(UniqueKey().toString(),
-                                  nombreFamilia.text, '0'));
-                            }
+                            if (familiaFormKey.currentState!.validate()) {
+                              if (isEdit) {
+                                final keyProducto =
+                                    listFamilia[selectedFamilia.value]
+                                        .idFamilia;
+                                listFamilia[selectedFamilia.value] = Familia(
+                                    keyProducto, nombreFamilia.text, '0');
+                              } else {
+                                listFamilia.add(Familia(UniqueKey().toString(),
+                                    nombreFamilia.text, '0'));
+                              }
 
-                            nombreFamilia.clear();
-                            Navigator.pop(context);
+                              nombreFamilia.clear();
+                              Navigator.pop(context);
+                            }
                           });
                         },
                         child: const Text('Aceptar'))
@@ -212,20 +230,35 @@ class _CrearProductoState extends State<CrearProducto> {
   }
 
   void deleteFamilia(BuildContext context) {
+    final List<SubFamilia> subFamilia = listSubFamilia
+        .where((element) => element.idFamilia
+            .contains(listFamilia[selectedFamilia.value].idFamilia))
+        .toList();
+    for (var subFamilia in subFamilia) {
+      listProducto.removeWhere(
+          (element) => element.idSubfamilia.contains(subFamilia.idSubfamilia));
+    }
     listSubFamilia.removeWhere((element) => element.idFamilia
         .contains(listFamilia[selectedFamilia.value].idFamilia));
     listFamilia.removeAt(selectedFamilia.value);
+    selectedSubFamilia.value = null;
+    selectedFamilia.value = null;
+    nombreFamilia.clear();
     Navigator.pop(context);
   }
 
   Widget rowSubFamilia(BuildContext context) {
-    final listaSubFamiliaSeleccionada = listSubFamilia.where((element) {
-      return element.idFamilia.toString().toLowerCase().contains(
-          listFamilia[selectedFamilia.value]
-              .idFamilia
-              .toString()
-              .toLowerCase());
-    });
+    Iterable listaSubFamiliaSeleccionada = [];
+    if (selectedFamilia.value != null) {
+      listaSubFamiliaSeleccionada = listSubFamilia.where((element) {
+        return element.idFamilia.toString().toLowerCase().contains(
+            listFamilia[selectedFamilia.value]
+                .idFamilia
+                .toString()
+                .toLowerCase());
+      });
+    }
+
     final width = MediaQuery.of(context).size.width * 0.775;
     return SizedBox(
       width: width,
@@ -233,15 +266,18 @@ class _CrearProductoState extends State<CrearProducto> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
             child: Text(
-              'Sub-Familia ${listFamilia[selectedFamilia.value].nombreFamilia}',
+              selectedSubFamilia.value == null
+                  ? ''
+                  : listSubFamilia[selectedSubFamilia.value].nombreSub,
               style: Theme.of(context).textTheme.headlineSmall,
+              textAlign: TextAlign.center,
             ),
           ),
           Row(
             children: [
-              listSubFamilia.isEmpty
+              listaSubFamiliaSeleccionada.isEmpty
                   ? const SizedBox()
                   : Flexible(
                       child: SizedBox(
@@ -276,14 +312,17 @@ class _CrearProductoState extends State<CrearProducto> {
                         ),
                       ),
                     ),
-              addCard(() {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return dialogSubFamilia(context, false);
-                  },
-                );
-              }),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: addCard(() {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return dialogSubFamilia(context, false);
+                    },
+                  );
+                }),
+              ),
             ],
           ),
         ],
@@ -298,6 +337,7 @@ class _CrearProductoState extends State<CrearProducto> {
         child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.35,
           child: Form(
+            key: subFamiliaFormKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,19 +352,7 @@ class _CrearProductoState extends State<CrearProducto> {
                     isEdit
                         ? IconButton(
                             onPressed: () {
-                              setState(() {
-                                if (selectedSubFamilia.value != null) {
-                                  listProducto.removeWhere((element) => element
-                                      .idSubfamilia
-                                      .contains(listSubFamilia[
-                                              selectedSubFamilia.value]
-                                          .idSubfamilia));
-                                  listSubFamilia
-                                      .removeAt(selectedSubFamilia.value);
-                                }
-
-                                Navigator.pop(context);
-                              });
+                              deleteSubFamilia(context);
                             },
                             icon: const Icon(Icons.delete),
                           )
@@ -333,6 +361,9 @@ class _CrearProductoState extends State<CrearProducto> {
                 ),
                 CustomTextField(
                     label: 'Nombre Sub-Familia',
+                    validateAction: (String value) {
+                      return emptyValidator(value);
+                    },
                     value: nombreSubFamilia.text,
                     controller: nombreSubFamilia,
                     keyboard: TextInputType.text),
@@ -347,15 +378,16 @@ class _CrearProductoState extends State<CrearProducto> {
                         child: const Text('Cancelar')),
                     FilledButton(
                         onPressed: () {
-                          setState(() {
-                            if (isEdit) {
-                              editSubFamilia();
-                            } else {
-                              loadSubFamilia();
-                            }
-
-                            Navigator.pop(context);
-                          });
+                          if (subFamiliaFormKey.currentState!.validate()) {
+                            setState(() {
+                              if (isEdit) {
+                                editSubFamilia();
+                              } else {
+                                loadSubFamilia();
+                              }
+                              Navigator.pop(context);
+                            });
+                          }
                         },
                         child: const Text('Aceptar'))
                   ],
@@ -366,6 +398,18 @@ class _CrearProductoState extends State<CrearProducto> {
         ),
       ),
     );
+  }
+
+  void deleteSubFamilia(BuildContext context) {
+    setState(() {
+      listProducto.removeWhere((element) => element.idSubfamilia
+          .contains(listSubFamilia[selectedSubFamilia.value].idSubfamilia));
+      listSubFamilia.removeAt(selectedSubFamilia.value);
+      selectedSubFamilia.value = null;
+      selectedTileSubFamilia.value = null;
+      nombreSubFamilia.clear();
+      Navigator.pop(context);
+    });
   }
 
   void onLongPressSubFamilia(
@@ -417,7 +461,7 @@ class _CrearProductoState extends State<CrearProducto> {
     });
 
     final width = MediaQuery.of(context).size.width * 0.5;
-    final height = MediaQuery.of(context).size.height * 0.55;
+    final height = MediaQuery.of(context).size.height * 0.5;
     return Expanded(
       child: SizedBox(
         width: width,
@@ -428,7 +472,7 @@ class _CrearProductoState extends State<CrearProducto> {
                 ? const SizedBox.shrink()
                 : Flexible(
                     child: Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
                       child: GridView.builder(
                         shrinkWrap: true,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -478,38 +522,43 @@ class _CrearProductoState extends State<CrearProducto> {
   }
 
   Widget addCardProducto(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.5 / 3,
-      child: Card(
-          elevation: 5,
-          shape: const RoundedRectangleBorder(),
-          child: ListTile(
-            onTap: () {
-              setState(() {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return dialogProducto(context, false);
-                  },
-                );
-              });
-            },
-            title: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Producto',
-                  style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.headlineSmall!.fontSize),
-                ),
-                const Icon(
-                  Icons.add,
-                  size: 30,
-                ),
-              ],
-            ),
-          )),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.5 / 3,
+        child: Card(
+            elevation: 5,
+            shape: const RoundedRectangleBorder(),
+            child: ListTile(
+              onTap: () {
+                setState(() {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return dialogProducto(context, false);
+                    },
+                  );
+                });
+              },
+              title: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Producto',
+                    style: TextStyle(
+                        fontSize: Theme.of(context)
+                            .textTheme
+                            .headlineSmall!
+                            .fontSize),
+                  ),
+                  const Icon(
+                    Icons.add,
+                    size: 30,
+                  ),
+                ],
+              ),
+            )),
+      ),
     );
   }
 
@@ -537,48 +586,64 @@ class _CrearProductoState extends State<CrearProducto> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.25,
+                              width: MediaQuery.of(context).size.width * 0.3,
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    '${isEdit ? 'Editar' : 'Agregar'} Producto',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall,
+                                  Row(
+                                    children: [
+                                      Text(
+                                        '${isEdit ? 'Editar' : 'Agregar'} Producto',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineSmall,
+                                      ),
+                                      Visibility(
+                                        visible: isEdit,
+                                        child: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                listProducto.removeAt(
+                                                    selectedProducto.value);
+                                                Navigator.pop(context);
+                                              });
+                                            },
+                                            icon: const Icon(Icons.delete)),
+                                      ),
+                                    ],
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
+                                        vertical: 16.0),
                                     child: CustomTextField(
                                         label: 'Nombre Producto',
                                         value: productoNombre.text,
                                         controller: productoNombre,
                                         keyboard: TextInputType.text),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: CustomTextField(
-                                              label: 'Precio',
-                                              value: precio.text,
-                                              controller: precio,
-                                              keyboard: TextInputType.number),
-                                        ),
-                                        Expanded(
-                                          child: CustomTextField(
-                                              label: 'Coste',
-                                              value: coste.text,
-                                              controller: coste,
-                                              keyboard: TextInputType.number),
-                                        ),
-                                        Expanded(
-                                            child: TextFormField(
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: CustomTextField(
+                                            label: 'Precio',
+                                            value: precio.text,
+                                            controller: precio,
+                                            keyboard: TextInputType.number),
+                                      ),
+                                      Expanded(
+                                        child: CustomTextField(
+                                            label: 'Coste',
+                                            value: coste.text,
+                                            controller: coste,
+                                            keyboard: TextInputType.number),
+                                      ),
+                                      Expanded(
+                                          child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0),
+                                        child: TextFormField(
                                           readOnly: true,
                                           controller: ganancia,
                                           decoration: const InputDecoration(
@@ -587,9 +652,9 @@ class _CrearProductoState extends State<CrearProducto> {
                                                 borderRadius: BorderRadius.all(
                                                     Radius.circular(10.0))),
                                           ),
-                                        )),
-                                      ],
-                                    ),
+                                        ),
+                                      )),
+                                    ],
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -619,44 +684,28 @@ class _CrearProductoState extends State<CrearProducto> {
                             SizedBox(
                               width: MediaQuery.of(context).size.width * 0.15,
                               child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  isEdit
-                                      ? FilledButton.icon(
-                                          style: FilledButton.styleFrom(
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              foregroundColor: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSecondaryContainer),
-                                          onPressed: () {
-                                            setState(() {
-                                              listProducto.removeAt(
-                                                  selectedProducto.value);
-                                              Navigator.pop(context);
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Cerveza',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge,
+                                      ),
+                                      Switch(
+                                          value: isCerveza,
+                                          onChanged: (value) {
+                                            state(() {
+                                              isCerveza = value;
                                             });
-                                          },
-                                          icon: const Icon(Icons.delete),
-                                          label: const Text('Eliminar'))
-                                      : Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              'Cerveza',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge,
-                                            ),
-                                            Switch(
-                                                value: isCerveza,
-                                                onChanged: (value) {
-                                                  state(() {
-                                                    isCerveza = value;
-                                                  });
-                                                })
-                                          ],
-                                        ),
+                                          })
+                                    ],
+                                  ),
                                   const ImagePicker(
                                     ratio: 0.25,
                                   ),
@@ -779,6 +828,7 @@ class _CrearProductoState extends State<CrearProducto> {
       width: MediaQuery.of(context).size.width * 0.15,
       height: 70,
       child: Card(
+        color: Theme.of(context).colorScheme.primaryContainer,
         elevation: 5,
         shape: const RoundedRectangleBorder(),
         child: ListTile(
@@ -791,8 +841,8 @@ class _CrearProductoState extends State<CrearProducto> {
     );
   }
 
-  SizedBox cardElement(int index, BuildContext context, String content,
-      notifier, tileNotifier, longPressAction, onTap) {
+  Widget cardElement(int index, BuildContext context, String content, notifier,
+      tileNotifier, longPressAction, onTap) {
     return SizedBox(
       height: 70,
       child: Card(
