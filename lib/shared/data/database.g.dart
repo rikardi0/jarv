@@ -149,7 +149,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Devolucion` (`idDevolucion` INTEGER NOT NULL, `devolucion` TEXT NOT NULL, PRIMARY KEY (`idDevolucion`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Producto` (`productoId` INTEGER NOT NULL, `producto` TEXT NOT NULL, `precio` REAL NOT NULL, `medida` INTEGER NOT NULL, `coste` REAL NOT NULL, `iva` REAL NOT NULL, `idSubfamilia` TEXT NOT NULL, PRIMARY KEY (`productoId`))');
+            'CREATE TABLE IF NOT EXISTS `Producto` (`productoId` INTEGER NOT NULL, `producto` TEXT NOT NULL, `idReceta` TEXT NOT NULL, `precio` REAL NOT NULL, `medida` INTEGER NOT NULL, `coste` REAL NOT NULL, `iva` REAL NOT NULL, `idSubfamilia` TEXT NOT NULL, PRIMARY KEY (`productoId`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Pedido` (`cifProveedor` TEXT NOT NULL, `producto` TEXT NOT NULL, `unidades` INTEGER NOT NULL, `costeFinal` REAL NOT NULL, `fecha` TEXT NOT NULL, PRIMARY KEY (`cifProveedor`))');
         await database.execute(
@@ -185,7 +185,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `ProductoOferta` (`idOferta` INTEGER NOT NULL, `idProducto` INTEGER NOT NULL, `cantidad` INTEGER NOT NULL, `unidades` INTEGER NOT NULL, PRIMARY KEY (`idOferta`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Receta` (`idReceta` TEXT NOT NULL, `idIngrediente` TEXT NOT NULL, `medida` TEXT NOT NULL, `cantidad` INTEGER NOT NULL, PRIMARY KEY (`idReceta`))');
+            'CREATE TABLE IF NOT EXISTS `Receta` (`idReceta` TEXT NOT NULL, `nombreReceta` TEXT NOT NULL, `coste` REAL NOT NULL, PRIMARY KEY (`idReceta`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Ingrediente` (`idIngrediente` TEXT NOT NULL, `nombreIngrediente` TEXT NOT NULL, `medida` TEXT NOT NULL, `precio` REAL NOT NULL, `unidadesCompradas` REAL NOT NULL, PRIMARY KEY (`idIngrediente`))');
 
@@ -508,6 +508,7 @@ class _$ProductoDao extends ProductoDao {
             (Producto item) => <String, Object?>{
                   'productoId': item.productoId,
                   'producto': item.producto,
+              'idReceta': item.idReceta,
                   'precio': item.precio,
                   'medida': item.medida,
                   'coste': item.coste,
@@ -522,6 +523,7 @@ class _$ProductoDao extends ProductoDao {
             (Producto item) => <String, Object?>{
                   'productoId': item.productoId,
                   'producto': item.producto,
+              'idReceta': item.idReceta,
                   'precio': item.precio,
                   'medida': item.medida,
                   'coste': item.coste,
@@ -544,13 +546,14 @@ class _$ProductoDao extends ProductoDao {
   Future<List<Producto>> findAllProductos() async {
     return _queryAdapter.queryList('SELECT * FROM Producto',
         mapper: (Map<String, Object?> row) => Producto(
-            row['productoId'] as int,
-            row['producto'] as String,
-            row['precio'] as double,
-            row['coste'] as double,
-            row['iva'] as double,
-            row['idSubfamilia'] as String,
-            row['medida'] as int));
+            productoId: row['productoId'] as int,
+            producto: row['producto'] as String,
+            precio: row['precio'] as double,
+            coste: row['coste'] as double,
+            iva: row['iva'] as double,
+            idSubfamilia: row['idSubfamilia'] as String,
+            medida: row['medida'] as int,
+            idReceta: row['idReceta'] as String));
   }
 
   @override
@@ -566,13 +569,14 @@ class _$ProductoDao extends ProductoDao {
     return _queryAdapter.queryStream(
         'SELECT * FROM Producto WHERE productoId = ?1',
         mapper: (Map<String, Object?> row) => Producto(
-            row['productoId'] as int,
-            row['producto'] as String,
-            row['precio'] as double,
-            row['coste'] as double,
-            row['iva'] as double,
-            row['idSubfamilia'] as String,
-            row['medida'] as int),
+            productoId: row['productoId'] as int,
+            producto: row['producto'] as String,
+            precio: row['precio'] as double,
+            coste: row['coste'] as double,
+            iva: row['iva'] as double,
+            idSubfamilia: row['idSubfamilia'] as String,
+            medida: row['medida'] as int,
+            idReceta: row['idReceta'] as String),
         arguments: [id],
         queryableName: 'Producto',
         isView: false);
@@ -583,13 +587,14 @@ class _$ProductoDao extends ProductoDao {
     return _queryAdapter.queryList(
         'SELECT * FROM Producto WHERE idSubfamilia = ?1',
         mapper: (Map<String, Object?> row) => Producto(
-            row['productoId'] as int,
-            row['producto'] as String,
-            row['precio'] as double,
-            row['coste'] as double,
-            row['iva'] as double,
-            row['idSubfamilia'] as String,
-            row['medida'] as int),
+            productoId: row['productoId'] as int,
+            producto: row['producto'] as String,
+            precio: row['precio'] as double,
+            coste: row['coste'] as double,
+            iva: row['iva'] as double,
+            idSubfamilia: row['idSubfamilia'] as String,
+            medida: row['medida'] as int,
+            idReceta: row['idReceta'] as String),
         arguments: [id]);
   }
 
@@ -2088,9 +2093,8 @@ class _$RecetasDao extends RecetasDao {
             'Receta',
             (Receta item) => <String, Object?>{
                   'idReceta': item.idReceta,
-                  'idIngrediente': item.idIngrediente,
-                  'medida': item.medida,
-                  'cantidad': item.cantidad
+              'nombreReceta': item.nombreReceta,
+              'coste': item.coste
                 }),
         _recetaUpdateAdapter = UpdateAdapter(
             database,
@@ -2098,9 +2102,8 @@ class _$RecetasDao extends RecetasDao {
             ['idReceta'],
             (Receta item) => <String, Object?>{
                   'idReceta': item.idReceta,
-                  'idIngrediente': item.idIngrediente,
-                  'medida': item.medida,
-                  'cantidad': item.cantidad
+              'nombreReceta': item.nombreReceta,
+              'coste': item.coste
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -2118,9 +2121,8 @@ class _$RecetasDao extends RecetasDao {
     return _queryAdapter.queryList('SELECT * FROM Receta',
         mapper: (Map<String, Object?> row) => Receta(
             idReceta: row['idReceta'] as String,
-            idIngrediente: row['idIngrediente'] as String,
-            medida: row['medida'] as String,
-            cantidad: row['cantidad'] as int));
+            nombreReceta: row['nombreReceta'] as String,
+            coste: row['coste'] as double));
   }
 
   @override

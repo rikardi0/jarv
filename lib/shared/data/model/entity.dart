@@ -214,6 +214,7 @@ class Producto {
   final int productoId;
 
   final String producto;
+  final String idReceta;
 
   final double precio;
 
@@ -225,8 +226,14 @@ class Producto {
 
   final String idSubfamilia;
 
-  Producto(this.productoId, this.producto, this.precio, this.coste, this.iva,
-      this.idSubfamilia, this.medida);
+  Producto({required this.productoId,
+    required this.producto,
+    required this.precio,
+    required this.coste,
+    required this.iva,
+    required this.idSubfamilia,
+    required this.medida,
+    required this.idReceta});
 }
 
 @entity
@@ -250,7 +257,6 @@ class Oferta {
 class ProductoOferta {
   @primaryKey
   final int idOferta;
-
   @primaryKey
   final int idProducto;
   final int cantidad;
@@ -286,14 +292,34 @@ class Ingrediente {
 class Receta {
   @primaryKey
   final String idReceta;
-  final String idIngrediente;
-  final String medida;
-  final int cantidad;
+  final String nombreReceta;
+  final double coste;
 
   Receta({
     required this.idReceta,
-    required this.idIngrediente,
+    required this.nombreReceta,
+    required this.coste,
+  });
+}
+
+@entity
+class IngredienteReceta {
+  @primaryKey
+  final int idIngredienteReceta;
+
+  //fk Ingrediente
+  final String idIngrediente;
+
+  //fk Receta
+  final String idReceta;
+  final String medida;
+  final int cantidad;
+
+  IngredienteReceta({
     required this.medida,
+    required this.idIngrediente,
+    required this.idIngredienteReceta,
+    required this.idReceta,
     required this.cantidad,
   });
 }
