@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/login/data/model/recetas_argument.dart';
 import 'package:jarv/app/feature/login/data/repository/interface/login_repository.dart';
+import 'package:jarv/app/feature/login/ui/provider/creacion_producto_provider.dart';
 import 'package:jarv/core/di/locator.dart';
 import 'package:jarv/shared/data/model/entity.dart';
 import 'package:jarv/shared/ui/widget/custom_text_field.dart';
 import 'package:jarv/shared/ui/widget/search_field.dart';
+import 'package:provider/provider.dart';
 
 class RecetasView extends StatefulWidget {
   const RecetasView({Key? key}) : super(key: key);
@@ -16,11 +18,8 @@ class RecetasView extends StatefulWidget {
 }
 
 class _RecetasViewState extends State<RecetasView> {
-  String? idSeleccionada;
-  String? medidaSeleccionada;
-
   final fetchRepository = localService<LoginRepository>();
-  String searchText = '';
+
   final TextEditingController searchField = TextEditingController();
   final TextEditingController nombreIngrediente = TextEditingController();
   final TextEditingController cantidadIngrediente = TextEditingController();
@@ -30,171 +29,41 @@ class _RecetasViewState extends State<RecetasView> {
   final TextEditingController cantidadIngredienteReceta =
       TextEditingController();
   final ValueNotifier<int?> selectedIngrediente = ValueNotifier<int?>(null);
+  String? idSeleccionada;
+  String? medidaSeleccionada;
+  String searchText = '';
+  double coste = 0;
   List<Ingrediente?> listIngrediente = [];
   List<Ingrediente?> listIngredienteReceta = [];
-
+  List<IngredienteReceta?> listaRelacion = [];
   bool isNewProduct = false;
+  final String recetaId = DateTime.now().millisecondsSinceEpoch.toString();
 
   @override
   Widget build(BuildContext context) {
     final RecetaArgument argument =
         ModalRoute.of(context)?.settings.arguments as RecetaArgument;
+    Receta receta = Receta(
+        idReceta: recetaId,
+        nombreReceta: argument.nombreProducto!,
+        coste: coste);
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(receta.idReceta),
+      ),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          buildColumnIngredientes(context, argument.isCerveza),
+          buildColumnIngredientes(context, argument.isCerveza, receta),
           const VerticalDivider(),
-          buildTableReceta(context, argument),
+          buildTableReceta(context, argument, receta),
         ],
       ),
     );
   }
 
-  Padding buildTableReceta(BuildContext context, RecetaArgument argument) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.65,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text(
-                  argument.nombreProducto!,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-              ),
-              Container(
-                decoration: const BoxDecoration(
-                    border: Border.symmetric(
-                        horizontal: BorderSide(color: Colors.black26))),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    containerColumn('Formato'),
-                    containerColumn('Medida'),
-                    containerColumn('Cantidad'),
-                    containerColumn('Coste'),
-                    containerColumn('Rentabilidad'),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.4,
-                child: ListView.builder(
-                  itemCount: listIngredienteReceta.length,
-                  itemBuilder: (context, index) {
-                    var item = listIngredienteReceta[index];
-                    return Container(
-                      decoration: const BoxDecoration(
-                          border: Border(
-                              bottom: BorderSide(color: Colors.black26))),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          containerColumn(item!.nombreIngrediente),
-                          containerColumn(item.medida),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                IconButton.outlined(
-                                    iconSize: 15,
-                                    visualDensity: VisualDensity.compact,
-                                    onPressed: () {
-                                      if (item.unidadesCompradas > 1) {
-                                        cantidadButton(item, index, false);
-                                      }
-                                    },
-                                    icon: const Icon(
-                                        Icons.arrow_downward_outlined)),
-                                containerColumn(
-                                    item.unidadesCompradas.toString()),
-                                IconButton.outlined(
-                                    iconSize: 15,
-                                    visualDensity: VisualDensity.compact,
-                                    onPressed: () {
-                                      cantidadButton(item, index, true);
-                                    },
-                                    icon: const Icon(
-                                        Icons.arrow_upward_outlined)),
-                              ],
-                            ),
-                          ),
-                          containerColumn(item.precio.toString()),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                containerColumn(item.nombreIngrediente),
-                                IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        listIngredienteReceta.removeAt(index);
-                                      });
-                                    },
-                                    icon: const Icon(Icons.delete))
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-              listIngredienteReceta.isNotEmpty
-                  ? ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.tertiary,
-                          foregroundColor:
-                              Theme.of(context).colorScheme.onTertiary),
-                      onPressed: () {},
-                      label: const Text('Agregar Receta'),
-                      icon: const Icon(Icons.add_box),
-                    )
-                  : const SizedBox.shrink()
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void cantidadButton(Ingrediente item, int index, bool isSuma) {
-    setState(() {});
-
-    double? cantidad;
-    if (isSuma) {
-      cantidad = item.unidadesCompradas + 1;
-    } else {
-      cantidad = item.unidadesCompradas - 1;
-    }
-    listIngredienteReceta[index] = Ingrediente(
-        idIngrediente: item.idIngrediente,
-        nombreIngrediente: item.nombreIngrediente,
-        medida: item.medida,
-        precio: item.precio,
-        unidadesCompradas: cantidad);
-  }
-
-  Expanded containerColumn(String label) {
-    return Expanded(
-        child: Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Text(
-        style: Theme.of(context).textTheme.titleMedium,
-        label,
-        textAlign: TextAlign.center,
-      ),
-    ));
-  }
-
-  Widget buildColumnIngredientes(BuildContext context, bool isCerveza) {
+  Widget buildColumnIngredientes(
+      BuildContext context, bool isCerveza, Receta receta) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.25,
       child: Padding(
@@ -217,8 +86,9 @@ class _RecetasViewState extends State<RecetasView> {
                 type: TextInputType.name,
                 controller: searchField,
                 onChanged: (value) {
-                  searchText = value;
-                  setState(() {});
+                  setState(() {
+                    searchText = value;
+                  });
                 },
               ),
             ),
@@ -228,23 +98,8 @@ class _RecetasViewState extends State<RecetasView> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       listIngrediente = snapshot.data!;
-                      if (isCerveza) {
-                        listIngrediente = listIngrediente.where((element) {
-                          return element!.nombreIngrediente
-                              .toString()
-                              .toLowerCase()
-                              .contains('barril'.toLowerCase());
-                        }).toList();
-                      } else {
-                        listIngrediente = listIngrediente.where((element) {
-                          return !element!.nombreIngrediente
-                              .toString()
-                              .toLowerCase()
-                              .contains('barril'.toLowerCase());
-                        }).toList();
-                      }
+                      escogerIngrediente(isCerveza);
                       searchFilter();
-
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         child: ListView.builder(
@@ -256,28 +111,8 @@ class _RecetasViewState extends State<RecetasView> {
                               children: [
                                 ListTile(
                                     onLongPress: () {
-                                      setState(() {
-                                        selectedIngrediente.value = index;
-                                        idSeleccionada =
-                                            ingrediente.idIngrediente;
-                                        nombreIngrediente.text =
-                                            ingrediente.nombreIngrediente;
-                                        medidaIngrediente.text =
-                                            ingrediente.medida.toString();
-                                        cantidadIngrediente.text = ingrediente
-                                            .unidadesCompradas
-                                            .toString();
-                                        costeIngrediente.text =
-                                            ingrediente.precio.toString();
-                                      });
-
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return dialogCrearIngrediente(
-                                              context, true, isCerveza);
-                                        },
-                                      );
+                                      longPressIngrediente(index, ingrediente,
+                                          context, isCerveza);
                                     },
                                     onTap: () {
                                       setState(() {
@@ -342,11 +177,11 @@ class _RecetasViewState extends State<RecetasView> {
                 : const SizedBox.shrink(),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: !boolBtn() ? Colors.blueAccent : null,
-                foregroundColor: !boolBtn() ? Colors.white : null,
+                backgroundColor: !isNewIngrediente() ? Colors.blueAccent : null,
+                foregroundColor: !isNewIngrediente() ? Colors.white : null,
               ),
               onPressed: () {
-                if (boolBtn()) {
+                if (isNewIngrediente()) {
                   showDialog(
                     context: context,
                     builder: (context) {
@@ -356,19 +191,59 @@ class _RecetasViewState extends State<RecetasView> {
                 } else if (double.parse(cantidadIngredienteReceta.text) >
                     listIngrediente[selectedIngrediente.value!]!
                         .unidadesCompradas) {
+                  print(
+                      'no hay suficiente ${listIngrediente[selectedIngrediente.value!]!.nombreIngrediente}');
                 } else {
                   addIngredientToReceta(
-                      listIngrediente[selectedIngrediente.value!]!);
+                      listIngrediente[selectedIngrediente.value!]!, receta);
                 }
               },
-              icon: Icon(!boolBtn() ? Icons.fastfood_rounded : Icons.add),
+              icon: Icon(
+                  !isNewIngrediente() ? Icons.food_bank_rounded : Icons.add),
               label: Text(
-                  '${!boolBtn() ? 'Añadir' : 'Nuevo'} ${isCerveza ? 'Barril' : 'Ingrediente'} '),
+                  '${!isNewIngrediente() ? 'Añadir' : 'Nuevo'} ${isCerveza ? 'Barril' : 'Ingrediente'} '),
             )
           ],
         ),
       ),
     );
+  }
+
+  void longPressIngrediente(int index, Ingrediente ingrediente,
+      BuildContext context, bool isCerveza) {
+    setState(() {
+      selectedIngrediente.value = index;
+      idSeleccionada = ingrediente.idIngrediente;
+      nombreIngrediente.text = ingrediente.nombreIngrediente;
+      medidaIngrediente.text = ingrediente.medida.toString();
+      cantidadIngrediente.text = ingrediente.unidadesCompradas.toString();
+      costeIngrediente.text = ingrediente.precio.toString();
+    });
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return dialogCrearIngrediente(context, true, isCerveza);
+      },
+    );
+  }
+
+  void escogerIngrediente(bool isCerveza) {
+    if (isCerveza) {
+      listIngrediente = listIngrediente.where((element) {
+        return element!.nombreIngrediente
+            .toString()
+            .toLowerCase()
+            .contains('barril'.toLowerCase());
+      }).toList();
+    } else {
+      listIngrediente = listIngrediente.where((element) {
+        return !element!.nombreIngrediente
+            .toString()
+            .toLowerCase()
+            .contains('barril'.toLowerCase());
+      }).toList();
+    }
   }
 
   void searchFilter() {
@@ -382,12 +257,12 @@ class _RecetasViewState extends State<RecetasView> {
     }
   }
 
-  bool boolBtn() {
+  bool isNewIngrediente() {
     return selectedIngrediente.value == null &&
         cantidadIngredienteReceta.text.isEmpty;
   }
 
-  void addIngredientToReceta(Ingrediente item) {
+  void addIngredientToReceta(Ingrediente item, Receta receta) {
     if (listIngredienteReceta
         .any((element) => element!.idIngrediente == item.idIngrediente)) {
       final itemTablaReceta = listIngredienteReceta
@@ -404,7 +279,25 @@ class _RecetasViewState extends State<RecetasView> {
           medida: itemTablaReceta.first!.medida,
           precio: itemTablaReceta.first!.precio,
           unidadesCompradas: cantidad);
+
+      coste += itemTablaReceta.first!.precio *
+          double.parse(cantidadIngredienteReceta.text);
+
+      listaRelacion[position] = IngredienteReceta(
+          medida: itemTablaReceta.first!.medida,
+          idIngrediente: itemTablaReceta.first!.idIngrediente,
+          idIngredienteReceta: listaRelacion[position]!.idIngredienteReceta,
+          idReceta: receta.idReceta,
+          cantidad: cantidad);
     } else {
+      coste += item.precio * double.parse(cantidadIngredienteReceta.text);
+      listaRelacion.add(IngredienteReceta(
+          medida: item.medida,
+          idIngrediente: item.idIngrediente,
+          idIngredienteReceta: DateTime.now().millisecondsSinceEpoch.toString(),
+          idReceta: receta.idReceta,
+          cantidad: double.parse(cantidadIngredienteReceta.text)));
+
       listIngredienteReceta.add(Ingrediente(
         idIngrediente: item.idIngrediente,
         nombreIngrediente: item.nombreIngrediente,
@@ -546,5 +439,176 @@ class _RecetasViewState extends State<RecetasView> {
         precio: double.parse(costeIngrediente.text),
         unidadesCompradas: double.parse(cantidadIngrediente.text)));
     Navigator.pop(context);
+  }
+
+  Widget buildTableReceta(
+      BuildContext context, RecetaArgument argument, Receta receta) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.65,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Text(
+                  receta.nombreReceta,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+              ),
+              Text(receta.coste.abs().toStringAsFixed(3)),
+              Container(
+                decoration: const BoxDecoration(
+                    border: Border.symmetric(
+                        horizontal: BorderSide(color: Colors.black26))),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    containerColumn('Formato'),
+                    containerColumn('Medida'),
+                    containerColumn('Cantidad'),
+                    containerColumn('Coste'),
+                    containerColumn('Rentabilidad'),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.4,
+                child: ListView.builder(
+                  itemCount: listIngredienteReceta.length,
+                  itemBuilder: (context, index) {
+                    var item = listIngredienteReceta[index];
+                    var itemReceta = listaRelacion[index];
+                    return Container(
+                      decoration: const BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(color: Colors.black26))),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          containerColumn(item!.nombreIngrediente),
+                          containerColumn(item.medida),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                IconButton.outlined(
+                                    iconSize: 15,
+                                    visualDensity: VisualDensity.compact,
+                                    onPressed: () {
+                                      setState(() {
+                                        if (item.unidadesCompradas > 1) {
+                                          cantidadButton(item, index, false,
+                                              itemReceta!, receta);
+                                        }
+                                      });
+                                    },
+                                    icon: const Icon(
+                                        Icons.arrow_downward_outlined)),
+                                containerColumn(
+                                    item.unidadesCompradas.toString()),
+                                IconButton.outlined(
+                                    iconSize: 15,
+                                    visualDensity: VisualDensity.compact,
+                                    onPressed: () {
+                                      setState(() {
+                                        cantidadButton(item, index, true,
+                                            itemReceta!, receta);
+                                      });
+                                    },
+                                    icon: const Icon(
+                                        Icons.arrow_upward_outlined)),
+                              ],
+                            ),
+                          ),
+                          containerColumn(item.precio.toString()),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                containerColumn(item.nombreIngrediente),
+                                IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        listIngredienteReceta.removeAt(index);
+                                        listaRelacion.removeAt(index);
+                                        coste -= item.precio *
+                                            item.unidadesCompradas;
+                                      });
+                                    },
+                                    icon: const Icon(Icons.delete))
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              listIngredienteReceta.isNotEmpty
+                  ? ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.tertiary,
+                          foregroundColor:
+                              Theme.of(context).colorScheme.onTertiary),
+                      onPressed: () {
+                        for (var element in listaRelacion) {
+                          context
+                              .read<CreacionProductoProvider>()
+                              .addIngredienteReceta(element!);
+                        }
+                        context
+                            .read<CreacionProductoProvider>()
+                            .updateRecetaId(receta.idReceta);
+                        Navigator.pop(context);
+                      },
+                      label: const Text('Agregar Receta'),
+                      icon: const Icon(Icons.add_box),
+                    )
+                  : const SizedBox.shrink()
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void cantidadButton(Ingrediente item, int index, bool isSuma,
+      IngredienteReceta itemReceta, Receta receta) {
+    double? cantidad;
+    if (isSuma) {
+      cantidad = item.unidadesCompradas + 1;
+      coste += item.precio;
+    } else {
+      cantidad = item.unidadesCompradas - 1;
+      coste -= item.precio;
+    }
+    listIngredienteReceta[index] = Ingrediente(
+        idIngrediente: item.idIngrediente,
+        nombreIngrediente: item.nombreIngrediente,
+        medida: item.medida,
+        precio: item.precio,
+        unidadesCompradas: cantidad);
+    listaRelacion[index] = IngredienteReceta(
+        medida: item.medida,
+        idIngrediente: item.idIngrediente,
+        idIngredienteReceta: itemReceta.idIngredienteReceta,
+        idReceta: receta.idReceta,
+        cantidad: cantidad);
+  }
+
+  Expanded containerColumn(String label) {
+    return Expanded(
+        child: Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Text(
+        style: Theme.of(context).textTheme.titleMedium,
+        label,
+        textAlign: TextAlign.center,
+      ),
+    ));
   }
 }

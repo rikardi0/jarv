@@ -213,12 +213,18 @@ class _ProductoRegistroState extends State<ProductoRegistro> {
   }
 
   Widget buildManualMethod(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [const CrearProducto(), buildActionRow()],
+      child: CrearProducto(
+        continueAction: () {
+          widget.continueAction();
+        },
+        cancelAction: () {
+          setState(() {
+            methodSelected = false;
+          });
+        },
       ),
     );
   }

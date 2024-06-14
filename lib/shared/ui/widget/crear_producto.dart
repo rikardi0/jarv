@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:jarv/app/feature/login/data/model/recetas_argument.dart';
+import 'package:jarv/app/feature/login/ui/provider/creacion_producto_provider.dart';
 import 'package:jarv/app/feature/login/ui/widget/image_picker.dart';
-import 'package:jarv/app/feature/login/ui/widget/step/recetas_view.dart';
+import 'package:jarv/app/feature/venta/ui/view/recetas_view.dart';
 import 'package:jarv/shared/data/model/entity.dart';
 import 'package:jarv/shared/ui/utils/validators.dart';
 import 'package:jarv/shared/ui/widget/custom_text_field.dart';
+import 'package:provider/provider.dart';
 
 class CrearProducto extends StatefulWidget {
   const CrearProducto({
     super.key,
+    this.continueAction,
+    this.cancelAction,
   });
+
+  final dynamic continueAction;
+  final dynamic cancelAction;
 
   @override
   State<CrearProducto> createState() => _CrearProductoState();
@@ -19,8 +26,8 @@ class _CrearProductoState extends State<CrearProducto> {
   List<Familia> listFamilia = [];
   List<SubFamilia> listSubFamilia = [];
   List<Producto> listProducto = [];
-  ValueNotifier selectedFamilia = ValueNotifier<int?>(null);
 
+  ValueNotifier selectedFamilia = ValueNotifier<int?>(null);
   ValueNotifier selectedSubFamilia = ValueNotifier<int?>(null);
   ValueNotifier selectedTileSubFamilia = ValueNotifier<int?>(null);
   ValueNotifier selectedProducto = ValueNotifier<int?>(null);
@@ -48,24 +55,61 @@ class _CrearProductoState extends State<CrearProducto> {
       selectedFamilia.value = 0;
     }
 
-    return SizedBox(
-        height: MediaQuery.of(context).size.height * 0.75,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            columnFamilia(context),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                listFamilia.isEmpty ? const SizedBox() : rowSubFamilia(context),
-                listFamilia.isEmpty
-                    ? const SizedBox.shrink()
-                    : gridProducto(context),
-              ],
-            ),
-          ],
-        ));
+    return Column(
+      children: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.75,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              columnFamilia(context),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  listFamilia.isEmpty
+                      ? const SizedBox()
+                      : rowSubFamilia(context),
+                  listFamilia.isEmpty
+                      ? const SizedBox.shrink()
+                      : gridProducto(context),
+                ],
+              ),
+            ],
+          ),
+        ),
+        buildActionRow()
+      ],
+    );
+  }
+
+  Widget buildActionRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        FilledButton.tonal(
+          onPressed: () {
+            widget.cancelAction();
+          },
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: () {
+            context
+                .read<CreacionProductoProvider>()
+                .setListFamilia(listFamilia);
+            context
+                .read<CreacionProductoProvider>()
+                .setListSubFamilia(listSubFamilia);
+            context
+                .read<CreacionProductoProvider>()
+                .setListProducto(listProducto);
+            widget.continueAction();
+          },
+          child: const Text('Continuar'),
+        ),
+      ],
+    );
   }
 
   Widget columnFamilia(BuildContext context) {
@@ -491,7 +535,7 @@ class _CrearProductoState extends State<CrearProducto> {
                           final listProductoItem = [];
                           for (var element in listaProductoSeleccionado) {
                             listProductoItem.add(element);
-                            itemNombre.add(element.producto);
+                            itemNombre.add(element.idReceta);
                             itemPrecio.add(element.precio);
                             itemCoste.add(element.coste);
                             itemIVA.add(element.iva);
@@ -531,6 +575,7 @@ class _CrearProductoState extends State<CrearProducto> {
             shape: const RoundedRectangleBorder(),
             child: ListTile(
               onTap: () {
+                context.read<CreacionProductoProvider>().clearRecetaId();
                 setState(() {
                   showDialog(
                     context: context,
@@ -568,6 +613,8 @@ class _CrearProductoState extends State<CrearProducto> {
           (double.parse(precio.text) - double.parse(coste.text)).toString();
     }
     return StatefulBuilder(builder: (context, state) {
+      final String? idReceta =
+          context.watch<CreacionProductoProvider>().recetaId;
       return Dialog(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -733,9 +780,12 @@ class _CrearProductoState extends State<CrearProducto> {
                                           Navigator.pushNamed(
                                               context, RecetasView.routeName,
                                               arguments: RecetaArgument(
-                                                  nombreProducto:
-                                                      productoNombre.text,
-                                                  isCerveza: isCerveza));
+                                                nombreProducto:
+                                                    productoNombre.text,
+                                                isCerveza: isCerveza,
+                                              ));
+
+                                          print('VOLVIIIIIIIII');
                                         },
                                         icon: Icon(isCerveza
                                             ? Icons.oil_barrel
@@ -762,9 +812,9 @@ class _CrearProductoState extends State<CrearProducto> {
                               onPressed: () {
                                 setState(() {
                                   if (isEdit) {
-                                    editProducto();
+                                    editProducto(idReceta!);
                                   } else {
-                                    loadProducto();
+                                    loadProducto(idReceta!);
                                   }
 
                                   Navigator.pop(context);
@@ -784,17 +834,19 @@ class _CrearProductoState extends State<CrearProducto> {
     });
   }
 
-  void editProducto() {
+  void editProducto(String id) {
     final keyProducto = listProducto[selectedProducto.value].productoId;
     final keySubFamilia = listProducto[selectedProducto.value].idSubfamilia;
+
     listProducto[selectedProducto.value] = Producto(
-        keyProducto,
-        productoNombre.text,
-        double.parse(precio.text),
-        double.parse(coste.text),
-        double.parse(iva.text),
-        keySubFamilia,
-        int.parse(medida.text));
+        productoId: keyProducto,
+        producto: productoNombre.text,
+        precio: double.parse(precio.text),
+        coste: double.parse(coste.text),
+        iva: double.parse(iva.text),
+        idSubfamilia: keySubFamilia,
+        medida: int.parse(medida.text),
+        idReceta: id);
   }
 
   void onTapProducto(
@@ -802,6 +854,7 @@ class _CrearProductoState extends State<CrearProducto> {
     final globalPosition = listProducto.indexOf(listProductoItem[index]);
     selectedProducto.value = globalPosition;
     productoNombre.text = listProducto[selectedProducto.value].producto;
+    context.read<CreacionProductoProvider>().clearRecetaId();
 
     showDialog(
       context: context,
@@ -812,15 +865,16 @@ class _CrearProductoState extends State<CrearProducto> {
     setState(() {});
   }
 
-  void loadProducto() {
+  void loadProducto(String id) {
     listProducto.add(Producto(
-        DateTime.now().microsecondsSinceEpoch,
-        productoNombre.text,
-        double.parse(precio.text),
-        double.parse(coste.text),
-        double.parse(iva.text),
-        listSubFamilia[selectedSubFamilia.value].idSubfamilia,
-        int.parse(medida.text)));
+        productoId: DateTime.now().microsecondsSinceEpoch,
+        producto: productoNombre.text,
+        precio: double.parse(precio.text),
+        coste: double.parse(coste.text),
+        iva: double.parse(iva.text),
+        idSubfamilia: listSubFamilia[selectedSubFamilia.value].idSubfamilia,
+        medida: int.parse(medida.text),
+        idReceta: id));
   }
 
   Widget addCard(action) {

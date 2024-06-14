@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:jarv/app/feature/inventario/ui/view/inventario_view.dart';
+import 'package:jarv/app/feature/login/ui/provider/creacion_producto_provider.dart';
 import 'package:jarv/app/feature/login/ui/view/login.dart';
 import 'package:jarv/app/feature/login/ui/view/primer_registro.dart';
-import 'package:jarv/app/feature/login/ui/widget/step/recetas_view.dart';
 import 'package:jarv/app/feature/proveedor/ui/view/proveedor_field.dart';
 import 'package:jarv/app/feature/proveedor/ui/view/proveedor_view.dart';
 import 'package:jarv/app/feature/settings/ui/provider/settings_controller.dart';
@@ -17,6 +17,7 @@ import 'package:jarv/app/feature/settings/ui/view/settings_view.dart';
 import 'package:jarv/app/feature/settings/ui/view/time_settings_view.dart';
 import 'package:jarv/app/feature/settings/ui/view/ventas_settings_view.dart';
 import 'package:jarv/app/feature/venta/ui/view/cliente_field.dart';
+import 'package:jarv/app/feature/venta/ui/view/recetas_view.dart';
 import 'package:jarv/core/theme/custom_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -48,11 +49,13 @@ class MyApp extends StatelessWidget {
           return MultiProvider(
             providers: [
               ChangeNotifierProvider(
-                  create: (BuildContext context) => VentaEsperaProvider(
+                  create: (_) => VentaEsperaProvider(
                         listaEspera: [],
                         posicionListaEspera: null,
                         mostrarElementoEspera: false,
-                      ))
+                      )),
+              ChangeNotifierProvider(
+                  create: (context) => CreacionProductoProvider())
             ],
             child: MaterialApp(
               restorationScopeId: 'app',
@@ -82,7 +85,7 @@ class MyApp extends StatelessWidget {
   Route<dynamic>? route(RouteSettings routeSettings) {
     final Map<String, WidgetBuilder> loginRoutes = {
       LoginScreen.routeName: (context) => LoginScreen(),
-      RecetasView.routeName: (context) => RecetasView(),
+      RecetasView.routeName: (context) => const RecetasView(),
     };
     final Map<String, WidgetBuilder> ventaRoutes = {
       MenuScreen.routeName: (context) => const MenuScreen(),
