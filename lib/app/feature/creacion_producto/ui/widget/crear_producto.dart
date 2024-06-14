@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/creacion_producto/ui/provider/creacion_producto_provider.dart';
+import 'package:jarv/app/feature/creacion_producto/ui/view/recetas_view.dart';
 import 'package:jarv/app/feature/login/data/model/recetas_argument.dart';
-import 'package:jarv/app/feature/login/ui/provider/creacion_producto_provider.dart';
 import 'package:jarv/app/feature/login/ui/widget/image_picker.dart';
-import 'package:jarv/app/feature/venta/ui/view/recetas_view.dart';
 import 'package:jarv/shared/data/model/entity.dart';
 import 'package:jarv/shared/ui/utils/validators.dart';
 import 'package:jarv/shared/ui/widget/custom_text_field.dart';

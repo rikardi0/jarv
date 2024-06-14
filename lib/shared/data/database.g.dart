@@ -113,6 +113,8 @@ class _$AppDatabase extends AppDatabase {
 
   RecetasDao? _recetaDaoInstance;
 
+  IngredienteRecetaDao? _ingredienteRecetaDaoInstance;
+
   Future<sqflite.Database> open(
     String path,
     List<Migration> migrations, [
@@ -188,6 +190,8 @@ class _$AppDatabase extends AppDatabase {
             'CREATE TABLE IF NOT EXISTS `Receta` (`idReceta` TEXT NOT NULL, `nombreReceta` TEXT NOT NULL, `coste` REAL NOT NULL, PRIMARY KEY (`idReceta`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Ingrediente` (`idIngrediente` TEXT NOT NULL, `nombreIngrediente` TEXT NOT NULL, `medida` TEXT NOT NULL, `precio` REAL NOT NULL, `unidadesCompradas` REAL NOT NULL, PRIMARY KEY (`idIngrediente`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `IngredienteReceta` (`idIngredienteReceta` TEXT NOT NULL, `idIngrediente` TEXT NOT NULL, `idReceta` TEXT NOT NULL, `medida` TEXT NOT NULL, `cantidad` REAL NOT NULL, PRIMARY KEY (`idIngredienteReceta`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -330,6 +334,12 @@ class _$AppDatabase extends AppDatabase {
   @override
   RecetasDao get recetaDao {
     return _recetaDaoInstance ??= _$RecetasDao(database, changeListener);
+  }
+
+  @override
+  IngredienteRecetaDao get ingredienteRecetaDao {
+    return _ingredienteRecetaDaoInstance ??=
+        _$IngredienteRecetaDao(database, changeListener);
   }
 }
 
@@ -508,7 +518,7 @@ class _$ProductoDao extends ProductoDao {
             (Producto item) => <String, Object?>{
                   'productoId': item.productoId,
                   'producto': item.producto,
-              'idReceta': item.idReceta,
+                  'idReceta': item.idReceta,
                   'precio': item.precio,
                   'medida': item.medida,
                   'coste': item.coste,
@@ -523,7 +533,7 @@ class _$ProductoDao extends ProductoDao {
             (Producto item) => <String, Object?>{
                   'productoId': item.productoId,
                   'producto': item.producto,
-              'idReceta': item.idReceta,
+                  'idReceta': item.idReceta,
                   'precio': item.precio,
                   'medida': item.medida,
                   'coste': item.coste,
@@ -2093,8 +2103,8 @@ class _$RecetasDao extends RecetasDao {
             'Receta',
             (Receta item) => <String, Object?>{
                   'idReceta': item.idReceta,
-              'nombreReceta': item.nombreReceta,
-              'coste': item.coste
+                  'nombreReceta': item.nombreReceta,
+                  'coste': item.coste
                 }),
         _recetaUpdateAdapter = UpdateAdapter(
             database,
@@ -2102,8 +2112,8 @@ class _$RecetasDao extends RecetasDao {
             ['idReceta'],
             (Receta item) => <String, Object?>{
                   'idReceta': item.idReceta,
-              'nombreReceta': item.nombreReceta,
-              'coste': item.coste
+                  'nombreReceta': item.nombreReceta,
+                  'coste': item.coste
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -2153,5 +2163,73 @@ class _$RecetasDao extends RecetasDao {
   @override
   Future<void> updateReceta(Receta receta) async {
     await _recetaUpdateAdapter.update(receta, OnConflictStrategy.abort);
+  }
+}
+
+class _$IngredienteRecetaDao extends IngredienteRecetaDao {
+  _$IngredienteRecetaDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _ingredienteRecetaInsertionAdapter = InsertionAdapter(
+            database,
+            'IngredienteReceta',
+            (IngredienteReceta item) => <String, Object?>{
+                  'idIngredienteReceta': item.idIngredienteReceta,
+                  'idIngrediente': item.idIngrediente,
+                  'idReceta': item.idReceta,
+                  'medida': item.medida,
+                  'cantidad': item.cantidad
+                }),
+        _ingredienteRecetaUpdateAdapter = UpdateAdapter(
+            database,
+            'IngredienteReceta',
+            ['idIngredienteReceta'],
+            (IngredienteReceta item) => <String, Object?>{
+                  'idIngredienteReceta': item.idIngredienteReceta,
+                  'idIngrediente': item.idIngrediente,
+                  'idReceta': item.idReceta,
+                  'medida': item.medida,
+                  'cantidad': item.cantidad
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<IngredienteReceta> _ingredienteRecetaInsertionAdapter;
+
+  final UpdateAdapter<IngredienteReceta> _ingredienteRecetaUpdateAdapter;
+
+  @override
+  Future<List<IngredienteReceta>> findAllRecetas() async {
+    return _queryAdapter.queryList('SELECT * FROM IngredienteReceta',
+        mapper: (Map<String, Object?> row) => IngredienteReceta(
+            medida: row['medida'] as String,
+            idIngrediente: row['idIngrediente'] as String,
+            idIngredienteReceta: row['idIngredienteReceta'] as String,
+            idReceta: row['idReceta'] as String,
+            cantidad: row['cantidad'] as double));
+  }
+
+  @override
+  Future<void> deleteRelacionReceta(String id) async {
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM IngredienteReceta WHERE idReceta = ?1',
+        arguments: [id]);
+  }
+
+  @override
+  Future<void> insertRelacionReceta(IngredienteReceta receta) async {
+    await _ingredienteRecetaInsertionAdapter.insert(
+        receta, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateRelacionReceta(IngredienteReceta receta) async {
+    await _ingredienteRecetaUpdateAdapter.update(
+        receta, OnConflictStrategy.abort);
   }
 }

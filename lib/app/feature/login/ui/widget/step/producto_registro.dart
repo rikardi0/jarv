@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:jarv/shared/ui/widget/crear_producto.dart';
+import 'package:jarv/app/feature/creacion_producto/ui/widget/crear_producto.dart';
 
 class ProductoRegistro extends StatefulWidget {
   const ProductoRegistro({

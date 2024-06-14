@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/creacion_producto/data/model/entity_creacion_producto.dart';
+import 'package:jarv/app/feature/creacion_producto/data/repository/interface/creacion_producto_repository.dart';
+import 'package:jarv/app/feature/creacion_producto/ui/provider/creacion_producto_provider.dart';
 import 'package:jarv/app/feature/login/data/model/recetas_argument.dart';
-import 'package:jarv/app/feature/login/data/repository/interface/login_repository.dart';
-import 'package:jarv/app/feature/login/ui/provider/creacion_producto_provider.dart';
 import 'package:jarv/core/di/locator.dart';
-import 'package:jarv/shared/data/model/entity.dart';
 import 'package:jarv/shared/ui/widget/custom_text_field.dart';
 import 'package:jarv/shared/ui/widget/search_field.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +18,7 @@ class RecetasView extends StatefulWidget {
 }
 
 class _RecetasViewState extends State<RecetasView> {
-  final fetchRepository = localService<LoginRepository>();
+  final fetchRepository = localService<CreacionProductoRepository>();
 
   final TextEditingController searchField = TextEditingController();
   final TextEditingController nombreIngrediente = TextEditingController();
@@ -192,8 +192,6 @@ class _RecetasViewState extends State<RecetasView> {
                 } else if (double.parse(cantidadIngredienteReceta.text) >
                     listIngrediente[selectedIngrediente.value!]!
                         .unidadesCompradas) {
-                  print(
-                      'no hay suficiente ${listIngrediente[selectedIngrediente.value!]!.nombreIngrediente}');
                 } else {
                   addIngredientToReceta(
                       listIngrediente[selectedIngrediente.value!]!, receta);

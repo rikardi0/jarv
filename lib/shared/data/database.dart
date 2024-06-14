@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:floor/floor.dart';
+import 'package:jarv/app/feature/creacion_producto/data/data-sources/dao_creacion_producto.dart';
+import 'package:jarv/app/feature/creacion_producto/data/model/entity_creacion_producto.dart';
 import 'package:jarv/app/feature/proveedor/data/data-sources/dao_proveedor.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
@@ -42,6 +44,7 @@ part 'database.g.dart';
   ProductoOferta,
   Receta,
   Ingrediente,
+  IngredienteReceta,
 ])
 abstract class AppDatabase extends FloorDatabase {
   FamiliaDao get familiaDao;
@@ -95,4 +98,6 @@ abstract class AppDatabase extends FloorDatabase {
   IngredienteDao get ingredienteDao;
 
   RecetasDao get recetaDao;
+
+  IngredienteRecetaDao get ingredienteRecetaDao;
 }

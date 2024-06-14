@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/creacion_producto/data/model/entity_creacion_producto.dart';
 import 'package:jarv/shared/data/model/entity.dart';
 
 class CreacionProductoProvider extends ChangeNotifier {

@@ -1,4 +1,6 @@
 import 'package:get_it/get_it.dart';
+import 'package:jarv/app/feature/creacion_producto/data/repository/creacion_producto_repository.dart';
+import 'package:jarv/app/feature/creacion_producto/data/repository/interface/creacion_producto_repository.dart';
 import 'package:jarv/app/feature/inventario/data/repositories/interface/inventario_repository.dart';
 import 'package:jarv/app/feature/inventario/data/repositories/inventario_repository.dart';
 import 'package:jarv/app/feature/login/data/repository/interface/login_repository.dart';
@@ -49,4 +51,6 @@ Future<void> initializeDependencies() async {
 
   localService.registerFactory<InventarioRepository>(
       () => InventarioRepositoryImpl(localService<AppDatabase>()));
+  localService.registerFactory<CreacionProductoRepository>(
+      () => CreacionProductoRepositoryImpl(localService<AppDatabase>()));
 }

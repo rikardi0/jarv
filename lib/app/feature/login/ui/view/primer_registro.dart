@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jarv/app/feature/login/ui/view/login.dart';
 import 'package:jarv/app/feature/login/ui/widget/step/administrador_view.dart';
 import 'package:jarv/app/feature/login/ui/widget/step/empresa_registro.dart';
 import 'package:jarv/app/feature/login/ui/widget/step/producto_registro.dart';
@@ -58,7 +59,15 @@ class _PrimerRegistroState extends State<PrimerRegistro> {
                   children: [
                     stepper(context),
                     centerIcon(),
-                    slideButton(context)
+                    slideButton(context),
+                    showButton
+                        ? ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                  context, LoginScreen.routeName);
+                            },
+                            child: const Text('Ir a menu'))
+                        : const SizedBox.shrink()
                   ],
                 ),
               ),
