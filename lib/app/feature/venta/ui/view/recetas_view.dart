@@ -44,9 +44,10 @@ class _RecetasViewState extends State<RecetasView> {
     final RecetaArgument argument =
         ModalRoute.of(context)?.settings.arguments as RecetaArgument;
     Receta receta = Receta(
-        idReceta: recetaId,
+        idReceta: argument.idReceta != 'vacio' ? argument.idReceta! : recetaId,
         nombreReceta: argument.nombreProducto!,
         coste: coste);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(receta.idReceta),

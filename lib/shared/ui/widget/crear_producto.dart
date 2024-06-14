@@ -780,12 +780,14 @@ class _CrearProductoState extends State<CrearProducto> {
                                           Navigator.pushNamed(
                                               context, RecetasView.routeName,
                                               arguments: RecetaArgument(
+                                                idReceta: listProducto[
+                                                        selectedProducto.value]
+                                                    .idReceta,
+                                                isCerveza: isCerveza,
                                                 nombreProducto:
                                                     productoNombre.text,
-                                                isCerveza: isCerveza,
                                               ));
 
-                                          print('VOLVIIIIIIIII');
                                         },
                                         icon: Icon(isCerveza
                                             ? Icons.oil_barrel
@@ -854,7 +856,14 @@ class _CrearProductoState extends State<CrearProducto> {
     final globalPosition = listProducto.indexOf(listProductoItem[index]);
     selectedProducto.value = globalPosition;
     productoNombre.text = listProducto[selectedProducto.value].producto;
-    context.read<CreacionProductoProvider>().clearRecetaId();
+    final producto = listProducto[selectedProducto.value];
+    if (producto.idReceta == 'vacio') {
+      context.read<CreacionProductoProvider>().clearRecetaId();
+    } else {
+      context
+          .read<CreacionProductoProvider>()
+          .updateRecetaId(producto.idReceta);
+    }
 
     showDialog(
       context: context,
