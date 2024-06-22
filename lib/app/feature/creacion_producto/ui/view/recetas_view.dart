@@ -19,23 +19,24 @@ class RecetasView extends StatefulWidget {
 
 class _RecetasViewState extends State<RecetasView> {
   final fetchRepository = localService<CreacionProductoRepository>();
-
   final TextEditingController searchField = TextEditingController();
   final TextEditingController nombreIngrediente = TextEditingController();
   final TextEditingController cantidadIngrediente = TextEditingController();
   final TextEditingController medidaIngrediente = TextEditingController();
   final TextEditingController costeIngrediente = TextEditingController();
   final TextEditingController costoUnidad = TextEditingController();
-  final TextEditingController cantidadIngredienteReceta =
-      TextEditingController();
+  final TextEditingController cantidadIngReceta = TextEditingController();
+
   final ValueNotifier<int?> selectedIngrediente = ValueNotifier<int?>(null);
+
   String? idSeleccionada;
   String? medidaSeleccionada;
   String searchText = '';
   double coste = 0;
+
   List<Ingrediente?> listIngrediente = [];
-  List<Ingrediente?> listIngredienteReceta = [];
-  List<PreIngredienteReceta?> listaRelacion = [];
+  List<PreIngredienteReceta?> listaIngredienteReceta = [];
+
   bool isNewProduct = false;
   final String idNuevo = DateTime.now().millisecondsSinceEpoch.toString();
 
@@ -55,18 +56,11 @@ class _RecetasViewState extends State<RecetasView> {
       return element.idReceta.contains(receta.idReceta);
     }).toList();
     for (var i in ingredienteRecetaActual) {
-      if (!listIngredienteReceta
+      if (!listaIngredienteReceta
           .any((element) => element!.idIngrediente.contains(i.idIngrediente))) {
-        listIngredienteReceta.add(Ingrediente(
-            idIngrediente: i.idIngrediente,
-            nombreIngrediente: i.nombreIngrediente,
-            medida: i.medida,
-            precio: i.precio,
-            unidadesCompradas: i.cantidad));
-        listaRelacion.add(i);
+        listaIngredienteReceta.add(i);
       }
     }
-
     return Scaffold(
       appBar: AppBar(),
       body: Row(
@@ -137,7 +131,7 @@ class _RecetasViewState extends State<RecetasView> {
                                         if (selectedIngrediente.value ==
                                             index) {
                                           selectedIngrediente.value = null;
-                                          cantidadIngredienteReceta.clear();
+                                          cantidadIngReceta.clear();
                                         } else {
                                           medidaSeleccionada =
                                               ingrediente.medida;
@@ -182,12 +176,12 @@ class _RecetasViewState extends State<RecetasView> {
                         child: CustomTextField(
                             trailing: IconButton(
                                 onPressed: () {
-                                  cantidadIngredienteReceta.clear();
+                                  cantidadIngReceta.clear();
                                 },
                                 icon: const Icon(Icons.clear)),
                             label: medidaSeleccionada!,
-                            value: cantidadIngredienteReceta.text,
-                            controller: cantidadIngredienteReceta,
+                            value: cantidadIngReceta.text,
+                            controller: cantidadIngReceta,
                             keyboard: TextInputType.number),
                       ),
                     ),
@@ -206,7 +200,7 @@ class _RecetasViewState extends State<RecetasView> {
                       return dialogCrearIngrediente(context, false, isCerveza);
                     },
                   );
-                } else if (double.parse(cantidadIngredienteReceta.text) >
+                } else if (double.parse(cantidadIngReceta.text) >
                     listIngrediente[selectedIngrediente.value!]!
                         .unidadesCompradas) {
                 } else {
@@ -274,60 +268,44 @@ class _RecetasViewState extends State<RecetasView> {
   }
 
   bool isNewIngrediente() {
-    return selectedIngrediente.value == null &&
-        cantidadIngredienteReceta.text.isEmpty;
+    return selectedIngrediente.value == null && cantidadIngReceta.text.isEmpty;
   }
 
   void addIngredientToReceta(Ingrediente item, Receta receta) {
-    if (listIngredienteReceta
+    if (listaIngredienteReceta
         .any((element) => element!.idIngrediente == item.idIngrediente)) {
-      final itemTablaReceta = listIngredienteReceta
+      final itemTablaReceta = listaIngredienteReceta
           .where((element) => element!.idIngrediente == item.idIngrediente);
 
-      final double cantidad = itemTablaReceta.first!.unidadesCompradas +
-          double.parse(cantidadIngredienteReceta.text);
+      final double cantidad = itemTablaReceta.first!.cantidad +
+          double.parse(cantidadIngReceta.text);
 
-      final position = listIngredienteReceta.indexOf(itemTablaReceta.first);
+      final position = listaIngredienteReceta.indexOf(itemTablaReceta.first);
 
-      listIngredienteReceta[position] = Ingrediente(
-          idIngrediente: itemTablaReceta.first!.idIngrediente,
-          nombreIngrediente: itemTablaReceta.first!.nombreIngrediente,
-          medida: itemTablaReceta.first!.medida,
-          precio: itemTablaReceta.first!.precio,
-          unidadesCompradas: cantidad);
+      coste +=
+          itemTablaReceta.first!.precio * double.parse(cantidadIngReceta.text);
 
-      coste += itemTablaReceta.first!.precio *
-          double.parse(cantidadIngredienteReceta.text);
-
-      listaRelacion[position] = PreIngredienteReceta(
+      listaIngredienteReceta[position] = PreIngredienteReceta(
         medida: itemTablaReceta.first!.medida,
         idIngrediente: itemTablaReceta.first!.idIngrediente,
-        idIngredienteReceta: listaRelacion[position]!.idIngredienteReceta,
+        idIngredienteReceta:
+            listaIngredienteReceta[position]!.idIngredienteReceta,
         idReceta: receta.idReceta,
         cantidad: cantidad,
         nombreIngrediente: itemTablaReceta.first!.nombreIngrediente,
         precio: itemTablaReceta.first!.precio,
       );
     } else {
-      coste += item.precio * double.parse(cantidadIngredienteReceta.text);
-      listaRelacion.add(PreIngredienteReceta(
+      coste += item.precio * double.parse(cantidadIngReceta.text);
+      listaIngredienteReceta.add(PreIngredienteReceta(
           medida: item.medida,
           idIngrediente: item.idIngrediente,
           idIngredienteReceta: DateTime.now().millisecondsSinceEpoch.toString(),
           idReceta: receta.idReceta,
-          cantidad: double.parse(cantidadIngredienteReceta.text),
+          cantidad: double.parse(cantidadIngReceta.text),
           nombreIngrediente: item.nombreIngrediente,
-          precio: 0.0));
-
-      listIngredienteReceta.add(Ingrediente(
-        idIngrediente: item.idIngrediente,
-        nombreIngrediente: item.nombreIngrediente,
-        medida: item.medida,
-        precio: item.precio,
-        unidadesCompradas: double.parse(cantidadIngredienteReceta.text),
-      ));
+          precio: item.precio));
     }
-
     setState(() {});
   }
 
@@ -499,10 +477,9 @@ class _RecetasViewState extends State<RecetasView> {
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.4,
                 child: ListView.builder(
-                  itemCount: listIngredienteReceta.length,
+                  itemCount: listaIngredienteReceta.length,
                   itemBuilder: (context, index) {
-                    var item = listIngredienteReceta[index];
-                    var itemReceta = listaRelacion[index];
+                    var item = listaIngredienteReceta[index];
                     return Container(
                       decoration: const BoxDecoration(
                           border: Border(
@@ -520,23 +497,22 @@ class _RecetasViewState extends State<RecetasView> {
                                     visualDensity: VisualDensity.compact,
                                     onPressed: () {
                                       setState(() {
-                                        if (item.unidadesCompradas > 1) {
-                                          cantidadButton(item, index, false,
-                                              itemReceta!, receta);
+                                        if (item.cantidad > 1) {
+                                          cantidadButton(
+                                              index, false, item, receta);
                                         }
                                       });
                                     },
                                     icon: const Icon(
                                         Icons.arrow_downward_outlined)),
-                                containerColumn(
-                                    item.unidadesCompradas.toString()),
+                                containerColumn(item.cantidad.toString()),
                                 IconButton.outlined(
                                     iconSize: 15,
                                     visualDensity: VisualDensity.compact,
                                     onPressed: () {
                                       setState(() {
-                                        cantidadButton(item, index, true,
-                                            itemReceta!, receta);
+                                        cantidadButton(
+                                            index, true, item, receta);
                                       });
                                     },
                                     icon: const Icon(
@@ -552,10 +528,11 @@ class _RecetasViewState extends State<RecetasView> {
                                 IconButton(
                                     onPressed: () {
                                       setState(() {
-                                        listIngredienteReceta.removeAt(index);
-                                        listaRelacion.removeAt(index);
-                                        coste -= item.precio *
-                                            item.unidadesCompradas;
+                                        listaIngredienteReceta.removeAt(index);
+                                        context
+                                            .read<CreacionProductoProvider>()
+                                            .deleteItemIngredienteReceta(item);
+                                        coste -= item.precio * item.cantidad;
                                       });
                                     },
                                     icon: const Icon(Icons.delete))
@@ -568,7 +545,7 @@ class _RecetasViewState extends State<RecetasView> {
                   },
                 ),
               ),
-              listIngredienteReceta.isNotEmpty
+              listaIngredienteReceta.isNotEmpty
                   ? ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                           backgroundColor:
@@ -576,7 +553,7 @@ class _RecetasViewState extends State<RecetasView> {
                           foregroundColor:
                               Theme.of(context).colorScheme.onTertiary),
                       onPressed: () {
-                        for (var element in listaRelacion) {
+                        for (var element in listaIngredienteReceta) {
                           context
                               .read<CreacionProductoProvider>()
                               .deleteItemIngredienteReceta(element!);
@@ -600,26 +577,21 @@ class _RecetasViewState extends State<RecetasView> {
     );
   }
 
-  void cantidadButton(Ingrediente item, int index, bool isSuma,
-      PreIngredienteReceta itemReceta, Receta receta) {
+  void cantidadButton(
+      int index, bool isSuma, PreIngredienteReceta item, Receta receta) {
     double? cantidad;
     if (isSuma) {
-      cantidad = item.unidadesCompradas + 1;
+      cantidad = item.cantidad + 1;
       coste += item.precio;
     } else {
-      cantidad = item.unidadesCompradas - 1;
+      cantidad = item.cantidad - 1;
       coste -= item.precio;
     }
-    listIngredienteReceta[index] = Ingrediente(
-        idIngrediente: item.idIngrediente,
-        nombreIngrediente: item.nombreIngrediente,
-        medida: item.medida,
-        precio: item.precio,
-        unidadesCompradas: cantidad);
-    listaRelacion[index] = PreIngredienteReceta(
+
+    listaIngredienteReceta[index] = PreIngredienteReceta(
         medida: item.medida,
         idIngrediente: item.idIngrediente,
-        idIngredienteReceta: itemReceta.idIngredienteReceta,
+        idIngredienteReceta: item.idIngredienteReceta,
         idReceta: receta.idReceta,
         cantidad: cantidad,
         nombreIngrediente: item.nombreIngrediente,
