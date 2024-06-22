@@ -35,29 +35,46 @@ class _RecetasViewState extends State<RecetasView> {
   double coste = 0;
   List<Ingrediente?> listIngrediente = [];
   List<Ingrediente?> listIngredienteReceta = [];
-  List<IngredienteReceta?> listaRelacion = [];
+  List<PreIngredienteReceta?> listaRelacion = [];
   bool isNewProduct = false;
-  final String recetaId = DateTime.now().millisecondsSinceEpoch.toString();
+  final String idNuevo = DateTime.now().millisecondsSinceEpoch.toString();
 
   @override
   Widget build(BuildContext context) {
     final RecetaArgument argument =
         ModalRoute.of(context)?.settings.arguments as RecetaArgument;
     Receta receta = Receta(
-        idReceta: argument.idReceta != 'vacio' ? argument.idReceta! : recetaId,
+        idReceta: argument.idReceta != 'vacio' ? argument.idReceta! : idNuevo,
         nombreReceta: argument.nombreProducto!,
         coste: coste);
 
+    final junctionList =
+        context.watch<CreacionProductoProvider>().listIngredienteReceta;
+
+    final ingredienteRecetaActual = junctionList.where((element) {
+      return element.idReceta.contains(receta.idReceta);
+    }).toList();
+    for (var i in ingredienteRecetaActual) {
+      if (!listIngredienteReceta
+          .any((element) => element!.idIngrediente.contains(i.idIngrediente))) {
+        listIngredienteReceta.add(Ingrediente(
+            idIngrediente: i.idIngrediente,
+            nombreIngrediente: i.nombreIngrediente,
+            medida: i.medida,
+            precio: i.precio,
+            unidadesCompradas: i.cantidad));
+        listaRelacion.add(i);
+      }
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(receta.idReceta),
-      ),
+      appBar: AppBar(),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           buildColumnIngredientes(context, argument.isCerveza, receta),
           const VerticalDivider(),
-          buildTableReceta(context, argument, receta),
+          buildTableReceta(context, argument, receta, junctionList),
         ],
       ),
     );
@@ -282,20 +299,25 @@ class _RecetasViewState extends State<RecetasView> {
       coste += itemTablaReceta.first!.precio *
           double.parse(cantidadIngredienteReceta.text);
 
-      listaRelacion[position] = IngredienteReceta(
-          medida: itemTablaReceta.first!.medida,
-          idIngrediente: itemTablaReceta.first!.idIngrediente,
-          idIngredienteReceta: listaRelacion[position]!.idIngredienteReceta,
-          idReceta: receta.idReceta,
-          cantidad: cantidad);
+      listaRelacion[position] = PreIngredienteReceta(
+        medida: itemTablaReceta.first!.medida,
+        idIngrediente: itemTablaReceta.first!.idIngrediente,
+        idIngredienteReceta: listaRelacion[position]!.idIngredienteReceta,
+        idReceta: receta.idReceta,
+        cantidad: cantidad,
+        nombreIngrediente: itemTablaReceta.first!.nombreIngrediente,
+        precio: itemTablaReceta.first!.precio,
+      );
     } else {
       coste += item.precio * double.parse(cantidadIngredienteReceta.text);
-      listaRelacion.add(IngredienteReceta(
+      listaRelacion.add(PreIngredienteReceta(
           medida: item.medida,
           idIngrediente: item.idIngrediente,
           idIngredienteReceta: DateTime.now().millisecondsSinceEpoch.toString(),
           idReceta: receta.idReceta,
-          cantidad: double.parse(cantidadIngredienteReceta.text)));
+          cantidad: double.parse(cantidadIngredienteReceta.text),
+          nombreIngrediente: item.nombreIngrediente,
+          precio: 0.0));
 
       listIngredienteReceta.add(Ingrediente(
         idIngrediente: item.idIngrediente,
@@ -440,8 +462,8 @@ class _RecetasViewState extends State<RecetasView> {
     Navigator.pop(context);
   }
 
-  Widget buildTableReceta(
-      BuildContext context, RecetaArgument argument, Receta receta) {
+  Widget buildTableReceta(BuildContext context, RecetaArgument argument,
+      Receta receta, List<PreIngredienteReceta> list) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: SizedBox(
@@ -557,7 +579,10 @@ class _RecetasViewState extends State<RecetasView> {
                         for (var element in listaRelacion) {
                           context
                               .read<CreacionProductoProvider>()
-                              .addIngredienteReceta(element!);
+                              .deleteItemIngredienteReceta(element!);
+                          context
+                              .read<CreacionProductoProvider>()
+                              .addIngredienteReceta(element);
                         }
                         context
                             .read<CreacionProductoProvider>()
@@ -567,7 +592,7 @@ class _RecetasViewState extends State<RecetasView> {
                       label: const Text('Agregar Receta'),
                       icon: const Icon(Icons.add_box),
                     )
-                  : const SizedBox.shrink()
+                  : const SizedBox.shrink(),
             ],
           ),
         ),
@@ -576,7 +601,7 @@ class _RecetasViewState extends State<RecetasView> {
   }
 
   void cantidadButton(Ingrediente item, int index, bool isSuma,
-      IngredienteReceta itemReceta, Receta receta) {
+      PreIngredienteReceta itemReceta, Receta receta) {
     double? cantidad;
     if (isSuma) {
       cantidad = item.unidadesCompradas + 1;
@@ -591,12 +616,14 @@ class _RecetasViewState extends State<RecetasView> {
         medida: item.medida,
         precio: item.precio,
         unidadesCompradas: cantidad);
-    listaRelacion[index] = IngredienteReceta(
+    listaRelacion[index] = PreIngredienteReceta(
         medida: item.medida,
         idIngrediente: item.idIngrediente,
         idIngredienteReceta: itemReceta.idIngredienteReceta,
         idReceta: receta.idReceta,
-        cantidad: cantidad);
+        cantidad: cantidad,
+        nombreIngrediente: item.nombreIngrediente,
+        precio: item.precio);
   }
 
   Expanded containerColumn(String label) {
