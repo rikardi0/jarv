@@ -44,14 +44,13 @@ class _RecetasViewState extends State<RecetasView> {
   Widget build(BuildContext context) {
     final RecetaArgument argument =
         ModalRoute.of(context)?.settings.arguments as RecetaArgument;
+
+    final junctionList =
+        context.watch<CreacionProductoProvider>().listIngredienteReceta;
     Receta receta = Receta(
         idReceta: argument.idReceta != 'vacio' ? argument.idReceta! : idNuevo,
         nombreReceta: argument.nombreProducto!,
         coste: coste);
-
-    final junctionList =
-        context.watch<CreacionProductoProvider>().listIngredienteReceta;
-
     final ingredienteRecetaActual = junctionList.where((element) {
       return element.idReceta.contains(receta.idReceta);
     }).toList();
@@ -59,8 +58,11 @@ class _RecetasViewState extends State<RecetasView> {
       if (!listaIngredienteReceta
           .any((element) => element!.idIngrediente.contains(i.idIngrediente))) {
         listaIngredienteReceta.add(i);
+
+        coste += i.precio * i.cantidad;
       }
     }
+
     return Scaffold(
       appBar: AppBar(),
       body: Row(
@@ -318,39 +320,36 @@ class _RecetasViewState extends State<RecetasView> {
           width: MediaQuery.of(context).size.width * 0.35,
           child: SafeArea(
             child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: CustomTextField(
-                            label:
-                                'Nombre del ${isCerveza ? 'Barril' : 'Ingrediente'}',
-                            value: nombreIngrediente.text,
-                            controller: nombreIngrediente,
-                            keyboard: TextInputType.text),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.35,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            '${isEdit ? 'Editar' : 'Agregar'} Ingrediente',
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                          Visibility(
+                            visible: isEdit,
+                            child: IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.delete)),
+                          ),
+                        ],
                       ),
-                      Visibility(
-                        visible: isEdit,
-                        child: FilledButton.tonalIcon(
-                            style: FilledButton.styleFrom(
-                                backgroundColor: Colors.transparent),
-                            onPressed: () {
-                              deleteIngrediente();
-                              selectedIngrediente.value = null;
-                              setState(() {});
-                            },
-                            label: const Icon(Icons.delete),
-                            icon: const Text('Eliminar')),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.25,
-                    child: Row(
+                    ),
+                    CustomTextField(
+                        label:
+                            'Nombre del ${isCerveza ? 'Barril' : 'Ingrediente'}',
+                        value: nombreIngrediente.text,
+                        controller: nombreIngrediente,
+                        keyboard: TextInputType.text),
+                    Row(
                       children: [
                         Expanded(
                           child: CustomTextField(
@@ -368,10 +367,7 @@ class _RecetasViewState extends State<RecetasView> {
                         ),
                       ],
                     ),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.25,
-                    child: Row(
+                    Row(
                       children: [
                         Expanded(
                           child: CustomTextField(
@@ -382,29 +378,29 @@ class _RecetasViewState extends State<RecetasView> {
                         ),
                       ],
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Cancelar')),
-                      FilledButton(
-                          onPressed: () {
-                            setState(() {
-                              if (isEdit) {
-                                updateIngrediente();
-                              } else {
-                                insertIngrediente(isCerveza);
-                              }
-                            });
-                          },
-                          child: const Text('Guardar')),
-                    ],
-                  )
-                ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Cancelar')),
+                        FilledButton(
+                            onPressed: () {
+                              setState(() {
+                                if (isEdit) {
+                                  updateIngrediente();
+                                } else {
+                                  insertIngrediente(isCerveza);
+                                }
+                              });
+                            },
+                            child: const Text('Guardar')),
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -449,29 +445,33 @@ class _RecetasViewState extends State<RecetasView> {
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text(
-                  receta.nombreReceta,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
+              Text(
+                receta.nombreReceta,
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
-              Text(receta.coste.abs().toStringAsFixed(3)),
-              Container(
-                decoration: const BoxDecoration(
-                    border: Border.symmetric(
-                        horizontal: BorderSide(color: Colors.black26))),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    containerColumn('Formato'),
-                    containerColumn('Medida'),
-                    containerColumn('Cantidad'),
-                    containerColumn('Coste'),
-                    containerColumn('Rentabilidad'),
-                  ],
+              Text(
+                'Coste: ${coste.abs().toStringAsFixed(3)}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32.0),
+                child: Container(
+                  decoration: const BoxDecoration(
+                      border: Border.symmetric(
+                          horizontal: BorderSide(color: Colors.black26))),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      containerColumn('Formato'),
+                      containerColumn('Medida'),
+                      containerColumn('Cantidad'),
+                      containerColumn('Coste'),
+                      containerColumn('Rentabilidad'),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(
@@ -510,10 +510,20 @@ class _RecetasViewState extends State<RecetasView> {
                                     iconSize: 15,
                                     visualDensity: VisualDensity.compact,
                                     onPressed: () {
-                                      setState(() {
+                                      final ingrediente = listIngrediente
+                                          .where((element) => element!
+                                              .idIngrediente
+                                              .contains(item.idIngrediente))
+                                          .toList();
+
+                                      if (item.cantidad >=
+                                          ingrediente
+                                              .first!.unidadesCompradas) {
+                                      } else {
                                         cantidadButton(
                                             index, true, item, receta);
-                                      });
+                                      }
+                                      setState(() {});
                                     },
                                     icon: const Icon(
                                         Icons.arrow_upward_outlined)),
