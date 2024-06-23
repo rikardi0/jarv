@@ -23,7 +23,7 @@ class ImagePicker extends StatelessWidget {
                   elevation: 15.0,
                   child: Icon(
                     Icons.image,
-                    size: 100,
+                    size: 125,
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ),

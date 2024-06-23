@@ -39,6 +39,7 @@ class _RecetasViewState extends State<RecetasView> {
   List<PreIngredienteReceta?> listaIngredienteReceta = [];
 
   bool isNewProduct = false;
+  bool isCerveza = false;
   final String idNuevo = DateTime.now().millisecondsSinceEpoch.toString();
 
   @override
@@ -65,11 +66,33 @@ class _RecetasViewState extends State<RecetasView> {
     }
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.25,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text(
+                  'Escandallo de Cerveza',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                Switch(
+                    value: isCerveza,
+                    onChanged: (value) {
+                      setState(() {
+                        isCerveza = value;
+                      });
+                    })
+              ],
+            ),
+          ),
+        ],
+      ),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          buildColumnIngredientes(context, argument.isCerveza, receta),
+          buildColumnIngredientes(context, isCerveza, receta),
           const VerticalDivider(),
           buildTableReceta(context, argument, receta, junctionList),
         ],
@@ -316,7 +339,7 @@ class _RecetasViewState extends State<RecetasView> {
       BuildContext context, bool isEdit, bool isCerveza) {
     return Dialog(
       child: Padding(
-        padding: const EdgeInsets.all(26.0),
+        padding: const EdgeInsets.all(32.0),
         child: SizedBox(
           width: MediaQuery.of(context).size.width * 0.35,
           child: SafeArea(

@@ -44,8 +44,6 @@ class _CrearProductoState extends State<CrearProducto> {
   final TextEditingController ganancia = TextEditingController();
   final TextEditingController idSubfamiliaProducto = TextEditingController();
 
-  bool isCerveza = false;
-
   GlobalKey<FormState> familiaFormKey = GlobalKey<FormState>();
   GlobalKey<FormState> subFamiliaFormKey = GlobalKey<FormState>();
 
@@ -801,52 +799,25 @@ class _CrearProductoState extends State<CrearProducto> {
                               ),
                             ),
                             SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.15,
+                              width: MediaQuery.of(context).size.width * 0.175,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Cerveza',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge,
-                                      ),
-                                      Switch(
-                                          value: isCerveza,
-                                          onChanged: (value) {
-                                            state(() {
-                                              isCerveza = value;
-                                            });
-                                          })
-                                    ],
-                                  ),
                                   const ImagePicker(
-                                    ratio: 0.25,
+                                    ratio: 0.3,
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width *
                                         0.15,
                                     child: ElevatedButton.icon(
                                         style: ElevatedButton.styleFrom(
-                                          foregroundColor: isCerveza
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .onSecondary
-                                              : Theme.of(context)
-                                                  .colorScheme
-                                                  .onTertiary,
-                                          backgroundColor: isCerveza
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .secondary
-                                              : Theme.of(context)
-                                                  .colorScheme
-                                                  .tertiary,
+                                          foregroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .onTertiary,
+                                          backgroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .tertiary,
                                         ),
                                         onPressed: productoNombre.text.isEmpty
                                             ? null
@@ -860,17 +831,12 @@ class _CrearProductoState extends State<CrearProducto> {
                                                           ? listProducto[index]
                                                               .idReceta
                                                           : 'vacio',
-                                                      isCerveza: isCerveza,
                                                       nombreProducto:
                                                           productoNombre.text,
                                                     ));
                                               },
-                                        icon: Icon(isCerveza
-                                            ? Icons.oil_barrel
-                                            : Icons.receipt_long),
-                                        label: Text(isCerveza
-                                            ? 'Barril de Cerveza'
-                                            : 'Receta')),
+                                        icon: const Icon(Icons.receipt_long),
+                                        label: const Text('Escandallo')),
                                   ),
                                 ],
                               ),
