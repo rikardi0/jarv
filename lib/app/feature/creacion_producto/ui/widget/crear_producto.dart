@@ -51,6 +51,8 @@ class _CrearProductoState extends State<CrearProducto> {
 
   @override
   Widget build(BuildContext context) {
+    final junctionList =
+        context.watch<CreacionProductoProvider>().listIngredienteReceta;
     if (listFamilia.length == 1) {
       selectedFamilia.value = 0;
     }
@@ -73,6 +75,21 @@ class _CrearProductoState extends State<CrearProducto> {
                   listFamilia.isEmpty
                       ? const SizedBox.shrink()
                       : gridProducto(context),
+                  Container(
+                    height: 100,
+                    width: 200,
+                    child: ListView.builder(
+                      itemCount: junctionList.length,
+                      itemBuilder: (context, index) {
+                        return Row(
+                          children: [
+                            Text(junctionList[index].nombreIngrediente),
+                            Text(junctionList[index].cantidad.toString()),
+                          ],
+                        );
+                      },
+                    ),
+                  )
                 ],
               ),
             ],
@@ -505,7 +522,7 @@ class _CrearProductoState extends State<CrearProducto> {
     });
 
     final width = MediaQuery.of(context).size.width * 0.5;
-    final height = MediaQuery.of(context).size.height * 0.5;
+    final height = MediaQuery.of(context).size.height * 0.6;
     return Expanded(
       child: SizedBox(
         width: width,
@@ -535,7 +552,7 @@ class _CrearProductoState extends State<CrearProducto> {
                           final listProductoItem = [];
                           for (var element in listaProductoSeleccionado) {
                             listProductoItem.add(element);
-                            itemNombre.add(element.idReceta);
+                            itemNombre.add(element.producto);
                             itemPrecio.add(element.precio);
                             itemCoste.add(element.coste);
                             itemIVA.add(element.iva);
@@ -576,6 +593,7 @@ class _CrearProductoState extends State<CrearProducto> {
             child: ListTile(
               onTap: () {
                 context.read<CreacionProductoProvider>().clearRecetaId();
+                selectedProducto.value = null;
                 setState(() {
                   showDialog(
                     context: context,
@@ -626,6 +644,60 @@ class _CrearProductoState extends State<CrearProducto> {
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: Column(
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 64.0, vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: TextFormField(
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer),
+                                  initialValue:
+                                      listFamilia[selectedFamilia.value]
+                                          .nombreFamilia,
+                                  readOnly: true,
+                                  decoration: const InputDecoration(
+                                    label: Text('Familia'),
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10.0))),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: TextFormField(
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer),
+                                  initialValue:
+                                      listSubFamilia[selectedSubFamilia.value]
+                                          .nombreSub,
+                                  readOnly: true,
+                                  decoration: const InputDecoration(
+                                    label: Text('Sub-Familia'),
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10.0))),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 30.0),
                         child: Row(
@@ -776,19 +848,23 @@ class _CrearProductoState extends State<CrearProducto> {
                                                   .colorScheme
                                                   .tertiary,
                                         ),
-                                        onPressed: () {
-                                          Navigator.pushNamed(
-                                              context, RecetasView.routeName,
-                                              arguments: RecetaArgument(
-                                                idReceta: listProducto[
-                                                        selectedProducto.value]
-                                                    .idReceta,
-                                                isCerveza: isCerveza,
-                                                nombreProducto:
-                                                    productoNombre.text,
-                                              ));
-
-                                        },
+                                        onPressed: productoNombre.text.isEmpty
+                                            ? null
+                                            : () {
+                                                final int? index =
+                                                    selectedProducto.value;
+                                                Navigator.pushNamed(context,
+                                                    RecetasView.routeName,
+                                                    arguments: RecetaArgument(
+                                                      idReceta: index != null
+                                                          ? listProducto[index]
+                                                              .idReceta
+                                                          : 'vacio',
+                                                      isCerveza: isCerveza,
+                                                      nombreProducto:
+                                                          productoNombre.text,
+                                                    ));
+                                              },
                                         icon: Icon(isCerveza
                                             ? Icons.oil_barrel
                                             : Icons.receipt_long),
