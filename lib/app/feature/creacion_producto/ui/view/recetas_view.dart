@@ -5,6 +5,7 @@ import 'package:jarv/app/feature/creacion_producto/ui/provider/creacion_producto
 import 'package:jarv/app/feature/login/data/model/recetas_argument.dart';
 import 'package:jarv/core/di/locator.dart';
 import 'package:jarv/shared/ui/widget/custom_text_field.dart';
+import 'package:jarv/shared/ui/widget/medida_selector.dart';
 import 'package:jarv/shared/ui/widget/search_field.dart';
 import 'package:provider/provider.dart';
 
@@ -351,14 +352,15 @@ class _RecetasViewState extends State<RecetasView> {
                         keyboard: TextInputType.text),
                     Row(
                       children: [
-                        Expanded(
-                          child: CustomTextField(
-                              label: 'Medida',
-                              value: medidaIngrediente.text,
-                              controller: medidaIngrediente,
-                              keyboard: TextInputType.text),
-                        ),
-                        Expanded(
+                        Expanded(child: MedidaSelector(
+                          onChanged: (value) {
+                            setState(() {
+                              medidaIngrediente.text = value;
+                            });
+                          },
+                        )),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.225,
                           child: CustomTextField(
                               label: 'Cantidad',
                               value: cantidadIngrediente.text,
