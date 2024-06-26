@@ -90,7 +90,38 @@ class _CrearProductoState extends State<CrearProducto> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         FilledButton.tonal(
-          onPressed: () {},
+          onPressed: () {
+            if (listFamilia.isNotEmpty) {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text(
+                      'Atencion!',
+                      textAlign: TextAlign.left,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    content: const Text('Los cambios seran eliminados'),
+                    actions: [
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Cancelar')),
+                      FilledButton(
+                          onPressed: () {
+                            widget.cancelAction();
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Aceptar'))
+                    ],
+                  );
+                },
+              );
+            } else {
+              widget.cancelAction();
+            }
+          },
           child: const Text('Cancelar'),
         ),
         FilledButton(
