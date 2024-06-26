@@ -205,7 +205,9 @@ class _RecetasViewState extends State<RecetasView> {
                                   cantidadIngReceta.clear();
                                 },
                                 icon: const Icon(Icons.clear)),
-                            label: medidaSeleccionada!,
+                            label: medidaSeleccionada != null
+                                ? medidaSeleccionada!
+                                : '',
                             value: cantidadIngReceta.text,
                             controller: cantidadIngReceta,
                             keyboard: TextInputType.number),
@@ -375,7 +377,13 @@ class _RecetasViewState extends State<RecetasView> {
                         keyboard: TextInputType.text),
                     Row(
                       children: [
-                        Expanded(child: MedidaSelector(
+                        Expanded(
+                            child: MedidaSelector(
+                          value: listIngrediente[selectedIngrediente.value!] !=
+                                  null
+                              ? listIngrediente[selectedIngrediente.value!]!
+                                  .medida
+                              : '',
                           onChanged: (value) {
                             setState(() {
                               medidaIngrediente.text = value;

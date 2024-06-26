@@ -151,7 +151,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Devolucion` (`idDevolucion` INTEGER NOT NULL, `devolucion` TEXT NOT NULL, PRIMARY KEY (`idDevolucion`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Producto` (`productoId` INTEGER NOT NULL, `producto` TEXT NOT NULL, `idReceta` TEXT NOT NULL, `precio` REAL NOT NULL, `medida` INTEGER NOT NULL, `coste` REAL NOT NULL, `iva` REAL NOT NULL, `idSubfamilia` TEXT NOT NULL, PRIMARY KEY (`productoId`))');
+            'CREATE TABLE IF NOT EXISTS `Producto` (`productoId` INTEGER NOT NULL, `producto` TEXT NOT NULL, `idReceta` TEXT NOT NULL, `precio` REAL NOT NULL, `medida` TEXT NOT NULL, `cantidad` INTEGER NOT NULL, `imageFile` TEXT NOT NULL, `coste` REAL NOT NULL, `iva` REAL NOT NULL, `idSubfamilia` TEXT NOT NULL, PRIMARY KEY (`productoId`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Pedido` (`cifProveedor` TEXT NOT NULL, `producto` TEXT NOT NULL, `unidades` INTEGER NOT NULL, `costeFinal` REAL NOT NULL, `fecha` TEXT NOT NULL, PRIMARY KEY (`cifProveedor`))');
         await database.execute(
@@ -521,6 +521,8 @@ class _$ProductoDao extends ProductoDao {
                   'idReceta': item.idReceta,
                   'precio': item.precio,
                   'medida': item.medida,
+                  'cantidad': item.cantidad,
+                  'imageFile': item.imageFile,
                   'coste': item.coste,
                   'iva': item.iva,
                   'idSubfamilia': item.idSubfamilia
@@ -536,6 +538,8 @@ class _$ProductoDao extends ProductoDao {
                   'idReceta': item.idReceta,
                   'precio': item.precio,
                   'medida': item.medida,
+                  'cantidad': item.cantidad,
+                  'imageFile': item.imageFile,
                   'coste': item.coste,
                   'iva': item.iva,
                   'idSubfamilia': item.idSubfamilia
@@ -556,13 +560,15 @@ class _$ProductoDao extends ProductoDao {
   Future<List<Producto>> findAllProductos() async {
     return _queryAdapter.queryList('SELECT * FROM Producto',
         mapper: (Map<String, Object?> row) => Producto(
+            cantidad: row['cantidad'] as int,
+            imageFile: row['imageFile'] as String,
             productoId: row['productoId'] as int,
             producto: row['producto'] as String,
             precio: row['precio'] as double,
             coste: row['coste'] as double,
             iva: row['iva'] as double,
             idSubfamilia: row['idSubfamilia'] as String,
-            medida: row['medida'] as int,
+            medida: row['medida'] as String,
             idReceta: row['idReceta'] as String));
   }
 
@@ -579,13 +585,15 @@ class _$ProductoDao extends ProductoDao {
     return _queryAdapter.queryStream(
         'SELECT * FROM Producto WHERE productoId = ?1',
         mapper: (Map<String, Object?> row) => Producto(
+            cantidad: row['cantidad'] as int,
+            imageFile: row['imageFile'] as String,
             productoId: row['productoId'] as int,
             producto: row['producto'] as String,
             precio: row['precio'] as double,
             coste: row['coste'] as double,
             iva: row['iva'] as double,
             idSubfamilia: row['idSubfamilia'] as String,
-            medida: row['medida'] as int,
+            medida: row['medida'] as String,
             idReceta: row['idReceta'] as String),
         arguments: [id],
         queryableName: 'Producto',
@@ -597,13 +605,15 @@ class _$ProductoDao extends ProductoDao {
     return _queryAdapter.queryList(
         'SELECT * FROM Producto WHERE idSubfamilia = ?1',
         mapper: (Map<String, Object?> row) => Producto(
+            cantidad: row['cantidad'] as int,
+            imageFile: row['imageFile'] as String,
             productoId: row['productoId'] as int,
             producto: row['producto'] as String,
             precio: row['precio'] as double,
             coste: row['coste'] as double,
             iva: row['iva'] as double,
             idSubfamilia: row['idSubfamilia'] as String,
-            medida: row['medida'] as int,
+            medida: row['medida'] as String,
             idReceta: row['idReceta'] as String),
         arguments: [id]);
   }

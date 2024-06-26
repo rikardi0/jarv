@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:jarv/shared/ui/utils/validators.dart';
 
 class MedidaSelector extends StatelessWidget {
-  const MedidaSelector({super.key, required this.onChanged});
+  const MedidaSelector({super.key, required this.onChanged, this.value});
 
   final dynamic onChanged;
+  final String? value;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: DropdownButtonFormField<String>(
+          value: value,
           validator: (value) {
             if (value == null) {
               return emptyValidator(value!);

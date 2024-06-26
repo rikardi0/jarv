@@ -215,25 +215,25 @@ class Producto {
 
   final String producto;
   final String idReceta;
-
   final double precio;
-
-  final int medida;
-
+  final String medida;
+  final int cantidad;
+  final String imageFile;
   final double coste;
-
   final double iva;
-
   final String idSubfamilia;
 
-  Producto({required this.productoId,
-    required this.producto,
-    required this.precio,
-    required this.coste,
-    required this.iva,
-    required this.idSubfamilia,
-    required this.medida,
-    required this.idReceta});
+  Producto(
+      {required this.cantidad,
+      required this.imageFile,
+      required this.productoId,
+      required this.producto,
+      required this.precio,
+      required this.coste,
+      required this.iva,
+      required this.idSubfamilia,
+      required this.medida,
+      required this.idReceta});
 }
 
 @entity
@@ -269,4 +269,3 @@ class ProductoOferta {
     required this.unidades,
   });
 }
-

@@ -6,6 +6,7 @@ import 'package:jarv/app/feature/login/ui/widget/image_picker.dart';
 import 'package:jarv/shared/data/model/entity.dart';
 import 'package:jarv/shared/ui/utils/validators.dart';
 import 'package:jarv/shared/ui/widget/custom_text_field.dart';
+import 'package:jarv/shared/ui/widget/medida_selector.dart';
 import 'package:provider/provider.dart';
 
 class CrearProducto extends StatefulWidget {
@@ -40,10 +41,11 @@ class _CrearProductoState extends State<CrearProducto> {
   final TextEditingController precio = TextEditingController();
   final TextEditingController coste = TextEditingController();
   final TextEditingController iva = TextEditingController();
-  final TextEditingController medida = TextEditingController();
+  final TextEditingController cantidad = TextEditingController();
   final TextEditingController ganancia = TextEditingController();
   final TextEditingController idSubfamiliaProducto = TextEditingController();
 
+  String? medida;
   GlobalKey<FormState> familiaFormKey = GlobalKey<FormState>();
   GlobalKey<FormState> subFamiliaFormKey = GlobalKey<FormState>();
 
@@ -73,21 +75,6 @@ class _CrearProductoState extends State<CrearProducto> {
                   listFamilia.isEmpty
                       ? const SizedBox.shrink()
                       : gridProducto(context),
-                  Container(
-                    height: 100,
-                    width: 200,
-                    child: ListView.builder(
-                      itemCount: junctionList.length,
-                      itemBuilder: (context, index) {
-                        return Row(
-                          children: [
-                            Text(junctionList[index].nombreIngrediente),
-                            Text(junctionList[index].cantidad.toString()),
-                          ],
-                        );
-                      },
-                    ),
-                  )
                 ],
               ),
             ],
@@ -103,9 +90,7 @@ class _CrearProductoState extends State<CrearProducto> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         FilledButton.tonal(
-          onPressed: () {
-            widget.cancelAction();
-          },
+          onPressed: () {},
           child: const Text('Cancelar'),
         ),
         FilledButton(
@@ -653,7 +638,7 @@ class _CrearProductoState extends State<CrearProducto> {
                                     const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: TextFormField(
                                   style: TextStyle(
-                                      fontWeight: FontWeight.w900,
+                                      fontWeight: FontWeight.w500,
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onPrimaryContainer),
@@ -676,7 +661,7 @@ class _CrearProductoState extends State<CrearProducto> {
                                     const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: TextFormField(
                                   style: TextStyle(
-                                      fontWeight: FontWeight.w900,
+                                      fontWeight: FontWeight.w500,
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onPrimaryContainer),
@@ -786,10 +771,21 @@ class _CrearProductoState extends State<CrearProducto> {
                                               keyboard: TextInputType.number),
                                         ),
                                         Expanded(
+                                            child: MedidaSelector(
+                                          value: listProducto[
+                                                  selectedProducto.value]
+                                              .medida,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              medida = value;
+                                            });
+                                          },
+                                        )),
+                                        Expanded(
                                           child: CustomTextField(
-                                              label: 'Medida',
-                                              value: medida.text,
-                                              controller: medida,
+                                              label: 'Cantidad',
+                                              value: cantidad.text,
+                                              controller: cantidad,
                                               keyboard: TextInputType.text),
                                         ),
                                       ],
@@ -889,8 +885,10 @@ class _CrearProductoState extends State<CrearProducto> {
         coste: double.parse(coste.text),
         iva: double.parse(iva.text),
         idSubfamilia: keySubFamilia,
-        medida: int.parse(medida.text),
-        idReceta: id);
+        medida: medida!,
+        idReceta: id,
+        cantidad: int.parse(cantidad.text),
+        imageFile: '');
   }
 
   void onTapProducto(
@@ -924,8 +922,10 @@ class _CrearProductoState extends State<CrearProducto> {
         coste: double.parse(coste.text),
         iva: double.parse(iva.text),
         idSubfamilia: listSubFamilia[selectedSubFamilia.value].idSubfamilia,
-        medida: int.parse(medida.text),
-        idReceta: id));
+        medida: medida!,
+        idReceta: id,
+        cantidad: int.parse(cantidad.text),
+        imageFile: ''));
   }
 
   Widget addCard(action) {
