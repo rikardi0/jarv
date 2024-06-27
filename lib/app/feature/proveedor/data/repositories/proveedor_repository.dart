@@ -22,13 +22,5 @@ class ProveedorRepositoryImpl extends ProveedorRepository {
     return _appDatabase.familiaDao.findFamiliaById(id);
   }
 
-  @override
-  Future<void> insertFamiliaProveedor(FamiliaProveedor familia) {
-    return _appDatabase.familiaProveedorDao.insertFamiliaProveedor(familia);
-  }
 
-  @override
-  Future<List<FamiliaProveedor>> findFamiliaByCif(String cif) {
-    return _appDatabase.familiaProveedorDao.findFamiliaByCif(cif);
-  }
 }

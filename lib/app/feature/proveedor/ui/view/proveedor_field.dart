@@ -123,15 +123,6 @@ class _CreateProveedorState extends State<CreateProveedor> {
             label: const Text('Borrar')),
         FilledButton.icon(
             onPressed: () {
-              listaRubro.forEach((key, value) {
-                fechtRepository.insertFamiliaProveedor(FamiliaProveedor(
-                    cif: _cifController.text,
-                    nombreFamilia: key,
-                    nombreSubFamilia: value,
-                    familiaId:
-                        DateTime.now().microsecondsSinceEpoch.toString()));
-              });
-
               fechtRepository.insertProveedor(Proveedor(
                   cif: _cifController.text,
                   nombreEmpresa: _empresaNameController.text,

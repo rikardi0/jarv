@@ -69,7 +69,9 @@ class _$AppDatabase extends AppDatabase {
 
   ProveedorDao? _proveedorDaoInstance;
 
-  FamiliaProveedorDao? _familiaProveedorDaoInstance;
+  PedidoProveedorDao? _pedidoProveedorDaoInstance;
+
+  ProductoProveedorDao? _productoProveedorDaoInstance;
 
   DevolucionDao? _devolucionDaoInstance;
 
@@ -143,7 +145,9 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Proveedor` (`cif` TEXT NOT NULL, `nombreEmpresa` TEXT NOT NULL, `numero` TEXT NOT NULL, `email` TEXT NOT NULL, PRIMARY KEY (`cif`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `FamiliaProveedor` (`familiaId` TEXT NOT NULL, `cif` TEXT NOT NULL, `nombreFamilia` TEXT NOT NULL, `nombreSubFamilia` TEXT NOT NULL, PRIMARY KEY (`familiaId`))');
+            'CREATE TABLE IF NOT EXISTS `PedidoProveedor` (`idPedidoProveedor` INTEGER NOT NULL, `idProducto` TEXT NOT NULL, `cif` TEXT NOT NULL, `unidades` INTEGER NOT NULL, `coste` REAL NOT NULL, `fecha` TEXT NOT NULL, PRIMARY KEY (`idPedidoProveedor`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `ProductoProveedor` (`idProductoProveedor` INTEGER NOT NULL, `idProducto` TEXT NOT NULL, `cif` TEXT NOT NULL, PRIMARY KEY (`idProductoProveedor`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Familia` (`idFamilia` TEXT NOT NULL, `nombreFamilia` TEXT NOT NULL, `idUsuario` TEXT NOT NULL, PRIMARY KEY (`idFamilia`))');
         await database.execute(
@@ -220,9 +224,15 @@ class _$AppDatabase extends AppDatabase {
   }
 
   @override
-  FamiliaProveedorDao get familiaProveedorDao {
-    return _familiaProveedorDaoInstance ??=
-        _$FamiliaProveedorDao(database, changeListener);
+  PedidoProveedorDao get pedidoProveedorDao {
+    return _pedidoProveedorDaoInstance ??=
+        _$PedidoProveedorDao(database, changeListener);
+  }
+
+  @override
+  ProductoProveedorDao get productoProveedorDao {
+    return _productoProveedorDaoInstance ??=
+        _$ProductoProveedorDao(database, changeListener);
   }
 
   @override
@@ -709,19 +719,33 @@ class _$ProveedorDao extends ProveedorDao {
   }
 }
 
-class _$FamiliaProveedorDao extends FamiliaProveedorDao {
-  _$FamiliaProveedorDao(
+class _$PedidoProveedorDao extends PedidoProveedorDao {
+  _$PedidoProveedorDao(
     this.database,
     this.changeListener,
   )   : _queryAdapter = QueryAdapter(database),
-        _familiaProveedorInsertionAdapter = InsertionAdapter(
+        _pedidoProveedorInsertionAdapter = InsertionAdapter(
             database,
-            'FamiliaProveedor',
-            (FamiliaProveedor item) => <String, Object?>{
-                  'familiaId': item.familiaId,
+            'PedidoProveedor',
+            (PedidoProveedor item) => <String, Object?>{
+                  'idPedidoProveedor': item.idPedidoProveedor,
+                  'idProducto': item.idProducto,
                   'cif': item.cif,
-                  'nombreFamilia': item.nombreFamilia,
-                  'nombreSubFamilia': item.nombreSubFamilia
+                  'unidades': item.unidades,
+                  'coste': item.coste,
+                  'fecha': item.fecha
+                }),
+        _pedidoProveedorUpdateAdapter = UpdateAdapter(
+            database,
+            'PedidoProveedor',
+            ['idPedidoProveedor'],
+            (PedidoProveedor item) => <String, Object?>{
+                  'idPedidoProveedor': item.idPedidoProveedor,
+                  'idProducto': item.idProducto,
+                  'cif': item.cif,
+                  'unidades': item.unidades,
+                  'coste': item.coste,
+                  'fecha': item.fecha
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -730,24 +754,87 @@ class _$FamiliaProveedorDao extends FamiliaProveedorDao {
 
   final QueryAdapter _queryAdapter;
 
-  final InsertionAdapter<FamiliaProveedor> _familiaProveedorInsertionAdapter;
+  final InsertionAdapter<PedidoProveedor> _pedidoProveedorInsertionAdapter;
+
+  final UpdateAdapter<PedidoProveedor> _pedidoProveedorUpdateAdapter;
 
   @override
-  Future<List<FamiliaProveedor>> findFamiliaByCif(String cif) async {
-    return _queryAdapter.queryList(
-        'SELECT * FROM FamiliaProveedor WHERE cif = ?1',
-        mapper: (Map<String, Object?> row) => FamiliaProveedor(
+  Future<List<PedidoProveedor>> findAllProveedores() async {
+    return _queryAdapter.queryList('SELECT * FROM PedidosProveedor',
+        mapper: (Map<String, Object?> row) => PedidoProveedor(
+            idPedidoProveedor: row['idPedidoProveedor'] as int,
+            idProducto: row['idProducto'] as String,
             cif: row['cif'] as String,
-            nombreFamilia: row['nombreFamilia'] as String,
-            nombreSubFamilia: row['nombreSubFamilia'] as String,
-            familiaId: row['familiaId'] as String),
-        arguments: [cif]);
+            unidades: row['unidades'] as int,
+            coste: row['coste'] as double,
+            fecha: row['fecha'] as String));
   }
 
   @override
-  Future<void> insertFamiliaProveedor(FamiliaProveedor familia) async {
-    await _familiaProveedorInsertionAdapter.insert(
-        familia, OnConflictStrategy.abort);
+  Future<void> insertPedidoProveedor(PedidoProveedor proveedor) async {
+    await _pedidoProveedorInsertionAdapter.insert(
+        proveedor, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updatePedidoProveedor(PedidoProveedor proveedor) async {
+    await _pedidoProveedorUpdateAdapter.update(
+        proveedor, OnConflictStrategy.abort);
+  }
+}
+
+class _$ProductoProveedorDao extends ProductoProveedorDao {
+  _$ProductoProveedorDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _productoProveedorInsertionAdapter = InsertionAdapter(
+            database,
+            'ProductoProveedor',
+            (ProductoProveedor item) => <String, Object?>{
+                  'idProductoProveedor': item.idProductoProveedor,
+                  'idProducto': item.idProducto,
+                  'cif': item.cif
+                }),
+        _productoProveedorUpdateAdapter = UpdateAdapter(
+            database,
+            'ProductoProveedor',
+            ['idProductoProveedor'],
+            (ProductoProveedor item) => <String, Object?>{
+                  'idProductoProveedor': item.idProductoProveedor,
+                  'idProducto': item.idProducto,
+                  'cif': item.cif
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<ProductoProveedor> _productoProveedorInsertionAdapter;
+
+  final UpdateAdapter<ProductoProveedor> _productoProveedorUpdateAdapter;
+
+  @override
+  Future<List<ProductoProveedor>> findAllProveedores() async {
+    return _queryAdapter.queryList('SELECT * FROM ProductoProveedor',
+        mapper: (Map<String, Object?> row) => ProductoProveedor(
+            idProductoProveedor: row['idProductoProveedor'] as int,
+            idProducto: row['idProducto'] as String,
+            cif: row['cif'] as String));
+  }
+
+  @override
+  Future<void> insertProductoProveedor(ProductoProveedor proveedor) async {
+    await _productoProveedorInsertionAdapter.insert(
+        proveedor, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateProductoProveedor(ProductoProveedor proveedor) async {
+    await _productoProveedorUpdateAdapter.update(
+        proveedor, OnConflictStrategy.abort);
   }
 }
 

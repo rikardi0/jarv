@@ -4,13 +4,9 @@ import 'package:floor/floor.dart';
 class Proveedor {
   @primaryKey
   final String cif;
-
   final String nombreEmpresa;
-
   final String numero;
-
   final String email;
-
   Proveedor(
       {required this.cif,
       required this.nombreEmpresa,
@@ -19,18 +15,33 @@ class Proveedor {
 }
 
 @entity
-class FamiliaProveedor {
+class PedidoProveedor {
   @primaryKey
-  final String familiaId;
-
-//foreign key PROVEEDOR
+  final int idPedidoProveedor;
+  final String idProducto;
   final String cif;
-  final String nombreFamilia;
-  final String nombreSubFamilia;
+  final int unidades;
+  final double coste;
+  final String fecha;
 
-  FamiliaProveedor(
-      {required this.cif,
-      required this.nombreFamilia,
-      required this.nombreSubFamilia,
-      required this.familiaId});
+  PedidoProveedor(
+      {required this.idPedidoProveedor,
+      required this.idProducto,
+      required this.cif,
+      required this.unidades,
+      required this.coste,
+      required this.fecha});
+}
+
+@entity
+class ProductoProveedor {
+  @primaryKey
+  final int idProductoProveedor;
+  final String idProducto;
+  final String cif;
+
+  ProductoProveedor(
+      {required this.idProductoProveedor,
+      required this.idProducto,
+      required this.cif});
 }

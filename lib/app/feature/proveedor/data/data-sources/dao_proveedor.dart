@@ -20,10 +20,25 @@ abstract class ProveedorDao {
 }
 
 @dao
-abstract class FamiliaProveedorDao {
-  @Query('SELECT * FROM FamiliaProveedor WHERE cif = :cif')
-  Future<List<FamiliaProveedor>> findFamiliaByCif(String cif);
+abstract class PedidoProveedorDao {
+  @Query('SELECT * FROM PedidosProveedor')
+  Future<List<PedidoProveedor>> findAllProveedores();
 
   @insert
-  Future<void> insertFamiliaProveedor(FamiliaProveedor familia);
+  Future<void> insertPedidoProveedor(PedidoProveedor proveedor);
+
+  @update
+  Future<void> updatePedidoProveedor(PedidoProveedor proveedor);
+}
+
+@dao
+abstract class ProductoProveedorDao {
+  @Query('SELECT * FROM ProductoProveedor')
+  Future<List<ProductoProveedor>> findAllProveedores();
+
+  @insert
+  Future<void> insertProductoProveedor(ProductoProveedor proveedor);
+
+  @update
+  Future<void> updateProductoProveedor(ProductoProveedor proveedor);
 }

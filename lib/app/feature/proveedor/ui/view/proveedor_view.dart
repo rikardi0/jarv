@@ -214,15 +214,8 @@ class _ProveedorViewState extends State<ProveedorView> {
               subtitle: Text(listaProveedor[index].cif),
               trailing: ElevatedButton(
                 onPressed: () async {
-                  final List<FamiliaProveedor> data =
-                      await fecthProveedorRepository
-                          .findFamiliaByCif(listaProveedor[index].cif);
                   final Map<String, String> listaRubro = {};
 
-                  for (var element in data) {
-                    listaRubro[element.nombreFamilia] =
-                        element.nombreSubFamilia;
-                  }
                   setState(() {
                     Navigator.pushNamed(context, '/create_proveedor',
                         arguments: ArgumentProveedor(
